@@ -1,0 +1,189 @@
+<div class="header-top-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+        <div class="logo-area">
+          <a href="#"><img src="assets/img/logo/logo.png" alt=""/></a>
+        </div>
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <div class="header-top-menu">
+          <ul class="nav navbar-nav notika-top-nav">
+
+
+            <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
+                                    class="nav-link dropdown-toggle"><span><i
+              class="notika-icon notika-alarm"></i></span>
+              <div class="spinner4 spinner-4"></div>
+              <div class="ntd-ctn"><span>3</span></div>
+            </a>
+              <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
+                <div class="hd-mg-tt">
+                  <h2>Notification</h2>
+                </div>
+                <div class="hd-message-info">
+                  <a href="#">
+                    <div class="hd-message-sn">
+                      <div class="hd-message-img">
+                        <img src="assets/img/post/1.jpg" alt=""/>
+                      </div>
+                      <div class="hd-mg-ctn">
+                        <h3>David Belle</h3>
+                        <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                      </div>
+                    </div>
+                  </a>
+                  <a href="#">
+                    <div class="hd-message-sn">
+                      <div class="hd-message-img">
+                        <img src="assets/img/post/2.jpg" alt=""/>
+                      </div>
+                      <div class="hd-mg-ctn">
+                        <h3>Jonathan Morris</h3>
+                        <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                      </div>
+                    </div>
+                  </a>
+                  <a href="#">
+                    <div class="hd-message-sn">
+                      <div class="hd-message-img">
+                        <img src="assets/img/post/4.jpg" alt=""/>
+                      </div>
+                      <div class="hd-mg-ctn">
+                        <h3>Fredric Mitchell</h3>
+                        <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                      </div>
+                    </div>
+                  </a>
+                  <a href="#">
+                    <div class="hd-message-sn">
+                      <div class="hd-message-img">
+                        <img src="assets/img/post/1.jpg" alt=""/>
+                      </div>
+                      <div class="hd-mg-ctn">
+                        <h3>David Belle</h3>
+                        <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                      </div>
+                    </div>
+                  </a>
+                  <a href="#">
+                    <div class="hd-message-sn">
+                      <div class="hd-message-img">
+                        <img src="assets/img/post/2.jpg" alt=""/>
+                      </div>
+                      <div class="hd-mg-ctn">
+                        <h3>Glenn Jecobs</h3>
+                        <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div class="hd-mg-va">
+                  <a href="#">View All</a>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
+                                    class="nav-link dropdown-toggle"><span><i class="fa fa-user"></i></span></a>
+              <div role="menu" class="dropdown-menu animated zoomIn">
+                <div class="hd-mg-tt text-center">
+                  <p>Login us "{{username}}"</p>
+                  <hr>
+                </div>
+
+                <div class="hd-message-info text-center">
+                  <a class="btn" (click)="logout()" style="font-size: 12pt">Log Out</a>
+
+                </div>
+
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-menu-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="mobile-menu">
+          <nav id="dropdown">
+            <ul class="mobile-menu-nav">
+
+              <li><a href="#">Dashboard</a>
+
+              </li>
+              <li><a href="#">Issues</a>
+
+              </li>
+
+
+              <li><a data-toggle="collapse" data-target="#Miscellaneousmob" href="#">App views</a>
+                <ul id="Miscellaneousmob" class="collapse dropdown-header-top">
+                  <li><a href="#">Issue Raised System</a>
+                  </li>
+                  <li><a href="#">Issue Type's</a>
+                  </li>
+                  <li><a href="#">Labels</a>
+                  </li>
+                  <li><a href="#">Basic Solution</a>
+                  </li>
+                </ul>
+              </li>
+
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main-menu-area mg-t-10">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <ul class="nav nav-tabs notika-menu-wrap menu-it-icon-pro">
+          <li routerLinkActive="active"><a data-toggle="tab" href="#Charts" routerLink="/LIT/dashboard"><i class="notika-icon notika-bar-chart"></i> Dashboard</a>
+          </li>
+          <li routerLinkActive="active"><a data-toggle="tab" href="#Interface" routerLink="/LIT/issues"><i class="notika-icon notika-edit"></i> Issues</a>
+          </li>
+          <li routerLinkActive="active" ><a data-toggle="tab" href="#Appviews" routerLink="/LIT/settings"><i class="notika-icon notika-app"></i> Settings</a>
+          </li>
+
+        </ul>
+        <div class="tab-content custom-menu-content" style="border-bottom: 1px solid #eee">
+          <div id="Charts" class="tab-pane notika-tab-menu-bg animated flipInX " routerLinkActive="active">
+            <ul class="notika-main-menu-dropdown">
+              <li routerLink="/LIT/dashboard">
+              </li>
+            </ul>
+          </div>
+          <div id="Interface" class="tab-pane notika-tab-menu-bg animated flipInX" routerLinkActive="active">
+            <ul class="notika-main-menu-dropdown">
+              <li routerLink="/LIT/issues">
+              </li>
+            </ul>
+          </div>
+          <div id="Appviews" class="tab-pane notika-tab-menu-bg animated flipInX" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+            <ul class="notika-main-menu-dropdown">
+              <li><a routerLink="/LIT/settings/issue-raised-system" >Issue Raised System</a>
+              </li>
+              <li><a routerLink="/LIT/settings/issue-types">Issue Type's</a>
+              </li>
+              <li><a routerLink="/LIT/settings/labels">Labels</a>
+              </li>
+              <li><a routerLink="/LIT/settings/basic-solution">Basic Solution</a>
+              </li>
+
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

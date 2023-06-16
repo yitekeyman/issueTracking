@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IssueTracking.Web", "IssueTracking.Web\IssueTracking.Web.csproj", "{05E05CE0-E70F-4EA4-B9A3-05FC177566B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IssueTracking.Datas", "IssueTracking.Datas\IssueTracking.Datas.csproj", "{542EFD0E-1822-4907-9A24-FE4359451082}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IssueTracking.Domain", "IssueTracking.Domain\IssueTracking.Domain.csproj", "{C76E847F-46CC-4FEF-AD91-C58414D7F875}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05E05CE0-E70F-4EA4-B9A3-05FC177566B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05E05CE0-E70F-4EA4-B9A3-05FC177566B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05E05CE0-E70F-4EA4-B9A3-05FC177566B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05E05CE0-E70F-4EA4-B9A3-05FC177566B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{542EFD0E-1822-4907-9A24-FE4359451082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{542EFD0E-1822-4907-9A24-FE4359451082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{542EFD0E-1822-4907-9A24-FE4359451082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{542EFD0E-1822-4907-9A24-FE4359451082}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C76E847F-46CC-4FEF-AD91-C58414D7F875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C76E847F-46CC-4FEF-AD91-C58414D7F875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C76E847F-46CC-4FEF-AD91-C58414D7F875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C76E847F-46CC-4FEF-AD91-C58414D7F875}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

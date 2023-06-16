@@ -1,0 +1,14 @@
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Domain.deps.json
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Domain.runtimeconfig.json
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Domain.runtimeconfig.dev.json
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Domain.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Domain.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Datas.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.csprojAssemblyReference.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.csproj.CoreCompileInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.AssemblyInfoInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.AssemblyInfo.cs
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.csproj.CopyComplete
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Debug\netcoreapp2.2\IssueTracking.Domain.pdb

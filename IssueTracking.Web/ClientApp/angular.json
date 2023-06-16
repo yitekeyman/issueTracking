@@ -1,0 +1,250 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": false
+  },
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "now-ui-dashboard-angular": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        },
+        "@schematics/angular:application": {
+          "strict": true
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "preserveSymlinks": true,
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/assets/css/bootstrap.min.css",
+              "src/assets/css/font-awesome.min.css",
+              "src/assets/css/owl.carousel.css",
+              "src/assets/css/owl.theme.css",
+              "src/assets/css/owl.transitions.css",
+              "src/assets/css/meanmenu/meanmenu.min.css",
+              "src/assets/css/animate.css",
+              "src/assets/css/summernote/summernote.css",
+              "src/assets/css/themesaller-forms.css",
+              "src/assets/css/normalize.css",
+              "src/assets/css/scrollbar/jquery.mCustomScrollbar.min.css",
+              "src/assets/css/notika-custom-icon.css",
+              "src/assets/css/bootstrap-select/bootstrap-select.css",
+              "src/assets/css/datapicker/datepicker3.css",
+              "src/assets/css/color-picker/farbtastic.css",
+              "src/assets/css/chosen/chosen.css",
+              "src/assets/css/notification/notification.css",
+              "src/assets/css/dropzone/dropzone.css",
+              "src/assets/css/wave/waves.min.css",
+              "src/assets/css/code-editor/codemirror.css",
+              "src/assets/css/code-editor/ambiance.css",
+              "src/assets/css/main.css",
+              "src/assets/style.css",
+              "src/assets/css/responsive.css"
+            ],
+            "scripts": [
+              "src/assets/js/vendor/modernizr-2.8.3.min.js",
+              "src/assets/js/vendor/jquery-1.12.4.min.js",
+              "src/assets/js/bootstrap.min.js",
+              "src/assets/js/wow.min.js",
+              "src/assets/js/jquery-price-slider.js",
+              "src/assets/js/jquery.scrollUp.min.js",
+              "src/assets/js/meanmenu/jquery.meanmenu.js",
+              "src/assets/js/counterup/jquery.counterup.min.js",
+              "src/assets/js/counterup/waypoints.min.js",
+              "src/assets/js/counterup/counterup-active.js",
+              "src/assets/js/scrollbar/jquery.mCustomScrollbar.concat.min.js",
+              "src/assets/js/sparkline/jquery.sparkline.min.js",
+              "src/assets/js/sparkline/sparkline-active.js",
+              "src/assets/js/flot/jquery.flot.js",
+              "src/assets/js/flot/jquery.flot.resize.js",
+              "src/assets/js/flot/flot-active.js",
+              "src/assets/js/knob/jquery.knob.js",
+              "src/assets/js/knob/jquery.appear.js",
+              "src/assets/js/knob/knob-active.js",
+              "src/assets/js/jasny-bootstrap.min.js",
+              "src/assets/js/icheck/icheck.min.js",
+              "src/assets/js/icheck/icheck-active.js",
+              "src/assets/js/rangle-slider/jquery-ui-1.10.4.custom.min.js",
+              "src/assets/js/rangle-slider/jquery-ui-touch-punch.min.js",
+              "src/assets/js/rangle-slider/rangle-active.js",
+              "src/assets/js/datapicker/bootstrap-datepicker.js",
+              "src/assets/js/datapicker/datepicker-active.js",
+              "src/assets/js/bootstrap-select/bootstrap-select.js",
+              "src/assets/js/color-picker/farbtastic.min.js",
+              "src/assets/js/color-picker/color-picker.js",
+              "src/assets/js/notification/bootstrap-growl.min.js",
+              "src/assets/js/notification/notification-active.js",
+              "src/assets/js/summernote/summernote-updated.min.js",
+              "src/assets/js/summernote/summernote-active.js",
+              "src/assets/js/dropzone/dropzone.js",
+              "src/assets/js/wave/waves.min.js",
+              "src/assets/js/wave/wave-active.js",
+              "src/assets/js/chosen/chosen.jquery.js",
+              "src/assets/js/code-editor/codemirror.js",
+              "src/assets/js/code-editor/code-editor.js",
+              "src/assets/js/code-editor/code-editor-active.js",
+              "src/assets/js/chat/jquery.chat.js",
+              "src/assets/js/todo/jquery.todo.js",
+              "src/assets/js/plugins.js",
+              "src/assets/js/main.js"
+            ],
+            "allowedCommonJsDependencies": [
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "now-ui-dashboard-angular:build:production"
+            },
+            "development": {
+              "browserTarget": "now-ui-dashboard-angular:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "now-ui-dashboard-angular:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/assets/css/bootstrap.min.css",
+              "src/assets/css/font-awesome.min.css",
+              "src/assets/css/owl.carousel.css",
+              "src/assets/css/owl.theme.css",
+              "src/assets/css/owl.transitions.css",
+              "src/assets/css/meanmenu/meanmenu.min.css",
+              "src/assets/css/animate.css",
+              "src/assets/css/summernote/summernote.css",
+              "src/assets/css/themesaller-forms.css",
+              "src/assets/css/normalize.css",
+              "src/assets/css/scrollbar/jquery.mCustomScrollbar.min.css",
+              "src/assets/css/notika-custom-icon.css",
+              "src/assets/css/bootstrap-select/bootstrap-select.css",
+              "src/assets/css/datapicker/datepicker3.css",
+              "src/assets/css/color-picker/farbtastic.css",
+              "src/assets/css/chosen/chosen.css",
+              "src/assets/css/notification/notification.css",
+              "src/assets/css/dropzone/dropzone.css",
+              "src/assets/css/wave/waves.min.css",
+              "src/assets/css/code-editor/codemirror.css",
+              "src/assets/css/code-editor/ambiance.css",
+              "src/assets/css/main.css",
+              "src/assets/style.css",
+              "src/assets/css/responsive.css"
+            ],
+            "scripts": [
+              "src/assets/js/vendor/modernizr-2.8.3.min.js",
+              "src/assets/js/vendor/jquery-1.12.4.min.js",
+              "src/assets/js/bootstrap.min.js",
+              "src/assets/js/wow.min.js",
+              "src/assets/js/jquery-price-slider.js",
+              "src/assets/js/jquery.scrollUp.min.js",
+              "src/assets/js/meanmenu/jquery.meanmenu.js",
+              "src/assets/js/counterup/jquery.counterup.min.js",
+              "src/assets/js/counterup/waypoints.min.js",
+              "src/assets/js/counterup/counterup-active.js",
+              "src/assets/js/scrollbar/jquery.mCustomScrollbar.concat.min.js",
+              "src/assets/js/sparkline/jquery.sparkline.min.js",
+              "src/assets/js/sparkline/sparkline-active.js",
+              "src/assets/js/flot/jquery.flot.js",
+              "src/assets/js/flot/jquery.flot.resize.js",
+              "src/assets/js/flot/flot-active.js",
+              "src/assets/js/knob/jquery.knob.js",
+              "src/assets/js/knob/jquery.appear.js",
+              "src/assets/js/knob/knob-active.js",
+              "src/assets/js/jasny-bootstrap.min.js",
+              "src/assets/js/icheck/icheck.min.js",
+              "src/assets/js/icheck/icheck-active.js",
+              "src/assets/js/rangle-slider/jquery-ui-1.10.4.custom.min.js",
+              "src/assets/js/rangle-slider/jquery-ui-touch-punch.min.js",
+              "src/assets/js/rangle-slider/rangle-active.js",
+              "src/assets/js/datapicker/bootstrap-datepicker.js",
+              "src/assets/js/datapicker/datepicker-active.js",
+              "src/assets/js/bootstrap-select/bootstrap-select.js",
+              "src/assets/js/color-picker/farbtastic.min.js",
+              "src/assets/js/color-picker/color-picker.js",
+              "src/assets/js/notification/bootstrap-growl.min.js",
+              "src/assets/js/notification/notification-active.js",
+              "src/assets/js/summernote/summernote-updated.min.js",
+              "src/assets/js/summernote/summernote-active.js",
+              "src/assets/js/dropzone/dropzone.js",
+              "src/assets/js/wave/waves.min.js",
+              "src/assets/js/wave/wave-active.js",
+              "src/assets/js/chosen/chosen.jquery.js",
+              "src/assets/js/code-editor/codemirror.js",
+              "src/assets/js/code-editor/code-editor.js",
+              "src/assets/js/code-editor/code-editor-active.js",
+              "src/assets/js/chat/jquery.chat.js",
+              "src/assets/js/todo/jquery.todo.js",
+              "src/assets/js/plugins.js",
+              "src/assets/js/main.js"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "now-ui-dashboard-angular"
+}

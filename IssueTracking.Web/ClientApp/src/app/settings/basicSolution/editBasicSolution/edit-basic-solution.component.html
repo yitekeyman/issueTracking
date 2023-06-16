@@ -1,0 +1,67 @@
+﻿<div class="modal-dialog modal-large">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" id="close" data-dismiss="modal" (click)="close()">&times;</button>
+    </div>
+    <form [formGroup]="solutionEditorForm" (submit)="saveChanges()">
+      <div class="modal-body form-element-area mg-b-15">
+        <h2>Edit Basic Issue Solution</h2>
+        <hr>
+        <div class="form-group" *ngIf="selectedIssueType>0">
+          <label class="nk-label"><small>Issue Type *</small></label>
+          <select class="form-control" formControlName="issueType"
+                  [(ngModel)]="solutionModal.issueTypeId" disabled="disabled">
+            <option value="0">Choose a Issue Type</option>
+            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
+          </select>
+
+        </div>
+        <div class="form-group" *ngIf="selectedIssueType==0">
+          <label class="nk-label"><small>Issue Type *</small></label>
+          <select class="form-control" formControlName="issueType"
+                  [(ngModel)]="solutionModal.issueTypeId" >
+            <option value="0">Choose a Issue Type</option>
+            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
+          </select>
+
+        </div>
+        <div class="form-group ">
+          <label class="nk-label"><small>Have You Solution in SQL Query</small></label>
+          <textarea rows="4" class="form-control" placeholder="" formControlName="query"
+                    [(ngModel)]="solutionModal.solutionQuery">
+
+
+          </textarea>
+
+        </div>
+        <div class="form-group ">
+          <label class="nk-label"><small>Description</small></label>
+          <textarea rows="4" class="form-control" placeholder="Write Description Here" formControlName="description"
+                    [(ngModel)]="solutionModal.solutionDescription"></textarea>
+
+        </div>
+        <div class="dropzone-area">
+          <div id="dropzone1" class="multi-uploader-cs">
+            <form action="/upload" class="dropzone dropzone-nk needsclick" id="demo1-upload">
+              <div class="dz-message needsclick download-custom">
+                <i class="notika-icon notika-cloud"></i>
+                <h2>Drop files here or click to upload.</h2>
+                <p><span class="note needsclick">(This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.)</span>
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="reset" class="btn btn-default btn-icon-notika waves-effect">Reset</button>
+        <button type="submit" class="btn btn-default btn-icon-notika waves-effect" *ngIf="solutionModal.id>0"
+                [disabled]="!solutionEditorForm.valid"><i class="notika-icon notika-checked"></i> UPDATE
+        </button>
+        <button type="submit" class="btn btn-default btn-icon-notika waves-effect" *ngIf="solutionModal.id==0"
+                [disabled]="!solutionEditorForm.valid"><i class="notika-icon notika-checked"></i> ADD NEW
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

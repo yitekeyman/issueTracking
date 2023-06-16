@@ -1,0 +1,34 @@
+<div class="login-content">
+  <!-- Login -->
+  <div class="nk-block toggled" style="width: 350px;">
+    <div class="nk-form">
+      <div class="nk-navigation nk-lg-ic">
+        <h4>Login Please</h4>
+        <p>LIC Issue Tracking System</p>
+        <hr>
+      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
+        <div class="input-group">
+          <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-support"></i></span>
+          <div class="nk-int-st">
+            <input type="text" class="form-control" placeholder="Username" formControlName="username" [(ngModel)]="loginModel.username">
+          </div>
+        </div>
+        <div class="input-group mg-t-15">
+          <span class="input-group-addon nk-ic-st-pro"><i class="notika-icon notika-edit"></i></span>
+          <div class="nk-int-st">
+            <input type="password" class="form-control" placeholder="Password" formControlName="password" [(ngModel)]="loginModel.password">
+          </div>
+        </div>
+        <div class="compose-ml mg-t-15">
+          <button type="submit" class="btn waves-effect" [disabled]="!loginForm.valid" >Login</button>
+        </div>
+      </form>
+    </div>
+
+
+  </div>
+
+  <!-- Register -->
+
+</div>
