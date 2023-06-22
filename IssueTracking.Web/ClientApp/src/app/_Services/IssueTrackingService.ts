@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {ApiServices} from "./api.service";
+import {Observable, ReplaySubject} from "rxjs";
 
 
 @Injectable()
@@ -55,6 +56,61 @@ export class IssueTrackingService{
   }
   public GetAllBasicSolution(){
     return this.apiService.get(`IssueTracking/GetAllBasicSolution`);
+  }
+
+
+  public convertFileToBase64(file: File): Observable<string> {
+    const result = new ReplaySubject<string>(1);
+    const reader = new FileReader();
+    reader.readAsBinaryString(file);
+    reader.onload = (event) => result.next(btoa(event.target.result.toString()));
+    return result;
+  }
+
+  public convertBase64ToFile(base64:any){
+    let blob=this.dataURItoBlob(base64);
+    const retFile=new File([blob],base64.fileName, {type:base64.mimeType});
+    return retFile
+  }
+
+  public dataURItoBlob(dataURI) {
+    const byteString = window.atob(dataURI.data);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const int8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      int8Array[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([int8Array], { type: dataURI.mimeType });
+    return blob;
+  }
+
+  public GetAllIssueStatusTypes(){
+    return this.apiService.get(`IssueTracking/GetAllIssueStatusTypes`);
+  }
+
+  public AddIssue(model:any){
+    return this.apiService.post(`IssueTracking/AddIssue`, model);
+  }
+  public EditIssue(model:any){
+    return this.apiService.post(`IssueTracking/EditIssue`, model);
+  }
+
+  public GetAllIssues(){
+    return this.apiService.get(`IssueTracking/GetAllIssues`);
+  }
+  public GetIssueByStatus(model:any){
+    return this.apiService.get(`IssueTracking/GetIssueByStatus?status=${model}`);
+  }
+
+  public GetAllBranch(){
+    return this.apiService.get(`IssueTracking/GetAllBranch`);
+  }
+  public GetAllEmployee(){
+    return this.apiService.get(`IssueTracking/GetAllEmployee`);
+  }
+
+  public GetAllEmployeeByBranchId(model:any){
+    return this.apiService.get(`IssueTracking/GetAllEmployeeByBranchId?id=${model}`);
   }
 
   public logout(){

@@ -19,39 +19,47 @@
         <div class="form-group" *ngIf="selectedIssueType==0">
           <label class="nk-label"><small>Issue Type *</small></label>
           <select class="form-control" formControlName="issueType"
-                  [(ngModel)]="solutionModal.issueTypeId" >
+                  [(ngModel)]="solutionModal.issueTypeId">
             <option value="0">Choose a Issue Type</option>
             <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
           </select>
 
         </div>
         <div class="form-group ">
-          <label class="nk-label"><small>Have You Solution in SQL Query</small></label>
-          <textarea rows="4" class="form-control" placeholder="" formControlName="query"
-                    [(ngModel)]="solutionModal.solutionQuery">
-
-
-          </textarea>
-
-        </div>
-        <div class="form-group ">
-          <label class="nk-label"><small>Description</small></label>
-          <textarea rows="4" class="form-control" placeholder="Write Description Here" formControlName="description"
+          <label class="nk-label"><small>Description *</small></label>
+          <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="description"
                     [(ngModel)]="solutionModal.solutionDescription"></textarea>
 
         </div>
+        <div class="form-group ">
+          <label class="nk-label"><small>Have You Solution in SQL Query</small></label>
+          <div class="editor-container" fxLayout="column">
+
+            <ngx-monaco-editor formControlName="query" fxFlex [options]="editorOptions" (init)="editorInit($event)"
+                               [(ngModel)]="solutionModal.solutionQuery">
+            </ngx-monaco-editor>
+          </div>
+
+        </div>
+
         <div class="dropzone-area">
           <div id="dropzone1" class="multi-uploader-cs">
-            <form action="/upload" class="dropzone dropzone-nk needsclick" id="demo1-upload">
-              <div class="dz-message needsclick download-custom">
-                <i class="notika-icon notika-cloud"></i>
-                <h2>Drop files here or click to upload.</h2>
-                <p><span class="note needsclick">(This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.)</span>
-                </p>
-              </div>
-            </form>
+            <label class="nk-label"><small>Have you Soulution Resource?</small></label>
+            <div class="custom-dropzone" ngx-dropzone (change)="onSelect($event)">
+              <ngx-dropzone-label>
+                <div>
+                  <i class="notika-icon notika-cloud" style="font-size: 45pt"></i>
+                  <p>Drop files here or click to upload.</p>
+                </div>
+              </ngx-dropzone-label>
+              <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"
+                                          [removable]="true" (removed)="onRemove(f)">
+                <ngx-dropzone-label>{{ f.name }}</ngx-dropzone-label>
+              </ngx-dropzone-image-preview>
+            </div>
           </div>
         </div>
+        <hr>
       </div>
       <div class="modal-footer">
         <button type="reset" class="btn btn-default btn-icon-notika waves-effect">Reset</button>

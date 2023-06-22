@@ -2,7 +2,6 @@ import {Component, OnInit} from "@angular/core";
 import dialog from "../../components/dialog";
 import {IssueTrackingService} from "../../_Services/IssueTrackingService";
 import {PagerService} from "../../_Services/pager.service";
-
 @Component({
   selector: 'app-issue-type-list',
   templateUrl: './issue-type-list.component.html'

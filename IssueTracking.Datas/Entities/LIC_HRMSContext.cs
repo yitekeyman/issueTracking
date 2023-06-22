@@ -2056,7 +2056,7 @@ namespace IssueTracking.Datas.Entities
                 entity.Property(e => e.IssueClosedDate)
                     .HasColumnName("issue_closed_date")
                     .HasDefaultValueSql("0");
-
+                entity.Property(e => e.IssueTitle).HasColumnName("issue_title");
                 entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
 
                 entity.Property(e => e.IssuePriority).HasColumnName("issue_priority");

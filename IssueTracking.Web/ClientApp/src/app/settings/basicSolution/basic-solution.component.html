@@ -17,7 +17,8 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-toggle="tooltip" data-placement="left" title="Add Solution" class="btn">Add Solution</button>
+                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal"
+                        data-target="#editIssueTypeModal" (click)="editBasicSolution(0,0)">Add Solution</button>
               </div>
             </div>
           </div>
@@ -32,84 +33,86 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
-        <div class="data-table-list" style="min-height: 450px;">
+        <div class="data-table-list wizard-wrap-int" style="min-height: 450px;">
           <div class="table-responsive">
             <table id="data-table-basic" class="table table-striped">
               <thead>
               <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>#</th>
+                <th>Issue Type</th>
+                <th>Raised System</th>
+                <th>Description</th>
+                <th>Have Query?</th>
+                <th>Have Resource?</th>
+                <th class="text-right">Action</th>
+
               </tr>
               </thead>
-              <tbody>
-              <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
-              </tr>
-              <tr>
-                <td>Garrett Winters</td>
-                <td>Accountant</td>
-                <td>Tokyo</td>
-                <td>63</td>
-                <td>2011/07/25</td>
-                <td>$170,750</td>
-              </tr>
-              <tr>
-                <td>Ashton Cox</td>
-                <td>Junior Technical Author</td>
-                <td>San Francisco</td>
-                <td>66</td>
-                <td>2009/01/12</td>
-                <td>$86,000</td>
-              </tr>
-              <tr>
-                <td>Cedric Kelly</td>
-                <td>Senior Javascript Developer</td>
-                <td>Edinburgh</td>
-                <td>22</td>
-                <td>2012/03/29</td>
-                <td>$433,060</td>
-              </tr>
-              <tr>
-                <td>Airi Satou</td>
-                <td>Accountant</td>
-                <td>Tokyo</td>
-                <td>33</td>
-                <td>2008/11/28</td>
-                <td>$162,700</td>
-              </tr>
-              <tr>
-                <td>Brielle Williamson</td>
-                <td>Integration Specialist</td>
-                <td>New York</td>
-                <td>61</td>
-                <td>2012/12/02</td>
-                <td>$372,000</td>
+              <tbody *ngIf="pagedItems?.length>0" style="min-height: 300px">
+              <tr *ngFor="let row of pagedItems; index as i">
+                <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
+                <td>{{row.issueType.name}}</td>
+                <td>{{row.issueType.raisedSystem.name}}</td>
+                <td>{{row.solutionDescription}}</td>
+                <td><span *ngIf="row.solutionQuery!=''">Yes</span> <span *ngIf="row.solutionQuery==''">No</span></td>
+                <td><span *ngIf="row.solutionResource?.length>0">Have {{row.solutionResource?.length}} File Resource</span> <span *ngIf="row.solutionResource?.length==0">No Resource</span></td>
+                <td class="text-right">
+                  <div class="btn-group">
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editBasicSolution( row.id, row.issueType.id)"><i class="fa fa-edit"></i>
+                      Edit
+                    </button>
+                    <button class="btn btn-sm "  type="button" (click)="seeBasicSolution(row.id)"><i class="fa fa-eye"></i>
+                     Details
+                    </button>
+                  </div>
+                </td>
               </tr>
 
+
               </tbody>
-              <tfoot>
+              <tbody *ngIf="pagedItems?.length==0">
               <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <td colspan="7" class="text-center">
+                  <div class="panel-body" style="text-align: center; margin: 20px">
+                    <div style="text-align: center; font-size: 50px; color:#00c292; opacity: 0.5"><i
+                      class="fa fa-exclamation-triangle"></i></div>
+                    <h2>Sorry</h2>
+                    <p>There is no recored found</p>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+              <tfoot *ngIf="pagedItems?.length>0 && pager.totalPages>1">
+              <tr>
+                <th>#</th>
+                <th>Issue Type</th>
+                <th>Raised System</th>
+                <th>Description</th>
+                <th>Have Query?</th>
+                <th>Have Resource?</th>
+                <th class="text-right">Action</th>
               </tr>
               </tfoot>
             </table>
+
+          </div>
+          <div class="wizard-action-pro" *ngIf="pagedItems?.length>0 && pager.totalPages>1">
+            <ul class="wizard-nav-ac">
+              <li><a [ngClass]="{'disabled':pager.currentPage === 1} +' button-first a-prevent '" [routerLink]=""
+                     (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
+              <li *ngFor="let page of pager.pages"><a [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
+                                                      [routerLink]="" (click)="setPage(page)"><i
+                class="notika-icon">{{page}}</i></a></li>
+              <li><a [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' a-prevent'" [routerLink]=""
+                     (click)="setPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
+
+            </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
+<div class="modal fade" id="editIssueTypeModal" role="dialog">
+  <app-edit-basic-solution *ngIf="isAdd || isEdit" (loadPage)="getAllBasicSolutions()" (closeModal)="closeModal()"  [selectedSolution]="selectedSolution" [selectedIssueType]="selectedIssueType"></app-edit-basic-solution>
 </div>

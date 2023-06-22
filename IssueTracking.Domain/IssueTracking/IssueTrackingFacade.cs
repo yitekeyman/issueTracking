@@ -9,7 +9,7 @@ namespace IssueTracking.Domain.IssueTracking
         UserSession Login(UserSession session,LoginModel model); 
         IssuePriorityType GetPriorityTypeById(UserSession session,long id);
         IList<IssuePriorityType> GetAllPriorityTypes(UserSession session);
-
+        IList<IssueStatusType> GetAllIssueStatusTypes(UserSession session);
         IssueRaisedSystem GetIssueRaisedSystemById(UserSession session,long id);
         IList<IssueRaisedSystem> GetAllIssueRaisedSystems(UserSession session);
         IssueRaisedSystemReturn GetRaisedSystemById(UserSession session,long id);
@@ -22,6 +22,14 @@ namespace IssueTracking.Domain.IssueTracking
         BasicSolutionReturn GetBasicSolutionById(UserSession session,long id);
         IList<BasicSolutionReturn> GetBasicSolutionByIssueType(UserSession session,long id);
         IList<BasicSolutionReturn> GetAllBasicSolution(UserSession session);
+        string GetResourceDoc(UserSession session, string fileName, string mimeType);
+        void AddIssue(UserSession session, IssuesListModel model);
+        void EditIssue(UserSession session, IssuesListModel model);
+        IssueListReturnModel GetAllIssues(UserSession session);
+        IList<IssueListReturn> GetIssueByStatus(UserSession session,long status);
+        IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
+        IList<EmployeeModel> GetAllEmployee(UserSession session);
+        IList<EmployeeModel> GetAllEmployeeByBranchId(UserSession session,string id);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -47,6 +55,12 @@ namespace IssueTracking.Domain.IssueTracking
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllPriorityTypes();
+        }
+
+        public IList<IssueStatusType> GetAllIssueStatusTypes(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllIssueStatusTypes();
         }
 
         public IssueRaisedSystem GetIssueRaisedSystemById(UserSession session, long id)
@@ -113,6 +127,54 @@ namespace IssueTracking.Domain.IssueTracking
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllBasicSolution();
+        }
+
+        public string GetResourceDoc(UserSession session, string fileName, string mimeType)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetResourceDoc(fileName,mimeType);
+        }
+
+        public void AddIssue(UserSession session, IssuesListModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AddIssue(model);
+        }
+
+        public void EditIssue(UserSession session, IssuesListModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.EditIssue(model);
+        }
+
+        public IssueListReturnModel GetAllIssues(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllIssues();
+        }
+
+        public IList<IssueListReturn> GetIssueByStatus(UserSession session, long status)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetIssueByStatus(status);
+        }
+
+        public IList<DepartmentSchemaModel> GetAllBranch(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllBranch();
+        }
+
+        public IList<EmployeeModel> GetAllEmployee(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllEmployee();
+        }
+
+        public IList<EmployeeModel> GetAllEmployeeByBranchId(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllEmployeeByBranchId(id);
         }
     }
 }

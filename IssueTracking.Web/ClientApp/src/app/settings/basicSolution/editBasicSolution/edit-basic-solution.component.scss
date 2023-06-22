@@ -1,0 +1,55 @@
+﻿:host {
+  flex-direction: column;
+}
+
+.editor-container {
+  height: 200px;
+  border:1px solid #eee;
+  background-color: #eee;
+}
+
+
+h2 {
+  text-align: center;
+  margin: 10px;
+}
+
+h3 {
+  text-align: center;
+  color: #2196f3;
+  margin: 10px;
+}
+mat-form-field {
+  margin: 15px;
+}
+mat-card {
+  padding: 0;
+  margin: 10px;
+  height: auto;
+}
+.basic-examples {
+  min-height: 300px;
+  > div {
+    min-width: 300px;
+    min-height: 300px;
+  }
+}
+
+.form-infos {
+  margin: 0 15px;
+  h4 {
+    margin: 10px 0;
+  }
+  .form-info {
+    margin-bottom: 10px;
+    span:last-child {
+      font-weight: bold;
+    }
+  }
+  pre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: #eeee;
+    padding: 10px;
+  }
+}

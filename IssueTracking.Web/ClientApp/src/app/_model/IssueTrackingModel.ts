@@ -18,6 +18,7 @@ export interface IssueRaisedSystemModel{
 
 export interface ResourceModel{
   docRef:string;
+  fileName:string;
   data:string;
   mimeType:string;
   index:number;
@@ -28,4 +29,15 @@ export interface BasicSolutionModel{
   solutionQuery:string;
   solutionDescription:string;
   solutionResource:ResourceModel[];
+}
+
+export interface IssueListModel {
+  id: string;
+  issueTitle: string
+  issueTypeId: number;
+  otherIssue: string;
+  policyNo: string[];
+  issueDescription: string;
+  issuePriority: number;
+  issueResource: ResourceModel[];
 }

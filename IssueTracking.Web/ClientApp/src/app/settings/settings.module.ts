@@ -10,13 +10,18 @@ import {IssueTypeListComponent} from "./issueType/issue-type-list.component";
 import {SettingsRouting} from "./settings.routing";
 import {EditIssueTypeComponent} from "./issueType/editIssueType/edit-issue-type.component";
 import {EditBasicSolutionComponent} from "./basicSolution/editBasicSolution/edit-basic-solution.component";
+import {NgxDropzoneModule} from "ngx-dropzone";
+import {MonacoEditorModule} from "@materia-ui/ngx-monaco-editor";
+import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view-basic-solution.component";
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(SettingsRouting),
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgxDropzoneModule,
+    MonacoEditorModule
   ],
   declarations: [
     BasicSolutionComponent,
@@ -24,7 +29,8 @@ import {EditBasicSolutionComponent} from "./basicSolution/editBasicSolution/edit
     LabelsComponent,
     IssueTypeListComponent,
     EditIssueTypeComponent,
-    EditBasicSolutionComponent
+    EditBasicSolutionComponent,
+    ViewBasicSolutionComponent
   ]
 })
 export class SettingsModule{

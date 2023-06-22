@@ -14,6 +14,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import {IssueTrackingService} from "./_Services/IssueTrackingService";
 import {ApiServices} from "./_Services/api.service";
 import {PagerService} from "./_Services/pager.service";
+import {NgxDropzoneModule} from "ngx-dropzone";
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import {PagerService} from "./_Services/pager.service";
     HttpClientModule,
     ComponentsModule,
     RouterModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgxDropzoneModule
   ],
   declarations: [
     AppComponent,

@@ -16,7 +16,7 @@ namespace IssueTracking.Domain.IssueTracking
         UserSession Login(LoginModel model);
         IssuePriorityType GetPriorityTypeById(long id);
         IList<IssuePriorityType> GetAllPriorityTypes();
-
+        IList<IssueStatusType> GetAllIssueStatusTypes();
         IssueRaisedSystem GetIssueRaisedSystemById(long id);
         IList<IssueRaisedSystem> GetAllIssueRaisedSystems();
         IssueRaisedSystemReturn GetRaisedSystemById(long id);
@@ -29,6 +29,16 @@ namespace IssueTracking.Domain.IssueTracking
         BasicSolutionReturn GetBasicSolutionById(long id);
         IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id);
         IList<BasicSolutionReturn> GetAllBasicSolution();
+        string GetResourceDoc(string fileName, string mimeType);
+        void AddIssue(IssuesListModel model);
+        void EditIssue(IssuesListModel model);
+        IssueListReturnModel GetAllIssues();
+        
+        IList<IssueListReturn> GetIssueByStatus(long status);
+        IList<DepartmentSchemaModel> GetAllBranch();
+        IList<EmployeeModel> GetAllEmployee();
+        IList<EmployeeModel> GetAllEmployeeByBranchId(string id);
+        
     }
 
     public class IssueTrackingService : IIssueTrackingService
@@ -103,6 +113,11 @@ namespace IssueTracking.Domain.IssueTracking
         public IList<IssuePriorityType> GetAllPriorityTypes()
         {
             return _context.IssuePriorityType.OrderBy(e => e.Id).ToList();
+        }
+
+        public IList<IssueStatusType> GetAllIssueStatusTypes()
+        {
+            return _context.IssueStatusType.OrderBy(e => e.Id).ToList();
         }
 
         public IssueRaisedSystem GetIssueRaisedSystemById(long id)
@@ -187,10 +202,21 @@ namespace IssueTracking.Domain.IssueTracking
                 issueTypes.Description = issues.Description;
                 var solution = _context.BasicIssueSolution.Where(e => e.IssueTypeId == issues.Id).ToList();
                 var raisedSystem = _context.IssueRaisedSystem.FirstOrDefault(e => e.Id == issues.RaisedSystemId);
-                // if (solution.Count>0)
-                // {
-                //     issueTypes.IssueSolution = solution;
-                // }
+                if (solution.Count>0)
+                {
+                    foreach (var sol in solution)
+                    {
+                        var sl = new BasicIssueSolution()
+                        {
+                            Id = sol.Id,
+                            SolutionDescription = sol.SolutionDescription,
+                            SolutionQuery = sol.SolutionQuery
+                        };
+                        issueTypes.IssueSolution.Add(sl);
+                    }
+                   
+                   
+                }
 
                 if (raisedSystem != null)
                 {
@@ -230,7 +256,7 @@ namespace IssueTracking.Domain.IssueTracking
                     solution.SolutionQuery = model.SolutionQuery;
                     solution.SolutionDescription = model.SolutionDescription;
 
-                    if (model.SolutionResource != null)
+                    if (model.SolutionResource.Count>0)
                     {
                         var index = 0;
                         foreach (var res in model.SolutionResource)
@@ -242,6 +268,7 @@ namespace IssueTracking.Domain.IssueTracking
                                 {
                                     DocRef = Guid.NewGuid().ToString(),
                                     MimeType = res.MimeType,
+                                    FileName = res.FileName,
                                     Data = "",
                                     Index = index
                                 };
@@ -275,7 +302,7 @@ namespace IssueTracking.Domain.IssueTracking
                     SolutionQuery = model.SolutionQuery,
                     SolutionDescription = model.SolutionDescription,
                 };
-                if (model.SolutionResource != null)
+                if (model.SolutionResource.Count>0)
                 {
                     var index = 0;
                     foreach (var res in model.SolutionResource)
@@ -283,6 +310,7 @@ namespace IssueTracking.Domain.IssueTracking
                         var resource = new ResourceModel()
                         {
                             DocRef = Guid.NewGuid().ToString(),
+                            FileName = res.FileName,
                             MimeType = res.MimeType,
                             Data = "",
                             Index = index++
@@ -309,7 +337,7 @@ namespace IssueTracking.Domain.IssueTracking
                 basicSolution.IssueTypeId = solution.IssueTypeId;
                 basicSolution.SolutionDescription = solution.SolutionDescription;
                 basicSolution.SolutionQuery = solution.SolutionQuery;
-                basicSolution.IssueType = _context.IssueTypeList.First(i => i.Id == solution.IssueTypeId);
+                basicSolution.IssueType = GetIssueTypeById(solution.IssueTypeId);
                 if (!string.IsNullOrEmpty(solution.SolutionResource))
                 {
                     var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(solution.SolutionResource);
@@ -385,7 +413,7 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
-        private string GetResourceDoc(string fileName, string mimeType)
+        public string GetResourceDoc(string fileName, string mimeType)
         {
             var imageData = string.Empty;
 
@@ -397,5 +425,253 @@ namespace IssueTracking.Domain.IssueTracking
 
             return imageData;
         }
+
+        public void AddIssue(IssuesListModel model)
+        {
+            var count = (_context.IssuesList.Count()+1).ToString();
+            var pt = "000000";
+            var ticket = pt.Substring(0, pt.Length - count.Length) + count;
+            var solutionId = _context.BasicIssueSolution.FirstOrDefault(e => e.IssueTypeId == model.IssueTypeId);
+            var issue = new IssuesList()
+            {
+                Id = Guid.NewGuid(),
+                IssueTitle = model.IssueTitle,
+                IssueTypeId = model.IssueTypeId,
+                OtherIssue = model.OtherIssue,
+                BranchId = Guid.Parse((ReadOnlySpan<char>)_session.DepartmentId),
+                IssueDescription = model.IssueDescription,
+                IssueRequestedBy = Guid.Parse(_session.UserId),
+                IssueRequestedDate = new DateTime().Ticks,
+                IssuePriority = model.IssuePriority,
+                IssueStatus = 1,
+                Ticket = ticket
+            };
+            if (solutionId != null)
+            {
+                issue.IssueRaisedSluId = solutionId.Id;
+            }
+            if (model.PolicyNo.Length > 0)
+            {
+                issue.PolicyNo = model.PolicyNo;
+            }
+            if (model.IssueResource.Count>0)
+            {
+                var index = 0;
+                var resourceModels = new List<ResourceModel>();
+                foreach (var res in model.IssueResource)
+                {
+                    var resource = new ResourceModel()
+                    {
+                        DocRef = Guid.NewGuid().ToString(),
+                        FileName = res.FileName,
+                        MimeType = res.MimeType,
+                        Data = "",
+                        Index = index++
+                    };
+                    SaveResource(resource.DocRef, resource.MimeType, res.Data);
+                    resourceModels.Add(resource);
+                }
+
+                issue.IssueResource = JsonConvert.SerializeObject(resourceModels);
+            }
+
+            _context.IssuesList.Add(issue);
+            _context.SaveChanges();
+        }
+
+        public void EditIssue(IssuesListModel model)
+        {
+            var index = _context.DeletedIssuesList.Count(e => e.OldIssueId == Guid.Parse(model.Id)) + 1;
+            var oldIssue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(model.Id));
+            if (oldIssue != null)
+            {
+                var deletedIssue = new DeletedIssuesList()
+                {
+                    Id = Guid.NewGuid(),
+                    OldIssueId = oldIssue.Id,
+                    IssueDetails = JsonConvert.SerializeObject(oldIssue),
+                    ModifiyedBy = Guid.Parse(_session.UserId),
+                    ModifiyedDate = new DateTime().Ticks,
+                    Indexs = index
+                };
+                var solutionId = _context.BasicIssueSolution.FirstOrDefault(e => e.IssueTypeId == model.IssueTypeId);
+                if (solutionId != null)
+                {
+                    oldIssue.IssueRaisedSluId = solutionId.Id;
+                }
+                else
+                {
+                    oldIssue.IssueRaisedSluId = null;
+                }
+
+                oldIssue.IssueTypeId = model.IssueTypeId;
+                oldIssue.OtherIssue = model.OtherIssue;
+                oldIssue.IssueTitle = model.IssueTitle;
+                oldIssue.IssueDescription = model.IssueDescription;
+                oldIssue.IssuePriority = model.IssuePriority;
+
+                if (model.IssueResource.Count > 0)
+                {
+                    var resourceModels = new List<ResourceModel>();
+                    var index1 = 0;
+                    foreach (var res in model.IssueResource)
+                    {
+                        index1++;
+                        if (string.IsNullOrEmpty(res.DocRef))
+                        {
+                            var resource = new ResourceModel()
+                            {
+                                DocRef = Guid.NewGuid().ToString(),
+                                MimeType = res.MimeType,
+                                FileName = res.FileName,
+                                Data = "",
+                                Index = index1
+                            };
+                            SaveResource(resource.DocRef, resource.MimeType, res.Data);
+                            resourceModels.Add(resource);
+                        }
+                        else
+                        {
+                            res.Data = "";
+                            res.Index = index1;
+                            resourceModels.Add(res);
+                        }
+                    }
+
+                    oldIssue.IssueResource = JsonConvert.SerializeObject(resourceModels);
+                }
+
+                _context.DeletedIssuesList.Add(deletedIssue);
+                _context.IssuesList.Update(oldIssue);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new AccessDeniedException("Sorry, I can't find any issue registered with this title of '"+model.IssueTitle+"'");
+            }
+        }
+
+        public IssueListReturnModel GetAllIssues()
+        {
+            var opened = new List<IssueListReturn>();
+            opened.AddRange(GetIssueByStatus(1));
+            opened.AddRange(GetIssueByStatus(3));
+            IssueListReturnModel ret = new IssueListReturnModel()
+            {
+                Opened= opened,
+                Closed = GetIssueByStatus(2)
+            };
+            return ret;
+        }
+
+        public IList<IssueListReturn> GetIssueByStatus(long status)
+        {
+            var ret = new List<IssueListReturn>();
+            var issues=_context.IssuesList.Where(e => e.IssueStatus == status).OrderByDescending(e=>e.Ticket).ToList();
+
+            foreach (var issue in issues)
+            {
+                var iss = new IssueListReturn()
+                {
+                    Id = issue.Id.ToString(),
+                    IssueTitle = issue.IssueTitle,
+                    IssueTypeId = issue.IssueTypeId,
+                    OtherIssue = issue.OtherIssue,
+                    PolicyNo = issue.PolicyNo,
+                    IssueDescription = issue.IssueDescription,
+                    BranchId = GetDepartment(issue.BranchId),
+                    IssueRequestedBy = GetEmployee(issue.IssueRequestedBy),
+                    IssuePriority = _context.IssuePriorityType.First(e=>e.Id==issue.IssuePriority).Name,
+                    IssueStatus = _context.IssueStatusType.First(e=>e.Id==issue.IssueStatus).Name,
+                    IssueType = GetIssueTypeById(issue.IssueTypeId??0),
+                    Ticket = issue.Ticket,
+                    Participant = 1+_context.IssueAssigned.Count(e=>e.IssueId==issue.Id),
+                    Comments = _context.IssueComments.Count(e=>e.IssueId==issue.Id),
+                    NoOfEdit = _context.DeletedIssuesList.Count(e=>e.OldIssueId==issue.Id),
+                };
+               ret.Add(iss);
+
+            }
+            return ret;
+        }
+
+        public IList<DepartmentSchemaModel> GetAllBranch()
+        {
+            var ret = new List<DepartmentSchemaModel>();
+            var branch = _context.DepartmentSchema.Where(d => d.Status == true).ToList();
+            foreach (var br in branch)
+            {
+                ret.Add(GetDepartment(br.Id));
+            }
+            return ret;
+        }
+
+        public IList<EmployeeModel> GetAllEmployee()
+        {
+            var ret = new List<EmployeeModel>();
+            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1).OrderBy(e=>e.FirstName).ToList();
+            foreach (var emp in employee)
+            {
+                ret.Add(GetEmployee(emp.Id));
+            }
+
+            return ret;
+        }
+
+        public IList<EmployeeModel> GetAllEmployeeByBranchId(string id)
+        {
+            var ret = new List<EmployeeModel>();
+            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1 && e.DepartmentId==Guid.Parse(id)).OrderBy(e=>e.FirstName).ToList();
+            foreach (var emp in employee)
+            {
+                ret.Add(GetEmployee(emp.Id));
+            }
+
+            return ret; 
+        }
+        private IssueListReturn GetSimpleIssueById(Guid id)
+        {
+            var ret = new IssueListReturn();
+            var issue = _context.IssuesList.First(e => e.Id == id);
+            
+
+            return ret;
+        }
+
+        private DepartmentSchemaModel GetDepartment(Guid id)
+        {
+            var dept = _context.DepartmentSchema.First(e => e.Id == id);
+            var ret = new DepartmentSchemaModel()
+            {
+                Id = dept.Id.ToString(),
+                BranchId = dept.BranchId,
+                DepartmentId = dept.DepartmentId,
+                DepartmentName = _context.Department.First(d=>d.Id==dept.DepartmentId).Name,
+                BranchName = _context.Branches.First(b=>b.Id==dept.BranchId).BraName
+            };
+            
+            return ret;
+        }
+
+        private EmployeeModel GetEmployee(Guid id)
+        {
+            var employee = _context.Employee.First(e => e.Id == id);
+            var ret = new EmployeeModel()
+            {
+                Id = employee.Id.ToString(),
+                FirstName = employee.FirstName,
+                FatherName = employee.FatherName,
+                GrFatherName = employee.GrFatherName,
+                Appellation = employee.Applelation,
+                Title = employee.Title,
+                Position = _context.Possitions.First(p=>p.Id==employee.PossitionId).Name,
+                EmpIdNo = employee.EmpIdNo,
+                Phone = employee.Phone,
+                Email = employee.Email,
+                Username = _context.Account.First(e=>e.EmployeeId==employee.Id).Username
+            };
+            return ret;
+        }
+        
     }
 }
