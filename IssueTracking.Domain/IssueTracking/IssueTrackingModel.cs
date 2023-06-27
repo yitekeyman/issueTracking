@@ -60,6 +60,7 @@ namespace IssueTracking.Domain.IssueTracking
         public long Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        
         public IList<IssueTypeList> IssueType = new List<IssueTypeList>();
     }
 
@@ -77,6 +78,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string[] PolicyNo { get; set; }
         public string IssueDescription { get; set; }
         public long? IssuePriority { get; set; }
+        
         public IList<ResourceModel> IssueResource = new List<ResourceModel>();
     }
 
@@ -88,9 +90,12 @@ namespace IssueTracking.Domain.IssueTracking
         public long? IssueTypeId { get; set; }
         public string OtherIssue { get; set; }
         public string[] PolicyNo { get; set; }
+        
         public DepartmentSchemaModel BranchId = new DepartmentSchemaModel();
         public string IssueDescription { get; set; }
+        
         public EmployeeModel IssueRequestedBy = new EmployeeModel();
+        
         public DateTime IssueRequestedDate { get; set; }
         public string IssuePriority { get; set; }
         public string IssueStatus { get; set; }
@@ -98,6 +103,7 @@ namespace IssueTracking.Domain.IssueTracking
         public int Participant { get; set; }
         public int Comments { get; set; }
         public int NoOfEdit { get; set; }
+        
         public IssueTypeReturn IssueType = new IssueTypeReturn();
         
     }
@@ -130,6 +136,44 @@ namespace IssueTracking.Domain.IssueTracking
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Username { get; set; }
+    }
+
+    public class IssueCommentsModel
+    {
+        public string Id { get; set; }
+        
+        public string IssueId { get; set; }
+        
+        public string IssueComment { get; set; } 
+
+        public string CommentedBy { get; set; }
+        
+        public DateTime IssueCommentDate { get; set; }
+        
+        public IList<ResourceModel> CommentResource = new List<ResourceModel>();
+        
+        public IssueStatusType IssueStatus = new IssueStatusType();
+       
+        public int Status { get; set; }
+        
+    }
+    
+    public class MilestonesModel
+    {
+      public string Id { get; set; }
+      
+      public string IssueId { get; set; }
+      
+      public DateTime DueDate { get; set; }
+      
+      public string Name { get; set; }
+      
+      public string Description { get; set; }
+      
+      public string CreatedBy { get; set; }
+      
+      public DateTime CreatedDate { get; set; }
+      
     }
 
     public class IssueFilterParameter
