@@ -25,8 +25,8 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(UserSession session, string fileName, string mimeType);
         void AddIssue(UserSession session, IssuesListModel model);
         void EditIssue(UserSession session, IssuesListModel model);
-        IssueListReturnModel GetAllIssues(UserSession session);
-        IList<IssueListReturn> GetIssueByStatus(UserSession session,long status);
+        IssueListReturnModel GetAllIssues(UserSession session, IssueFilterParameter model);
+        IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
         IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
         IList<EmployeeModel> GetAllEmployee(UserSession session);
         IList<EmployeeModel> GetAllEmployeeByBranchId(UserSession session,string id);
@@ -147,16 +147,16 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssue(model);
         }
 
-        public IssueListReturnModel GetAllIssues(UserSession session)
+        public IssueListReturnModel GetAllIssues(UserSession session, IssueFilterParameter model)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetAllIssues();
+            return _issueTrackingService.GetAllIssues(model);
         }
 
-        public IList<IssueListReturn> GetIssueByStatus(UserSession session, long status)
+        public IList<IssueListReturn> GetIssueByStatus(UserSession session, IssueFilterParameter model, long status)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetIssueByStatus(status);
+            return _issueTrackingService.GetIssueByStatus(model,status);
         }
 
         public IList<DepartmentSchemaModel> GetAllBranch(UserSession session)

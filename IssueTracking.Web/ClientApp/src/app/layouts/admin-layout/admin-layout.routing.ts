@@ -10,10 +10,10 @@ import {AdminLayoutComponent} from "./admin-layout.component";
 import {AdminLayoutModule} from "./admin-layout.module";
 import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
+import {IssuesModule} from "../../issues/issues.module";
 
 export const AdminLayoutRoutes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
-  {path: 'issues', component: IssuesComponent},
   {
     path: 'settings',
     redirectTo: 'settings/issue-raised-system',
@@ -26,5 +26,13 @@ export const AdminLayoutRoutes: Routes = [
       {
         path: '',
         loadChildren: () => SettingsModule
+      }]},
+  {
+    path: 'issues',
+    component: IssuesComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () => IssuesModule
       }]},
 ];

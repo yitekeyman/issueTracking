@@ -105,13 +105,16 @@ namespace IssueTracking.Domain.IssueTracking
         public int NoOfEdit { get; set; }
         
         public IssueTypeReturn IssueType = new IssueTypeReturn();
-        
+       
+
     }
 
     public class IssueListReturnModel
     {
         public IList<IssueListReturn> Opened = new List<IssueListReturn>();
         public IList<IssueListReturn> Closed = new List<IssueListReturn>();
+        public IList<SideBarStat> UpperSideBarStats = new List<SideBarStat>();
+        public IList<SideBarStat> LowerSideBarStats = new List<SideBarStat>();
     }
 
     public class DepartmentSchemaModel
@@ -178,10 +181,18 @@ namespace IssueTracking.Domain.IssueTracking
 
     public class IssueFilterParameter
     {
-        public long? Priority { get; set; }
-        public long? RaisedSystem { get; set; }
-        public long? IssueType { get; set; }
-        public DateTime DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
+        public long Priority { get; set; }
+        public long RaisedSystem { get; set; }
+        public long IssueType { get; set; }
+        public long Sort { get; set; }
+        public string Branch { get; set; }
+        public string UserId { get; set; }
+    }
+
+    public class SideBarStat
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public int Stat { get; set; }
     }
 }

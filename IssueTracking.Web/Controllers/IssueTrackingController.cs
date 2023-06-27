@@ -342,12 +342,12 @@ namespace IssueTracking.Web.Controllers
                 return StatusCode(stCode, new { message = e.InnerException });
             }
         }
-        [HttpGet]
-        public IActionResult GetAllIssues()
+        [HttpPost]
+        public IActionResult GetAllIssues([FromBody] IssueFilterParameter parameter)
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetAllIssues(GetSession()));
+                return Json(_iIssueTrackingFacade.GetAllIssues(GetSession(), parameter));
                 
             }
             catch (Exception e)
@@ -359,23 +359,23 @@ namespace IssueTracking.Web.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetIssueByStatus([FromQuery] long status)
-        {
-            try
-            {
-                return Json(_iIssueTrackingFacade.GetIssueByStatus(GetSession(), status));
-                
-            }
-            catch (Exception e)
-            {
-                var stCode = 500;
-                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
-                    stCode = 400;
-                return StatusCode(stCode, new { message = e.InnerException });
-            }
-        }
-        
+        // [HttpGet]
+        // public IActionResult GetIssueByStatus([FromQuery] long status)
+        // {
+        //     try
+        //     {
+        //         return Json(_iIssueTrackingFacade.GetIssueByStatus(GetSession(), status));
+        //         
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         var stCode = 500;
+        //         if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+        //             stCode = 400;
+        //         return StatusCode(stCode, new { message = e.InnerException });
+        //     }
+        // }
+        //
         [HttpGet]
         public IActionResult GetAllBranch()
         {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -32,9 +33,9 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(string fileName, string mimeType);
         void AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
-        IssueListReturnModel GetAllIssues();
+        IssueListReturnModel GetAllIssues(IssueFilterParameter parameter);
         
-        IList<IssueListReturn> GetIssueByStatus(long status);
+        IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
         IList<DepartmentSchemaModel> GetAllBranch();
         IList<EmployeeModel> GetAllEmployee();
         IList<EmployeeModel> GetAllEmployeeByBranchId(string id);
@@ -551,24 +552,87 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
-        public IssueListReturnModel GetAllIssues()
+        public IssueListReturnModel GetAllIssues(IssueFilterParameter parameter)
         {
             var opened = new List<IssueListReturn>();
-            opened.AddRange(GetIssueByStatus(1));
-            opened.AddRange(GetIssueByStatus(3));
+            opened.AddRange(GetIssueByStatus(parameter,1));
+            opened.AddRange(GetIssueByStatus(parameter,3));
             IssueListReturnModel ret = new IssueListReturnModel()
             {
                 Opened= opened,
-                Closed = GetIssueByStatus(2)
+                Closed = GetIssueByStatus(parameter,2)
             };
             return ret;
         }
 
-        public IList<IssueListReturn> GetIssueByStatus(long status)
+        public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter,long status)
         {
             var ret = new List<IssueListReturn>();
-            var issues=_context.IssuesList.Where(e => e.IssueStatus == status).OrderByDescending(e=>e.Ticket).ToList();
+            var issues = new List<IssuesList>();
+                var queryableIssue = _context.IssuesList.Where(e =>
+                    e.IssueStatus == status &&
+                    (string.IsNullOrEmpty(parameter.UserId) || Guid.Parse(parameter.UserId) == e.IssueRequestedBy) &&
+                    (parameter.Priority == 0 || parameter.Priority == e.IssuePriority) &&
+                    (string.IsNullOrEmpty(parameter.Branch) || Guid.Parse(parameter.Branch) == e.BranchId));
 
+                if (parameter.RaisedSystem == 0)
+                {
+                    if (parameter.Sort == 1)
+                    {
+                        issues = queryableIssue.OrderByDescending(e => e.IssueRequestedDate).ToList();
+                    }else if (parameter.Sort == 2)
+                    {
+                        issues = queryableIssue.OrderBy(e => e.IssueRequestedDate).ToList();
+                    }else if (parameter.Sort == 3)
+                    {
+                         issues = queryableIssue.OrderByDescending(e => e.IssueClosedDate).ToList();
+                    }else if (parameter.Sort == 4)
+                    {
+                        issues = queryableIssue.OrderBy(e => e.IssueClosedDate).ToList();
+                    }
+                }
+                else
+                {
+                    string sort = "";
+                    string query = "";
+
+                    var issueTypes = _context.IssueTypeList.Where(e => e.RaisedSystemId == parameter.RaisedSystem)
+                        .ToList();
+                    if (issueTypes.Count > 0)
+                    {
+                         query = " WHERE ";
+                        var index = 0;
+                        foreach (var it in issueTypes)
+                        {
+                            if (index == 0)
+                            {
+                                query += $"IssueTypeId={it.Id}";
+                            }
+                            else
+                            {
+                                query += $" or IssueTypeId={it.Id}";
+                            }
+
+                            index++;
+                        }
+                    }
+                    if (parameter.Sort == 1)
+                    {
+                        sort = $" Order By IssueRequestedDate desc";
+                    }else if (parameter.Sort == 2)
+                    {
+                        sort = $" Order By IssueRequestedDate asc";
+                    }else if (parameter.Sort == 3)
+                    {
+                        sort = $" Order By IssueClosedDate desc";
+                    }else if (parameter.Sort == 4)
+                    {
+                        sort = $" Order By IssueClosedDate asc";
+                    }
+
+                    issues = queryableIssue.FromSql($"Select * From queryableIssue {query}{sort}").ToList();
+                }
+               
             foreach (var issue in issues)
             {
                 var iss = new IssueListReturn()
@@ -590,7 +654,6 @@ namespace IssueTracking.Domain.IssueTracking
                     NoOfEdit = _context.DeletedIssuesList.Count(e=>e.OldIssueId==issue.Id),
                 };
                ret.Add(iss);
-
             }
             return ret;
         }
@@ -672,6 +735,68 @@ namespace IssueTracking.Domain.IssueTracking
             };
             return ret;
         }
+
+        private IList<SideBarStat> GetUpperSideBarStat()
+        {
+            var upperSidebars = new List<SideBarStat>();
+            var departStat = new SideBarStat()
+            {
+                Id = 1,
+                Name = "In Your Branch/ Dept",
+                Stat = _context.IssuesList.Count(e => e.BranchId == Guid.Parse(_session.DepartmentId))
+            };
+            upperSidebars.Add(departStat);
+            var createdByYou = new SideBarStat()
+            {
+                Id = 2,
+                Name = "Created By You",
+                Stat = _context.IssuesList.Count(e => e.IssueRequestedBy == Guid.Parse(_session.UserId))
+            };
+            upperSidebars.Add(createdByYou);
+            var assignedToYou = new SideBarStat()
+            {
+                Id = 3,
+                Name = "Assigned To You",
+                Stat = _context.IssueAssigned.Count(e => e.AssignedBy == Guid.Parse(_session.UserId))
+            };
+              upperSidebars.Add(assignedToYou);  
+            return upperSidebars;
+        }
         
+        private IList<SideBarStat> GetLowerSideBarStat()
+        {
+            var lowerSidebars = new List<SideBarStat>();
+            var systems = _context.IssueRaisedSystem.ToList();
+            foreach (var system in systems)
+            {
+                int issueCount = 0;
+                var issueTypes = _context.IssueTypeList.Where(e=>e.RaisedSystemId==system.Id).ToList();
+                foreach (var issueType in issueTypes)
+                {
+                    int counter = 0;
+                    if (_session.Role == 1)
+                    {
+                        counter = _context.IssuesList.Count(e => e.IssueTypeId == issueType.Id);
+                    }
+                    else
+                    {
+                        counter = _context.IssuesList.Count(e => e.IssueTypeId == issueType.Id && e.IssueRequestedBy==Guid.Parse(_session.UserId));
+                    }
+                    issueCount += counter;
+                }
+
+                if (issueCount > 0)
+                {
+                    var sideBarStat=new SideBarStat()
+                    {
+                        Id = system.Id,
+                        Name = system.Name,
+                        Stat = issueCount
+                    };
+                    lowerSidebars.Add(sideBarStat);
+                }
+            }
+            return lowerSidebars;
+        }
     }
 }
