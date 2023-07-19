@@ -25,6 +25,10 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(UserSession session, string fileName, string mimeType);
         void AddIssue(UserSession session, IssuesListModel model);
         void EditIssue(UserSession session, IssuesListModel model);
+        void AddIssueComment(UserSession session, IssueCommentsModel model);
+        void EditIssueComment(UserSession session, IssueCommentsModel model);
+        IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId);
+        void DeleteIssueComment(UserSession session, string commentId);
         IssueListReturnModel GetAllIssues(UserSession session, IssueFilterParameter model);
         IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
         IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
@@ -135,6 +139,37 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetResourceDoc(fileName,mimeType);
         }
 
+        public void AddIssueComment(UserSession session, IssueCommentsModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AddIssueComment(model);
+        }
+
+        public void EditIssueComment(UserSession session, IssueCommentsModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.EditIssueComment(model);
+        }
+
+        public IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllIssueComments(issueId);
+        }
+
+        public void DeleteIssueComment(UserSession session, string commentId)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.DeleteIssueComment(commentId);
+        }
+
+        public IList<IssueListReturn> GetIssueByStatus(UserSession session, IssueFilterParameter model, long status)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetIssueByStatus(model,status);
+        }
+        
+        
         public void AddIssue(UserSession session, IssuesListModel model)
         {
             _issueTrackingService.SetSession(session);
@@ -153,11 +188,6 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetAllIssues(model);
         }
 
-        public IList<IssueListReturn> GetIssueByStatus(UserSession session, IssueFilterParameter model, long status)
-        {
-            _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetIssueByStatus(model,status);
-        }
 
         public IList<DepartmentSchemaModel> GetAllBranch(UserSession session)
         {

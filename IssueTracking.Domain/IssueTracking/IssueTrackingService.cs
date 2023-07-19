@@ -34,8 +34,13 @@ namespace IssueTracking.Domain.IssueTracking
         void AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
         IssueListReturnModel GetAllIssues(IssueFilterParameter parameter);
-        
         IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
+
+        void AddIssueComment(IssueCommentsModel model);
+        void EditIssueComment(IssueCommentsModel model);
+        IList<IssueCommentsModel> GetAllIssueComments(string issueId);
+        void DeleteIssueComment(string commentId);
+        
         IList<DepartmentSchemaModel> GetAllBranch();
         IList<EmployeeModel> GetAllEmployee();
         IList<EmployeeModel> GetAllEmployeeByBranchId(string id);
@@ -657,6 +662,115 @@ namespace IssueTracking.Domain.IssueTracking
             }
             return ret;
         }
+
+        public void AddIssueComment(IssueCommentsModel model)
+        {
+            var comment = new IssueComments()
+            {
+               IssueId = Guid.Parse(model.IssueId),
+               IssueComment = model.IssueComment,
+               CommentedBy = Guid.Parse(_session.UserId),
+               CommentDate = model.IssueCommentDate.Date
+            };
+            if (model.CommentResource.Count > 0)
+            {
+                var resourceModels = new List<ResourceModel>();
+                foreach (var res in model.CommentResource)
+                {
+                    var resource = new ResourceModel()
+                    {
+                       DocRef = Guid.NewGuid().ToString(),
+                       MimeType = res.MimeType,
+                       FileName = res.FileName,
+                       Data = "",
+                       Index = res.Index
+                    };
+                    SaveResource(resource.DocRef, resource.MimeType,res.Data);
+                    resourceModels.Add(resource);
+                }
+                comment.CommentResource = JsonConvert.SerializeObject(resourceModels);
+            }
+
+            if (model.IssueStatus != null)
+            {
+                comment.IssueStatus = model.IssueStatus.Id;
+            }
+
+            _context.IssueComments.Add(comment);
+            _context.SaveChanges();
+        }
+
+        public void EditIssueComment(IssueCommentsModel model)
+        {
+            var existingComment = _context.IssueComments.FirstOrDefault(c => c.Id == Guid.Parse(model.Id));
+            if (existingComment != null)
+            {
+                existingComment.IssueComment = model.IssueComment;
+                existingComment.ModifiedDate = model.ModifiedDate.Date;
+                if (model.CommentResource.Count > 0)
+                {
+                    var resourceModels = new List<ResourceModel>();
+                    // Update resources 
+                    existingComment.CommentResource = JsonConvert.SerializeObject(resourceModels);
+                }
+                
+                if (model.IssueStatus != null)
+                {
+                    existingComment.IssueStatus = model.IssueStatus.Id;
+                }
+                
+                _context.IssueComments.Update(existingComment);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("Comment not found!");
+            }
+        }
+        // To retrieve all comments for a specific issue
+        public IList<IssueCommentsModel> GetAllIssueComments(string issueId)  
+        {
+            var issueGuid = new Guid(issueId);
+        
+            return _context.IssueComments
+                .Where(c => c.IssueId == issueGuid)
+                .Select(c => new IssueCommentsModel() 
+                {
+                    Id = c.Id.ToString(),        
+                    IssueId = c.IssueId.ToString(), 
+                    IssueComment = c.IssueComment,
+                    CommentedBy = c.CommentedBy.ToString(),
+                    IssueCommentDate = c.CommentDate,           
+                    CommentResource = JsonConvert.DeserializeObject<List<ResourceModel>>(c.CommentResource),
+                    IssueStatus = new IssueStatusType() 
+                    {
+                        Id = (long) c.IssueStatus,
+                        Name = _context.IssueStatusType
+                            .Where(s => s.Id == c.IssueStatus)
+                            .Select(s => s.Name)
+                            .FirstOrDefault(),                 
+                        Description = _context.IssueStatusType
+                            .Where(s => s.Id == c.IssueStatus)  
+                            .Select(s => s.Description)
+                            .FirstOrDefault()
+                    },               
+                    Status = 1           
+                })
+                .ToList();      
+        }
+        
+        public void DeleteIssueComment(string commentId) {
+
+            var comment = _context.IssueComments.Find(commentId);
+            if(comment == null) {
+                throw new Exception("Comment not found");   
+            }
+
+            _context.IssueComments.Remove(comment);
+            _context.SaveChanges();
+
+        }
+        
 
         public IList<DepartmentSchemaModel> GetAllBranch()
         {

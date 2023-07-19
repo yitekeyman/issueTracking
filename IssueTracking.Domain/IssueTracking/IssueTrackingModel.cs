@@ -153,6 +153,8 @@ namespace IssueTracking.Domain.IssueTracking
         
         public DateTime IssueCommentDate { get; set; }
         
+        public DateTime ModifiedDate { get; set; }
+        
         public IList<ResourceModel> CommentResource = new List<ResourceModel>();
         
         public IssueStatusType IssueStatus = new IssueStatusType();
