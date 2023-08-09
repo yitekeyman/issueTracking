@@ -13,6 +13,8 @@ import {EditBasicSolutionComponent} from "./basicSolution/editBasicSolution/edit
 import {NgxDropzoneModule} from "ngx-dropzone";
 import {MonacoEditorModule} from "@materia-ui/ngx-monaco-editor";
 import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view-basic-solution.component";
+import {IssuesModule} from "../issues/issues.module";
+
 
 @NgModule({
   imports: [
@@ -21,7 +23,8 @@ import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view
     FormsModule,
     ReactiveFormsModule,
     NgxDropzoneModule,
-    MonacoEditorModule
+    MonacoEditorModule,
+    IssuesModule
   ],
   declarations: [
     BasicSolutionComponent,
@@ -30,7 +33,8 @@ import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view
     IssueTypeListComponent,
     EditIssueTypeComponent,
     EditBasicSolutionComponent,
-    ViewBasicSolutionComponent
+    ViewBasicSolutionComponent,
+
   ]
 })
 export class SettingsModule{

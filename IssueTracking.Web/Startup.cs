@@ -113,7 +113,19 @@ namespace IssueTracking.Web
                     name: "default",
                     template: "api/{controller}/{action=Index}/{id?}");
             });
+            
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
 
+                if (env.IsDevelopment())
+                {
+                    app.UseDeveloperExceptionPage();
+                    spa.Options.StartupTimeout = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 30);
+                    spa.UseAngularCliServer(npmScript: "start");
+                }
+            });
+            /*
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -126,6 +138,7 @@ namespace IssueTracking.Web
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+            */
         }
 
         private void InjectDependencies(IServiceCollection services)

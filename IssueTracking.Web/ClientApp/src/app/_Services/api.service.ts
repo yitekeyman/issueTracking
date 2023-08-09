@@ -5,8 +5,6 @@ import {configs} from "../app-config";
 import {Observable, ReplaySubject, throwError} from "rxjs";
 import { catchError } from 'rxjs/operators';
 
-
-
 export class ErrorMsg {
   status: number;
   msg: string;
@@ -69,8 +67,6 @@ export class ApiServices {
     console.log(response);
 
     let errMsg = new ErrorMsg();
-
-
 
 
     if (response.ok) {

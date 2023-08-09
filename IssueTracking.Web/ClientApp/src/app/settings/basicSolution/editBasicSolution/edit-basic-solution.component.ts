@@ -88,7 +88,6 @@ export class EditBasicSolutionComponent implements OnInit {
         for(let i=0; i<this.resourceModels.length; i++){
           let image=this.issueTrackingService.convertBase64ToFile(this.resourceModels[i]);
           this.files.push(image);
-
         }
       });
     }

@@ -16,9 +16,15 @@ export class IssuesListComponent implements OnInit {
   public departmentId = '';
   public issuesList: IssueListReturnModel;
   public pager: any = {};
+  public isAdd = false;
+  public isEdit = false;
+  public selectedIssueType: any;
+  public selectedIssue: any;
+  public isAddIssue = false;
   pagedItems: any[];
   public pager1: any = {};
   pagedItems1: any[];
+
 
   constructor(public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router: Router) {
     if (localStorage.getItem('role') == '6') {
@@ -28,20 +34,15 @@ export class IssuesListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.filterParameter = {
-      userId: this.userId,
-      branch: this.departmentId,
-      priority: 0,
-      issueType: 0,
-      raisedSystem: 0,
-      sort: 1
-    };
     this.getAllIssues();
   }
 
+
+
+
   public getAllIssues() {
     dialog.loading();
-    this.issueTrackingService.GetAllIssues(this.filterParameter).subscribe(res => {
+    this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issuesList = res;
       if (this.issuesList.opened.length > 0) {
         if (this.pager.currentPage == 0) {
@@ -87,5 +88,44 @@ export class IssuesListComponent implements OnInit {
     //get the paged items
     this.pagedItems1 = this.issuesList.closed.slice(this.pager1.startIndex, this.pager1.endIndex + 1);
 
+  }
+
+  public editIssue(id: any, issueTypeId:any) {
+    this.selectedIssueType=issueTypeId;
+    if (id > 0) {
+      this.isAdd = false;
+      this.isEdit = true;
+      this.selectedIssue = id;
+    } else {
+      this.isEdit = false;
+      this.isAdd = true;
+      this.selectedIssue = null;
+
+    }
+  }
+
+  public editIssueType(index: any, id: any) {
+    if (index == '1') {
+      this.isAdd = false;
+      this.isEdit = true;
+      this.selectedIssueType = id;
+    } else {
+      this.isEdit = false;
+      this.isAdd = true;
+      this.selectedIssueType = null;
+    }
+  }
+
+  public addIssue(id:any) {
+    this.isAddIssue= true;
+    this.selectedIssue = null;
+    this.selectedIssueType=id;
+  }
+
+  public closeModal() {
+    this.isEdit = false;
+    this.isAdd = false;
+    this.isAddIssue = false;
+    this.selectedIssueType = null;
   }
 }

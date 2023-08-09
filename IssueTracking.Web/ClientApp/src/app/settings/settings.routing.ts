@@ -11,7 +11,8 @@ export const SettingsRouting: Routes = [
   {path: 'labels', component: LabelsComponent},
   {path: 'issue-types', component: IssueTypeListComponent},
   {path: 'view-basic-solution/:solution-id', component: ViewBasicSolutionComponent},
-  {path: 'basic-solution-issue-type/:issue-type-id', component: ViewBasicSolutionComponent}
+  {path: 'basic-solution-issue-type/:issue-type-id', component: ViewBasicSolutionComponent},
+
 ]
 
 

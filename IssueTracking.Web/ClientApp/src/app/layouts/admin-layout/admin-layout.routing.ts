@@ -1,7 +1,7 @@
 import {Routes} from '@angular/router';
 
 import {DashboardComponent} from '../../dashboard/dashboard.component';
-import {IssuesComponent} from "../../issues/issues.component";
+// import {IssuesComponent} from "../../issues/issues.component";
 import {BasicSolutionComponent} from "../../settings/basicSolution/basic-solution.component";
 import {IssueRaisedSystemComponent} from "../../settings/issueRaisedSystem/issue-raised-system.component";
 import {LabelsComponent} from "../../settings/labels/labels.component";
@@ -11,6 +11,7 @@ import {AdminLayoutModule} from "./admin-layout.module";
 import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
 import {IssuesModule} from "../../issues/issues.module";
+import {IssuesComponent} from "../../issues/issues.component";
 
 export const AdminLayoutRoutes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
@@ -27,7 +28,7 @@ export const AdminLayoutRoutes: Routes = [
         path: '',
         loadChildren: () => SettingsModule
       }]},
-  {
+   {
     path: 'issues',
     component: IssuesComponent,
     children: [

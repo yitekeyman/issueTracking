@@ -33,8 +33,9 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(string fileName, string mimeType);
         void AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
-        IssueListReturnModel GetAllIssues(IssueFilterParameter parameter);
+        IList<IssueListReturn> GetAllIssues();
         IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
+        IssueListReturn GetIssueById(Guid id);
 
         void AddIssueComment(IssueCommentsModel model);
         void EditIssueComment(IssueCommentsModel model);
@@ -361,6 +362,48 @@ namespace IssueTracking.Domain.IssueTracking
 
             return basicSolution;
         }
+        
+        public IssueListReturn GetIssueById(Guid id) {
+        
+           var issueList = new IssueListReturn();
+           
+           var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
+           if (issue != null)
+           {
+                issueList.Id = issue.Id.ToString();
+                issueList.IssueTitle = issue.IssueTitle;
+                issueList.IssueTypeId = issue.IssueTypeId;
+                issueList.OtherIssue = issue.OtherIssue;
+                issueList.PolicyNo = issue.PolicyNo;
+                issueList.BranchId = GetDepartment(issue.BranchId);
+                issueList.IssueDescription = issue.IssueDescription;
+                issueList.IssueRequestedBy =  GetEmployee(issue.IssueRequestedBy);
+                issueList.IssueRequestedDate = DateTimeOffset.FromUnixTimeSeconds(issue.IssueRequestedDate.Value).UtcDateTime;
+                issueList.IssuePriority = _context.IssuePriorityType.First(e=>e.Id==issue.IssuePriority).Name;
+                issueList.IssueStatus = _context.IssueStatusType.First(e=>e.Id==issue.IssueStatus).Name;
+                issueList.Ticket = issue.Ticket;
+                issueList.Participant = 1+_context.IssueAssigned.Count(e=>e.IssueId==issue.Id);
+                issueList.Comments = _context.IssueComments.Count(e=>e.IssueId==issue.Id);
+                issueList.NoOfEdit =  _context.DeletedIssuesList.Count(e=>e.OldIssueId==issue.Id);
+                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId??0);
+                 if (!string.IsNullOrEmpty(issue.IssueResource))
+                 {
+                       var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
+                       foreach (var res in imageResource) {
+                           var data = GetResourceDoc(res.DocRef, res.MimeType);
+                           if (!string.IsNullOrEmpty(data))
+                           {
+                               res.Data = data;
+                               issueList.IssueResource.Add(res);
+                           }
+                       }
+                 }
+           }
+        
+           return issueList;
+        
+        }
+   
 
         public IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id)
         {
@@ -557,6 +600,22 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
+        public IList<IssueListReturn> GetAllIssues()
+        {
+            var allIssues = new List<IssueListReturn>();
+            var issues = _context.IssuesList.OrderBy(i => i.Id).ToList();
+            foreach (var issue in issues)
+            {
+                var ai = GetIssueById(issue.Id);
+                if (ai != null &&  int.TryParse(ai.Id, out int id) && id > 0)
+                {
+                    allIssues.Add(ai);
+                }
+            }
+
+            return allIssues;
+        }
+        
         public IssueListReturnModel GetAllIssues(IssueFilterParameter parameter)
         {
             var opened = new List<IssueListReturn>();

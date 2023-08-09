@@ -103,7 +103,7 @@ namespace IssueTracking.Domain.IssueTracking
         public int Participant { get; set; }
         public int Comments { get; set; }
         public int NoOfEdit { get; set; }
-        
+        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
         public IssueTypeReturn IssueType = new IssueTypeReturn();
        
 

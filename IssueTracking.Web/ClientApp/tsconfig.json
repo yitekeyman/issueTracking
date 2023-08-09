@@ -18,6 +18,14 @@
     "lib": [
       "es2018",
       "dom"
+    ],
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "./node_modules/*"
+  ],
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts",
     ]
-  }
 }

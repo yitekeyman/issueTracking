@@ -1,6 +1,8 @@
 import {Component, OnInit} from "@angular/core";
 import {LoginUser} from "../_model/IssueTrackingModel";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormsModule} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
 import {IssueTrackingService} from "../_Services/IssueTrackingService";
 import {Router} from "@angular/router";
 import dialog from "../components/dialog";

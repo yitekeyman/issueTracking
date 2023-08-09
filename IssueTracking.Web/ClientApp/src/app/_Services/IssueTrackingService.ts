@@ -95,8 +95,12 @@ export class IssueTrackingService{
     return this.apiService.post(`IssueTracking/EditIssue`, model);
   }
 
-  public GetAllIssues(model:any){
-    return this.apiService.post(`IssueTracking/GetAllIssues`, model);
+  public GetAllIssues(){
+    return this.apiService.get(`IssueTracking/GetAllIssues`);
+  }
+
+  public GetIssueById(model:any){
+    return this.apiService.get(`IssueTracking/GetIssueById?id=${model}`);
   }
   // public GetIssueByStatus(model:any){
   //   return this.apiService.get(`IssueTracking/GetIssueByStatus?status=${model}`);

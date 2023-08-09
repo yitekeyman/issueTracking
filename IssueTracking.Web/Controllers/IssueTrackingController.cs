@@ -195,11 +195,11 @@ namespace IssueTracking.Web.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetAllIssueType()
+        public IActionResult GetIssueById([FromQuery] Guid id)
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetAllIssueType(GetSession()));
+                return Json(_iIssueTrackingFacade.GetIssueById(GetSession(), id));
             }
             catch (Exception e)
             {
@@ -209,6 +209,7 @@ namespace IssueTracking.Web.Controllers
                 return StatusCode(stCode, new { message = e.InnerException });
             }
         }
+
         [HttpPost]
         public IActionResult EditBasicIssueSolution([FromBody] BasicSolutionModel model)
         {
@@ -227,6 +228,21 @@ namespace IssueTracking.Web.Controllers
             }
         }
         
+        [HttpGet]
+        public IActionResult GetAllIssueType()
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetAllIssueType(GetSession()));
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.InnerException });
+            }
+        }
         [HttpGet]
         public IActionResult GetBasicSolutionById([FromQuery] long id)
         {
@@ -343,12 +359,10 @@ namespace IssueTracking.Web.Controllers
             }
         }
         [HttpPost]
-        public IActionResult GetAllIssues([FromBody] IssueFilterParameter parameter)
-        {
-            try
+        public IActionResult GetAllIssues()
+        { try
             {
-                return Json(_iIssueTrackingFacade.GetAllIssues(GetSession(), parameter));
-                
+                return Json(_iIssueTrackingFacade.GetAllBasicSolution(GetSession()));
             }
             catch (Exception e)
             {

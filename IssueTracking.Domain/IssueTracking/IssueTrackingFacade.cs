@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 
@@ -29,7 +30,8 @@ namespace IssueTracking.Domain.IssueTracking
         void EditIssueComment(UserSession session, IssueCommentsModel model);
         IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId);
         void DeleteIssueComment(UserSession session, string commentId);
-        IssueListReturnModel GetAllIssues(UserSession session, IssueFilterParameter model);
+        IList<IssueListReturn> GetAllIssues(UserSession session);
+        IssueListReturn GetIssueById(UserSession session, Guid id);
         IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
         IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
         IList<EmployeeModel> GetAllEmployee(UserSession session);
@@ -120,6 +122,12 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetBasicSolutionById(id);
         }
+              
+        public IssueListReturn GetIssueById(UserSession session, Guid id)
+        {
+           _issueTrackingService.SetSession(session);
+           return _issueTrackingService.GetIssueById(id);
+        }
 
         public IList<BasicSolutionReturn> GetBasicSolutionByIssueType(UserSession session, long id)
         {
@@ -162,6 +170,7 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.SetSession(session);
             _issueTrackingService.DeleteIssueComment(commentId);
         }
+        
 
         public IList<IssueListReturn> GetIssueByStatus(UserSession session, IssueFilterParameter model, long status)
         {
@@ -182,10 +191,10 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssue(model);
         }
 
-        public IssueListReturnModel GetAllIssues(UserSession session, IssueFilterParameter model)
+        public IList<IssueListReturn> GetAllIssues(UserSession session)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetAllIssues(model);
+            return _issueTrackingService.GetAllIssues();
         }
 
 
@@ -206,5 +215,7 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllEmployeeByBranchId(id);
         }
+        
+       
     }
 }
