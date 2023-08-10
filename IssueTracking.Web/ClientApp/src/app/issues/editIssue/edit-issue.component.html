@@ -20,6 +20,12 @@
             <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label class="nk-label"><small>Other Issue *</small></label>
+          <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue"></textarea>
+        </div>
+
 		<div class="form-group">
           <label class="nk-label"><small>Policy Number *</small></label>
           <textarea rows="3" class="form-control" placeholder="Policy Number" formControlName="PolicyNo"></textarea>
@@ -30,6 +36,10 @@
           <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="issueDescription"></textarea>
         </div>
 
+        <div class="form-group">
+          <label class="nk-label"><small>Issue Priority *</small></label>
+          <textarea rows="3" class="form-control" placeholder="Issue Priority" formControlName="issuePriority"></textarea>
+        </div>
 		  <!--
         <div class="form-group ">
           <label class="nk-label"><small>Description *</small></label>
@@ -38,46 +48,6 @@
 
         </div>
         -->
-
-        <div class="form-group">
-          <label class="nk-label"><small>Other Issue *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue"></textarea>
-        </div>
-
-		<div class="form-group">
-          <label class="nk-label"><small>Issue Requested By *</small></label>
-          <input type="text" class="form-control" formControlName="issue_requested_by">
-        </div>
-
-		<div class="form-group">
-           <label class="nk-label"><small>Issue Requested Date *</small></label>
-           <input type="date" class="form-control" placeholder=" Request Date" formControlName="issue_requested_date">
-        </div>
-
-		<div class="form-group">
-          <label class="nk-label"><small>Issue Responded By *</small></label>
-          <input type="text" class="form-control" formControlName="issue_respond_by">
-        </div>
-
-		<div class="form-group">
-           <label class="nk-label"><small>Issue Responded Date *</small></label>
-           <input type="date" class="form-control" placeholder=" Respond Date" formControlName="issue_respond_date">
-        </div>
-
-        <div class="form-group">
-          <label class="nk-label"><small>Issue Closed By *</small></label>
-          <input type="text" class="form-control" formControlName="issue_closed_by">
-        </div>
-
-		<div class="form-group">
-           <label class="nk-label"><small>Issue Closed Date *</small></label>
-           <input type="date" class="form-control" placeholder=" Closed Date" formControlName="issue_closed_date">
-        </div>
-
-        <div class="form-group">
-          <label class="nk-label"><small>Issue Status *</small></label>
-          <input type="text" class="form-control" formControlName="issueStatus">
-        </div>
 
         <div class="form-group">
           <label class="nk-label"><small>Ticket *</small></label>

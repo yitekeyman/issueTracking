@@ -104,18 +104,6 @@ export class IssuesListComponent implements OnInit {
     }
   }
 
-  public editIssueType(index: any, id: any) {
-    if (index == '1') {
-      this.isAdd = false;
-      this.isEdit = true;
-      this.selectedIssueType = id;
-    } else {
-      this.isEdit = false;
-      this.isAdd = true;
-      this.selectedIssueType = null;
-    }
-  }
-
   public addIssue(id:any) {
     this.isAddIssue= true;
     this.selectedIssue = null;

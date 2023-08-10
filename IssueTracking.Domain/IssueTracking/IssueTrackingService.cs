@@ -378,7 +378,7 @@ namespace IssueTracking.Domain.IssueTracking
                 issueList.BranchId = GetDepartment(issue.BranchId);
                 issueList.IssueDescription = issue.IssueDescription;
                 issueList.IssueRequestedBy =  GetEmployee(issue.IssueRequestedBy);
-                issueList.IssueRequestedDate = DateTimeOffset.FromUnixTimeSeconds(issue.IssueRequestedDate.Value).UtcDateTime;
+                issueList.IssueRequestedDate = DateTime.Now;
                 issueList.IssuePriority = _context.IssuePriorityType.First(e=>e.Id==issue.IssuePriority).Name;
                 issueList.IssueStatus = _context.IssueStatusType.First(e=>e.Id==issue.IssueStatus).Name;
                 issueList.Ticket = issue.Ticket;

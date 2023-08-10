@@ -38,16 +38,8 @@ export interface IssueListModel {
   issueTypeId: number;
   otherIssue: string;
   policyNo: string[];
-  branchId: number;
   issueDescription: string;
-  issue_respond_by: string;
-  issue_respond_date: bigint;
-  issue_closed_by: string;
-  issue_closed_date: bigint;
-  issue_requested_by: string;
-  issue_requested_date: bigint;
   issuePriority: number;
-  issueStatus: string;
   ticket: string;
   issueResource: ResourceModel[];
 }

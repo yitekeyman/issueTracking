@@ -1,16 +1,10 @@
-﻿import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
+﻿import {Component, OnInit,} from "@angular/core";
 import {IssueFilterParameter, IssueListModel, IssueListReturnModel, ResourceModel} from "../_model/IssueTrackingModel";
 import {IssueTrackingService} from "../_Services/IssueTrackingService";
 import {PagerService} from "../_Services/pager.service";
 import {Router} from "@angular/router";
 import dialog from "../components/dialog";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import swal from "sweetalert2";
-import {
-  MonacoEditorComponent, MonacoEditorConstructionOptions,
-  MonacoEditorLoaderService,
-  MonacoStandaloneCodeEditor
-} from "@materia-ui/ngx-monaco-editor";
+import {FormBuilder} from "@angular/forms";
 
 
 @Component({
@@ -42,34 +36,37 @@ export class IssuesComponent implements OnInit{
     this.getAllIssues();
   }
   public openAddIssueModal() {
-    this.router.navigate(['/edit-issue']);
+    this.router.navigate(['/LIT/issues/edit-issue']);
   }
-
-  public getAllIssues() {
+  public getAllIssues(){
     dialog.loading();
     this.closeModal();
-    this.issueTrackingService.GetIssueById(this.selectedIssue).subscribe(res => {
+    this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issuesList = res;
-      if (this.issueListReturn.opened.length > 0) {
+      if (this.issuesList.length > 0) {
         if (this.pager.currentPage == 0) {
-          this.setOpenPage(1);
+          this.setPage(1);
         } else {
-          this.setOpenPage(this.pager.currentPage);
+          this.setPage(this.pager.currentPage);
         }
       } else {
-        this.setOpenPage(1);
-      }
-      if (this.issueListReturn.closed.length > 0) {
-        if (this.pager1.currentPage == 0) {
-          this.setClosedPage(1);
-        } else {
-          this.setClosedPage(this.pager1.currentPage);
-        }
-      } else {
-        this.setClosedPage(1);
+        this.setPage(1);
       }
       dialog.close();
-    },dialog.error)
+    }, dialog.error)
+
+  }
+
+  public setPage(page: number) {
+    if (page < 1 || page > this.pager.totalPages) {
+      return;
+    }
+
+    this.pager = this.pagerService.getPager(this.issuesList.length, page);
+
+    //get the paged items
+    this.pagedItems = this.issuesList.slice(this.pager.startIndex, this.pager.endIndex + 1);
+
   }
 
   public setOpenPage(page: number) {
@@ -108,6 +105,9 @@ export class IssuesComponent implements OnInit{
       this.selectedIssue = null;
 
     }
+  }
+  public seeIssue(id:any){
+
   }
 
   public closeModal() {

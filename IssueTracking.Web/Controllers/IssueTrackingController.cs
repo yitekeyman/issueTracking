@@ -362,7 +362,7 @@ namespace IssueTracking.Web.Controllers
         public IActionResult GetAllIssues()
         { try
             {
-                return Json(_iIssueTrackingFacade.GetAllBasicSolution(GetSession()));
+                return Json(_iIssueTrackingFacade.GetAllIssues(GetSession()));
             }
             catch (Exception e)
             {

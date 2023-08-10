@@ -16,7 +16,7 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-toggle="tooltip" data-placement="left" title="Add Issue" class="btn"  data-target="#addIssueModal"  (click)="editIssue(0,0)">Add Issue</button>
+                <button data-toggle="tooltip" data-placement="left" title="Add Issue" class="btn"  data-target="#addIssueModal"  (click)="openAddIssueModal()">Add Issue</button>
               </div>
             </div>
           </div>
@@ -40,16 +40,8 @@
                 <th>Issue Type</th>
                 <th>Other Issue</th>
                 <th>Policy Number</th>
-                <th>Branch Id</th>
                 <th>Issue Description</th>
-                <th>Issue Requested By</th>
-                <th>Issue Requested Date</th>
-                <th>Issue Responded By</th>
-                <th>Issue Responded Date</th>
-                <th>Issue Closed By</th>
-                <th>Issue Closed Date</th>
                 <th>Issue Priority</th>
-                <th>Issue Status</th>
                 <th>Ticket</th>
                 <th>Issue Resource</th>
                 <th class="text-right">Action</th>
@@ -61,26 +53,18 @@
                 <td>{{row.issueTitle.name}}</td>
                 <td>{{row.issueType.name}}</td>
                 <td>{{row.otherIssue.description}}</td>
-                <td>{{row.branchId}}</td>
                 <td>{{row.policyNo}}</td>
                 <td>{{row.issueDescription.description}}</td>
-                <td>{{row.issue_requested_by}}</td>
-                <td>{{row.issue_requested_date}}</td>
-                <td>{{row.issue_respond_by}}</td>
-                <td>{{row.issue_respond_date}}</td>
-                <td>{{row.issue_closed_by}}</td>
-                <td>{{row.issue_closed_date}}</td>
                 <td>{{row.issuePriority}}</td>
-                <td>{{row.issueStatus}}</td>
                 <td>{{row.ticket}}</td>
                 <td><span *ngIf="row.solutionResource?.length>0">Have {{row.solutionResource?.length}} File Resource</span> <span *ngIf="row.solutionResource?.length==0">No Resource</span></td>
                 <td class="text-right">
                   <div class="btn-group">
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" ><i class="fa fa-edit"></i>
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button"  (click)="editIssue( row.id, row.issueType.id)"><i class="fa fa-edit"></i>
                       Edit
                     </button>
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" ><i class="fa fa-plus-square-o"></i>
-                      Add Issue
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" (click)="seeIssue(row.id)"><i class="fa fa-eye"></i>
+                      Details
                     </button>
                   </div>
                 </td>
@@ -106,16 +90,8 @@
                 <th>Issue Type</th>
                 <th>Other Issue</th>
                 <th>Policy Number</th>
-                <th>Branch Id</th>
                 <th>Issue Description</th>
-                <th>Issue Requested By</th>
-                <th>Issue Requested Date</th>
-                <th>Issue Responded By</th>
-                <th>Issue Responded Date</th>
-                <th>Issue Closed By</th>
-                <th>Issue Closed Date</th>
                 <th>Issue Priority</th>
-                <th>Issue Status</th>
                 <th>Ticket</th>
                 <th>Issue Resource</th>
                 <th class="text-right">Action</th>
@@ -143,5 +119,5 @@
 </div>
 
 <div class="modal fade" id="addIssueModal" role="dialog">
-  <app-edit-issue *ngIf="isAdd || isEdit" [id]="addIssueModalId" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
+  <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="openAddIssueModal()" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
 </div>

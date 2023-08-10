@@ -2367,7 +2367,7 @@ hr {
     padding: 0;
     width: 22px;
     height: 22px;
-    background: url('../src/assets/img/green1.png') no-repeat;
+    background: url('C:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/green1.png') no-repeat;
     border: none;
     cursor: pointer;
 }
@@ -2970,7 +2970,7 @@ textarea.auto-size {
     background-color: #FFF;
     background-position: right calc(100% - 7px);
     background-repeat: no-repeat;
-    background-image: url('../src/assets/images/select.png');
+    background-image: url('C:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/images/select.png');
     pointer-events: none;
     z-index: 5;
 }
@@ -3146,7 +3146,7 @@ textarea.auto-size {
 .chosen-container-multi .chosen-choices li.search-choice .search-choice-close{
 	width: 15px;
     height: 10px;
-    background: url('../src/assets/img/chosen-sprite.png') -38px 1px no-repeat;
+    background: url('C:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') -38px 1px no-repeat;
 	display: inline-block;
     text-align: center;
 	color:#333;
@@ -3169,7 +3169,7 @@ textarea.auto-size {
     background-color: #FFF;
     background-position: right calc(100% - 7px);
     background-repeat: no-repeat;
-    background-image: url('../src/assets/images/select.png');
+    background-image: url('C:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/images/select.png');
     pointer-events: none;
     z-index: 5;
 }
@@ -4063,7 +4063,7 @@ textarea.auto-size {
     padding: 6px 25px;
 }
 .chosen-container-single .chosen-search input[type="text"]{
-	background: white url(../src/assets/img/chosen-sprite.png) no-repeat 100% -20px;
+	background: white url('C:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') no-repeat 100% -20px;
 }
 .modal-footer .btn-primary[disabled]:focus, .modal-footer .btn-primary[disabled]:hover{
 	background: #00c292;

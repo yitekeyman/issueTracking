@@ -65,25 +65,17 @@
                 <td>{{row.issueTitle.name}}</td>
                 <td>{{row.issueType.name}}</td>
                 <td>{{row.otherIssue.name}}</td>
-                <td>{{row.branchId.number}}</td>
                 <td>{{row.policyNo.name}}</td>
                 <td>{{row.issueDescription.description}}</td>
-                <td>{{row.issue_requested_by.name}}</td>
-                <td>{{row.issue_requested_date.date}}</td>
-                <td>{{row.issue_respond_by.name}}</td>
-                <td>{{row.issue_respond_date.date}}</td>
-                <td>{{row.issue_closed_by.name}}</td>
-                <td>{{row.issue_closed_date.date}}</td>
                 <td>{{row.issuePriority.name}}</td>
-                <td>{{row.issueStatus.name}}</td>
                 <td>{{row.ticket.name}}</td>
                 <td><span *ngIf="row.issueSolution?.length>0"><a [routerLink]="">have {{row.issueSolution?.length}} Solution</a></span><span *ngIf="row.issueSolution?.length==0">No Solution</span></td>
                 <td class="text-right">
                   <div class="btn-group">
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editIssueType(1, row)"><i class="fa fa-edit"></i>
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editIssue( row.id, row.issueType.id)"> <i class="fa fa-edit"> </i>
                       Edit
                     </button>
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editIssue(0,null)"><i class="fa fa-plus-square-o"></i>
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" ><i class="fa fa-plus-square-o"></i>
                       Add Issue
                     </button>
                   </div>
