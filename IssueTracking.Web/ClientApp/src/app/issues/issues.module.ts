@@ -5,9 +5,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxDropzoneModule} from "ngx-dropzone";
 import {MonacoEditorModule} from "@materia-ui/ngx-monaco-editor";
 import {IssuesRouting} from "./issues.routing";
-import {IssuesListComponent} from "./issues-list/issues-list.component";
-import {SettingsModule} from "../settings/settings.module";
-import {IssuesComponent} from "./issues.component";
+import {ViewIssueComponent} from "./viewIssues/view-issue.component";
 import {EditIssueComponent} from "./editIssue/edit-issue.component";
 
 @NgModule({
@@ -23,7 +21,7 @@ import {EditIssueComponent} from "./editIssue/edit-issue.component";
     EditIssueComponent
   ],
   declarations: [
-    IssuesListComponent,
+    ViewIssueComponent,
     EditIssueComponent
   ]
 })

@@ -63,6 +63,7 @@ namespace IssueTracking.Domain.IssueTracking
         
         public IList<IssueTypeList> IssueType = new List<IssueTypeList>();
     }
+    
 
     public class LITOptions
     {

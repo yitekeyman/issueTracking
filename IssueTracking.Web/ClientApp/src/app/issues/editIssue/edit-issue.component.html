@@ -10,12 +10,21 @@
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Title *</small></label>
-          <input type="text" class="form-control" formControlName="issueTitle">
+          <input type="text" class="form-control" formControlName="issueTitle" [(ngModel)]="issueModal.issueTitle">
+        </div>
+
+
+        <div class="form-group" *ngIf="selectedIssueType > 0" formGroupName="issueType">
+          <label class="nk-label"><small>Issue Type *</small></label>
+          <select class="form-control" formControlName="id"  [(ngModel)]="issueModal.issueTypeId">
+            <option value="0">Choose an Issue Type</option>
+            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
+          </select>
         </div>
 
         <div class="form-group" *ngIf="selectedIssueType==0" formGroupName="issueType">
           <label class="nk-label"><small>Issue Type *</small></label>
-          <select class="form-control" formControlName="id">
+          <select class="form-control" formControlName="id"  [(ngModel)]="issueModal.issueTypeId">
             <option value="0">Choose an Issue Type</option>
             <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
           </select>
@@ -23,35 +32,41 @@
 
         <div class="form-group">
           <label class="nk-label"><small>Other Issue *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue"></textarea>
+          <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue" [(ngModel)]="issueModal.otherIssue" ></textarea>
         </div>
 
 		<div class="form-group">
           <label class="nk-label"><small>Policy Number *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Policy Number" formControlName="PolicyNo"></textarea>
+          <textarea rows="3" class="form-control" placeholder="Policy Number" formControlName="PolicyNo" [(ngModel)]="issueModal.policyNo"></textarea>
         </div>
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Description *</small></label>
-          <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="issueDescription"></textarea>
+          <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="issueDescription"
+                    [(ngModel)]="issueModal.issueDescription"></textarea>
         </div>
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Priority *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Issue Priority" formControlName="issuePriority"></textarea>
+          <select class="form-control" formControlName="issuePriority"
+                  [(ngModel)]="issueModal.issuePriority">
+            <option value="0">Choose the priority * </option>
+            <option [value]="ir.id" *ngFor="let ir of priorityList">{{ir.name}}</option>
+          </select>
         </div>
-		  <!--
-        <div class="form-group ">
-          <label class="nk-label"><small>Description *</small></label>
-          <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="description"
-                    [(ngModel)]="solutionModal.solutionDescription"></textarea>
-
-        </div>
-        -->
+        <!--
+        <div class="form-group">
+          <label class="nk-label"><small>Issue Status *</small></label>
+          <select class="form-control" formControlName="issueStatus"
+                  [(ngModel)]="issueModal.issueStatus">
+            <option value="0">Choose the status * </option>
+            <option [value]="ir.id" *ngFor="let ir of statusList">{{ir.name}}</option>
+          </select>
+        </div> -->
 
         <div class="form-group">
           <label class="nk-label"><small>Ticket *</small></label>
-          <input type="text" class="form-control" formControlName="Ticket">
+          <input type="text" class="form-control" formControlName="Ticket"  [(ngModel)]="issueModal.ticket">
         </div>
 
         <div class="dropzone-area">

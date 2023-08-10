@@ -1,0 +1,120 @@
+<div class="breadcomb-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="breadcomb-list">
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+              <div class="breadcomb-wp">
+                <div class="breadcomb-icon">
+                  <i class="notika-icon notika-app"></i>
+                </div>
+                <div class="breadcomb-ctn">
+                  <h2>View Issue Details</h2>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+              <div class="breadcomb-report">
+                <button data-placement="left" title="Add Issue" class="btn" data-toggle="modal"
+                        data-target="#addIssueModal" >Add Issue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="invoice-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-3">
+        <div class="panel">
+          <div class="panel-heading bg-au">
+            <label>Issue Type Details</label>
+          </div>
+          <div class="panel-body data-table-list">
+            <table class="table table-striped " id="data-table-basic" style="font-size: 12px">
+              <tr>
+                <td><label> Issue Title: </label> {{issue.issueType.name}}</td>
+              </tr>
+              <tr>
+                <td><label>System Raised: </label> {{issue.issueType.issueTypeId.name}}
+                  <small>({{issue.issueType.raisedSystem.description}})</small></td>
+              </tr>
+              <tr>
+                <td><label>Description: </label> {{issue.issueType.description}}</td>
+              </tr>
+              <tr>
+                <td><label>Other Solution: </label> <span
+                  *ngIf="issue.issueType.issueSolution?.length>1">have {{issue.issueType.issueSolution.length}}
+                  other solution</span>
+                  <span *ngIf="issue.issueType.issueSolution?.length<=1"> there is no other solution</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9 col-md-9" style="min-height: 450px;">
+        <div class="panel">
+          <div class="panel-heading">
+            <label>Issue Type Details</label>
+          </div>
+          <div class="panel-body data-table-list">
+            <table class="table" style="font-size: 13px">
+              <tr>
+                <td>{{issue.issueTitle}}</td>
+              </tr>
+              <tr>
+                <td>{{issue.otherIssue}}</td>
+              </tr>
+              <tr>
+                <td>{{issue.policyNo}}</td>
+              </tr>
+              <tr>
+                <td>{{issue.issueDescription}}</td>
+              </tr>
+              <tr>
+                <td>{{issue.issuePriority}}</td>
+              </tr>
+              <tr>
+                <td>{{issue.ticket}}</td>
+              </tr>
+              <tr *ngIf="issue.issueResource?.length>0">
+                <td>
+                  <label class="nk-label"><small>Issue Resource</small></label>
+                  <div class="solution-dropzone">
+                    <div class="row">
+                      <div *ngFor="let image of issue.issueResource;index as i "
+                           [ngClass]="{'col-md-12 solution-dropzone-preview-1':i<1,'col-md-3 solution-dropzone-preview':i>0}">
+                        <a
+                          href="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
+                          target="_blank">
+                          <img
+                            src="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
+                            alt=""/>
+                          <label>{{image.fileName}}</label>
+                        </a>
+                      </div>
+                    </div>
+
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addIssueModal" role="dialog">
+  <app-edit-issue> </app-edit-issue>
+</div>
+

@@ -7,7 +7,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import {LoginComponent} from "./login/login.component";
 import {AdminLayoutModule} from "./layouts/admin-layout/admin-layout.module";
 import {IssuesComponent} from "./issues/issues.component";
-import {IssuesListComponent} from "./issues/issues-list/issues-list.component";
+import {ViewIssueComponent} from "./issues/viewIssues/view-issue.component";
 
 const routes: Routes =[
   {
@@ -17,7 +17,7 @@ const routes: Routes =[
 
   {
     path: 'GetAllIssues',
-    component: IssuesListComponent
+    component: ViewIssueComponent
   },
 
   {

@@ -119,5 +119,5 @@
 </div>
 
 <div class="modal fade" id="addIssueModal" role="dialog">
-  <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="openAddIssueModal()" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
+  <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="getAllIssues()" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
 </div>

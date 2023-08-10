@@ -24,6 +24,7 @@ export class EditIssueComponent implements OnInit {
   @Output() public loadPage = new EventEmitter();
   @Output() public closeModal = new EventEmitter();
 
+  public priorityList = [];
   public issueTypeList = [];
   public issueList = [];
   public issueModal: IssueListModel;
@@ -59,9 +60,13 @@ export class EditIssueComponent implements OnInit {
       this.issueTypeList = res;
     });
 
+    this.issueTrackingService.GetAllPriorityTypes().subscribe(res => {
+      this.priorityList = res;
+    });
+
     this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issueList = res;
-    })
+    });
 
   }
   ngOnInit() {

@@ -11,7 +11,7 @@ import {LabelsComponent} from "../../settings/labels/labels.component";
 import {BasicSolutionComponent} from "../../settings/basicSolution/basic-solution.component";
 import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
-import {IssuesListComponent} from "../../issues/issues-list/issues-list.component";
+import {ViewIssueComponent} from "../../issues/viewIssues/view-issue.component";
 import {IssuesModule} from "../../issues/issues.module";
 import {IssuesRouting} from "../../issues/issues.routing";
 

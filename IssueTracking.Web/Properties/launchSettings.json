@@ -18,7 +18,7 @@
     "IssueTracking.Web": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://127.0.0.1:5004;https://127.0.0.1:5000",
+      "applicationUrl": "https://127.0.0.1:5004; https://127.0.0.1:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
