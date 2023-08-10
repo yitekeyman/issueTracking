@@ -626,6 +626,8 @@ namespace IssueTracking.Domain.IssueTracking
                 Opened= opened,
                 Closed = GetIssueByStatus(parameter,2)
             };
+            ret.UpperSideBarStats = GetUpperSideBarStat();
+            ret.LowerSideBarStats = GetLowerSideBarStat();
             return ret;
         }
 
