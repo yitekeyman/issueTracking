@@ -7,7 +7,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import {LoginComponent} from "./login/login.component";
 import {AdminLayoutModule} from "./layouts/admin-layout/admin-layout.module";
 import {IssuesComponent} from "./issues/issues.component";
-import {ViewIssueComponent} from "./issues/viewIssues/view-issue.component";
+import {EditIssueComponent} from "./issues/editIssue/edit-issue.component";
 
 const routes: Routes =[
   {
@@ -15,10 +15,6 @@ const routes: Routes =[
     component:LoginComponent
   },
 
-  {
-    path: 'GetAllIssues',
-    component: ViewIssueComponent
-  },
 
   {
     path: '',
@@ -38,6 +34,17 @@ const routes: Routes =[
       path: '',
       loadChildren: () => AdminLayoutModule
   }]},
+  {
+    path: 'issues',
+
+    component: IssuesComponent,
+    children: [
+      {
+        path: 'edit-issue',
+        component: EditIssueComponent
+      }
+    ]
+  },
   {
     path: '**',
     redirectTo: 'login',

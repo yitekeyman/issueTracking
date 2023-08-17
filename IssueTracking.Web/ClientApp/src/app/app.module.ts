@@ -7,7 +7,6 @@ import { RouterModule } from '@angular/router';
 
 import { AppRoutingModule } from './app.routing';
 import { ComponentsModule } from './components/components.module';
-
 import { AppComponent } from './app.component';
 import {LoginComponent} from "./login/login.component";
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
@@ -17,6 +16,7 @@ import {PagerService} from "./_Services/pager.service";
 import {NgxDropzoneModule} from "ngx-dropzone";
 import {IssuesComponent} from "./issues/issues.component";
 import {IssuesModule} from "./issues/issues.module";
+import {routes} from "./issues/issues.routing";
 
 @NgModule({
   imports: [
@@ -25,7 +25,7 @@ import {IssuesModule} from "./issues/issues.module";
     FormsModule,
     HttpClientModule,
     ComponentsModule,
-    RouterModule,
+    RouterModule.forChild(routes),
     AppRoutingModule,
     NgxDropzoneModule,
     IssuesModule

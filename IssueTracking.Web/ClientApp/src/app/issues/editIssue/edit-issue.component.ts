@@ -1,5 +1,5 @@
 ﻿import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validator, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {IssueTrackingService} from "../../_Services/IssueTrackingService";
 import {IssueListModel, ResourceModel} from "../../_model/IssueTrackingModel";
 import dialog from "../../components/dialog";
@@ -12,6 +12,7 @@ import {
 import {Observable, ReplaySubject, take} from "rxjs";
 import {filter} from "rxjs/operators";
 import {MonacoDiffEditorConstructionOptions} from "@materia-ui/ngx-monaco-editor/lib/interfaces";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-edit-issue',
@@ -19,7 +20,7 @@ import {MonacoDiffEditorConstructionOptions} from "@materia-ui/ngx-monaco-editor
   styleUrls: ['./edit-issue.component.scss']
 })
 export class EditIssueComponent implements OnInit {
-  @Input() public selectedIssue = 0;
+  @Input() public selectedIssue = null;
   @Input() public selectedIssueType = 0;
   @Output() public loadPage = new EventEmitter();
   @Output() public closeModal = new EventEmitter();
@@ -53,7 +54,21 @@ export class EditIssueComponent implements OnInit {
       endLineNumber: 3
     });
   }
-  constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService)
+
+  /*
+   addIssueForm = new FormGroup({
+    issueTitle: new FormControl(''),
+    issueTypeId: new FormControl(''),
+    issueType: new FormControl(0 , [Validators.required, Validators.min(1)]),
+    otherIssue: new FormControl(''),
+    PolicyNo: new FormControl(''),
+    issueDescription: new FormControl('', Validators.required),
+    issuePriority: new FormControl ('', [Validators.required, Validators.min(1)]),
+    ticket: new FormControl(''),
+    resource: new FormControl('')
+  })
+  */
+  constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService, public router: Router)
   {
 
     this.issueTrackingService.GetAllIssueType().subscribe(res => {
@@ -67,44 +82,41 @@ export class EditIssueComponent implements OnInit {
     this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issueList = res;
     });
+    this.addIssueForm = this.fb.group({
+      issueTitle: [''],
+      issueType: [0, [Validators.required, Validators.min(1)]],
+      otherIssue: [''],
+      PolicyNo: [''],
+      issueDescription: ['', Validators.required],
+      issuePriority: ['', Validators.required],
+      ticket: [''],
+      resource: [''],
+    })
+
+
 
   }
   ngOnInit() {
-
     this.issueModal = {
       id: 0,
-      issueTypeId: this.selectedIssueType,
       issueTitle: '',
+      issueTypeId: this.selectedIssueType,
       otherIssue: '',
       policyNo: [''],
       issueDescription: '',
       issuePriority: 0,
       ticket: '',
       issueResource: this.resourceModels,
-    };
-
-    this.addIssueForm = this.fb.group({
-      issueTitle: [''],
-      issueTypeId: [''],
-      issueType: [0, [Validators.required, Validators.min(1)]],
-      otherIssue: [''],
-      PolicyNo: [''],
-      issueDescription: ['', Validators.required],
-      issuePriority: ['', [Validators.required, Validators.min(1)]],
-      ticket: [''],
-      resource: [''],
-    })
-
-
+    }
     this.resourceModel = {
-      docRef: "",
-      fileName:"",
-      data: "",
-      mimeType: "",
+      docRef: '',
+      fileName:'',
+      data: '',
+      mimeType: '',
       index: 0
     };
-    if (this.selectedIssue >0) {
-      this.issueTrackingService.GetIssueById(this.selectedIssue).subscribe(res=>{
+    if (this.selectedIssue !=null) {
+      this.issueTrackingService.EditIssue(this.selectedIssue).subscribe(res=>{
         this.issueModal = {
           id: res.id,
           issueTitle: res.issueTitle,
@@ -124,7 +136,7 @@ export class EditIssueComponent implements OnInit {
       });
     }
   }
-
+/*
   public editIssue(id: any, issueTypeId:any) {
     this.selectedIssueType=issueTypeId;
     if (id > 0) {
@@ -138,10 +150,10 @@ export class EditIssueComponent implements OnInit {
 
     }
   }
-
+*/
   public saveChanges() {
     dialog.loading();
-    this.issueTrackingService.GetIssueById(this.selectedIssue).subscribe(res => {
+    this.issueTrackingService.EditIssue(this.issueModal).subscribe(res => {
       dialog.close();
       swal({
         type: 'success',

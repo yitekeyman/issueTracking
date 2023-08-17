@@ -32,7 +32,6 @@ export class ApiServices {
 
   public get(path: string): Observable<any> {
     return this._http.get(`${this.base_url}${path}`, {withCredentials: true, headers: this.headers}).pipe(catchError(ApiServices.handleError));
-
   }
 
   public post(path: string, body: any): Observable<any> {
@@ -53,7 +52,7 @@ export class ApiServices {
 
   public postFormData(path: string, form_data: FormData): Observable<any> {
     const formDataHeaders = new HttpHeaders();
-    formDataHeaders.set('enctype', 'multipart\/form-data');
+    formDataHeaders.set('enctype', 'multipart/form-data');
     formDataHeaders.set('Accept', 'application/json');
     formDataHeaders.set('Authorization', 'Bearer ' + window.localStorage.getItem(this.KEY_NAME));
     formDataHeaders.set('Access-Control-Allow-Headers', '*');

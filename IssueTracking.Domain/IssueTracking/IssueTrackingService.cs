@@ -597,7 +597,7 @@ namespace IssueTracking.Domain.IssueTracking
             else
             {
                 throw new AccessDeniedException("Sorry, I can't find any issue registered with this title of '"+model.IssueTitle+"'");
-            }
+            } 
         }
 
         public IList<IssueListReturn> GetAllIssues()
@@ -612,10 +612,10 @@ namespace IssueTracking.Domain.IssueTracking
                     allIssues.Add(ai);
                 }
             }
-
+        
             return allIssues;
         }
-        
+        /*
         public IssueListReturnModel GetAllIssues(IssueFilterParameter parameter)
         {
             var opened = new List<IssueListReturn>();
@@ -630,7 +630,7 @@ namespace IssueTracking.Domain.IssueTracking
             ret.LowerSideBarStats = GetLowerSideBarStat();
             return ret;
         }
-
+       */
         public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter,long status)
         {
             var ret = new List<IssueListReturn>();

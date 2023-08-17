@@ -2111,6 +2111,11 @@ namespace IssueTracking.Datas.Entities
                     .WithMany(p => p.IssuesList)
                     .HasForeignKey(d => d.IssueTypeId)
                     .HasConstraintName("issue_type_issue_fk");
+                entity.HasOne(d => d.IssueRaisedSys)
+                    .WithMany(p => p.IssuesList)
+                    .HasForeignKey(d => d.IssueRaisedSluId)
+                    .HasConstraintName("issue_raised_slu_id_fk");
+                
             });
 
             modelBuilder.Entity<LabelList>(entity =>

@@ -358,7 +358,7 @@ namespace IssueTracking.Web.Controllers
                 return StatusCode(stCode, new { message = e.InnerException });
             }
         }
-        [HttpPost]
+        [HttpGet]
         public IActionResult GetAllIssues()
         { try
             {

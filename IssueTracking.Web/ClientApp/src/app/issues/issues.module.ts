@@ -4,26 +4,30 @@ import {RouterModule} from "@angular/router";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxDropzoneModule} from "ngx-dropzone";
 import {MonacoEditorModule} from "@materia-ui/ngx-monaco-editor";
-import {IssuesRouting} from "./issues.routing";
+import {IssuesRoutingModule, routes} from "./issues.routing";
 import {ViewIssueComponent} from "./viewIssues/view-issue.component";
 import {EditIssueComponent} from "./editIssue/edit-issue.component";
 
 @NgModule({
+  declarations: [
+    ViewIssueComponent,
+    EditIssueComponent,
+  ],
+
   imports: [
     CommonModule,
-    RouterModule.forChild(IssuesRouting),
+    RouterModule.forChild(routes),
     FormsModule,
     ReactiveFormsModule,
     NgxDropzoneModule,
     MonacoEditorModule,
+    IssuesRoutingModule
   ],
+
   exports: [
     EditIssueComponent
+
   ],
-  declarations: [
-    ViewIssueComponent,
-    EditIssueComponent
-  ]
 })
 export class IssuesModule{
 

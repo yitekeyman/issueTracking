@@ -10,13 +10,15 @@
                   <i class="notika-icon notika-edit"></i>
                 </div>
                 <div class="breadcomb-ctn">
-                  <h2>Issues this is the real page</h2>
+                  <h2>Issues List</h2>
                 </div>
               </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-toggle="tooltip" data-placement="left" title="Add Issue" class="btn"  data-target="#addIssueModal"  (click)="openAddIssueModal()">Add Issue</button>
+                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal fade in"
+                        data-target="#editIssueModal" (click)="editIssue(0, 1)"> Add Issue
+                </button>
               </div>
             </div>
           </div>
@@ -50,20 +52,20 @@
               <tbody *ngIf="pagedItems?.length>0" style="min-height: 300px">
               <tr *ngFor="let row of pagedItems; index as i">
                 <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
-                <td>{{row.issueTitle.name}}</td>
-                <td>{{row.issueType.name}}</td>
+                <td>{{row.issueTitle}}</td>
+                <td>{{row.issueType}}</td>
                 <td>{{row.otherIssue.description}}</td>
                 <td>{{row.policyNo}}</td>
                 <td>{{row.issueDescription.description}}</td>
                 <td>{{row.issuePriority}}</td>
                 <td>{{row.ticket}}</td>
-                <td><span *ngIf="row.solutionResource?.length>0">Have {{row.solutionResource?.length}} File Resource</span> <span *ngIf="row.solutionResource?.length==0">No Resource</span></td>
+                <td><span *ngIf="row.issueResource?.length>0">Have {{row.issueResource?.length}} File Resource</span> <span *ngIf="row.solutionResource?.length==0">No Resource</span></td>
                 <td class="text-right">
                   <div class="btn-group">
                     <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button"  (click)="editIssue( row.id, row.issueType.id)"><i class="fa fa-edit"></i>
                       Edit
                     </button>
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" (click)="seeIssue(row.id)"><i class="fa fa-eye"></i>
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" (click)="seeIssueDetails(row.id)"><i class="fa fa-eye"></i>
                       Details
                     </button>
                   </div>
@@ -73,7 +75,7 @@
               </tbody>
               <tbody *ngIf="pagedItems?.length==0">
               <tr>
-                <td colspan="6" class="text-center">
+                <td colspan="10" class="text-center">
                   <div class="panel-body" style="text-align: center; margin: 20px">
                     <div style="text-align: center; font-size: 50px; color:#00c292; opacity: 0.5"><i
                       class="fa fa-exclamation-triangle"></i></div>
@@ -83,32 +85,19 @@
                 </td>
               </tr>
               </tbody>
-              <tfoot *ngIf="pagedItems?.length>0 && pager.totalPages>1">
-              <tr>
-                <th>#</th>
-                <th>Issue Title</th>
-                <th>Issue Type</th>
-                <th>Other Issue</th>
-                <th>Policy Number</th>
-                <th>Issue Description</th>
-                <th>Issue Priority</th>
-                <th>Ticket</th>
-                <th>Issue Resource</th>
-                <th class="text-right">Action</th>
-              </tr>
-              </tfoot>
+
             </table>
 
           </div>
           <div class="wizard-action-pro" *ngIf="pagedItems?.length>0 && pager.totalPages>1">
             <ul class="wizard-nav-ac">
               <li><a [ngClass]="{'disabled':pager.currentPage === 1} +' button-first a-prevent '" [routerLink]=""
-                     (click)="setOpenPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
+                     (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
               <li *ngFor="let page of pager.pages"><a [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
-                                                      [routerLink]="" (click)="setOpenPage(page)"><i
+                                                      [routerLink]="" (click)="setPage(page)"><i
                 class="notika-icon">{{page}}</i></a></li>
               <li><a [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' a-prevent'" [routerLink]=""
-                     (click)="setOpenPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
+                     (click)="setPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
 
             </ul>
           </div>
@@ -118,6 +107,10 @@
   </div>
 </div>
 
-<div class="modal fade" id="addIssueModal" role="dialog">
+<div class="modal fade in" id="addIssueModal" role="dialog">
   <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="getAllIssues()" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
+</div>
+
+<div *ngIf="isAdd">
+  <app-edit-issue ></app-edit-issue>
 </div>

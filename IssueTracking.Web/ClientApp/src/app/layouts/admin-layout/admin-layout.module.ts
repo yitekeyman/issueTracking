@@ -13,7 +13,6 @@ import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
 import {ViewIssueComponent} from "../../issues/viewIssues/view-issue.component";
 import {IssuesModule} from "../../issues/issues.module";
-import {IssuesRouting} from "../../issues/issues.routing";
 
 @NgModule({
     imports: [

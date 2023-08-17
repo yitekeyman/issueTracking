@@ -14,6 +14,7 @@ namespace IssueTracking.Datas.Entities
             Labels = new HashSet<Labels>();
             Milestones = new HashSet<Milestones>();
             WatchedIssue = new HashSet<WatchedIssue>();
+            
         }
 
         public Guid Id { get; set; }
@@ -40,6 +41,7 @@ namespace IssueTracking.Datas.Entities
         public virtual Employee IssueRequestedByNavigation { get; set; }
         public virtual IssueStatusType IssueStatusNavigation { get; set; }
         public virtual IssueTypeList IssueType { get; set; }
+        public virtual IssueRaisedSystem IssueRaisedSys{ get; set; }
         public virtual ICollection<DeletedIssuesList> DeletedIssuesList { get; set; }
         public virtual ICollection<IssueAssigned> IssueAssigned { get; set; }
         public virtual ICollection<IssueComments> IssueComments { get; set; }

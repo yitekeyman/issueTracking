@@ -5,6 +5,7 @@ import {PagerService} from "../_Services/pager.service";
 import {Router} from "@angular/router";
 import dialog from "../components/dialog";
 import {FormBuilder} from "@angular/forms";
+import {EditIssueComponent} from "./editIssue/edit-issue.component";
 
 
 @Component({
@@ -18,7 +19,6 @@ export class IssuesComponent implements OnInit{
   public issuesList: [];
   public issueListReturn: IssueListReturnModel;
   public pager: any = {};
-  public addIssueModalId = 'addIssueModal';
   public isAdd = false;
   public isEdit = false;
   public selectedIssue = 0;
@@ -35,15 +35,13 @@ export class IssuesComponent implements OnInit{
   ngOnInit() {
     this.getAllIssues();
   }
-  public openAddIssueModal() {
-    this.router.navigate(['/LIT/issues/edit-issue']);
-  }
+
   public getAllIssues(){
     dialog.loading();
     this.closeModal();
     this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issuesList = res;
-      if (this.issuesList.length > 0) {
+      if (this.issuesList.length> 0) {
         if (this.pager.currentPage == 0) {
           this.setPage(1);
         } else {
@@ -68,7 +66,7 @@ export class IssuesComponent implements OnInit{
     this.pagedItems = this.issuesList.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
   }
-
+  /*
   public setOpenPage(page: number) {
     if (page < 1 || page > this.pager.totalPages) {
       return;
@@ -93,8 +91,12 @@ export class IssuesComponent implements OnInit{
 
   }
 
-  public editIssue(id: any, issueTypeId:any) {
-    this.selectedIssueType=issueTypeId;
+  public openAddIssueForm() {
+      this.router.navigate(['/issues/edit-issue']);
+  }
+*/
+  public editIssue(id: any, issueType:any) {
+    this.selectedIssueType=issueType;
     if (id > 0) {
       this.isAdd = false;
       this.isEdit = true;
@@ -106,8 +108,9 @@ export class IssuesComponent implements OnInit{
 
     }
   }
-  public seeIssue(id:any){
 
+  public seeIssueDetails(id:string){
+    this.router.navigate(['/issues/view-issue/', id]);
   }
 
   public closeModal() {
@@ -117,4 +120,5 @@ export class IssuesComponent implements OnInit{
     this.selectedIssueType=0;
   }
 
+  protected readonly EditIssueComponent = EditIssueComponent;
 }

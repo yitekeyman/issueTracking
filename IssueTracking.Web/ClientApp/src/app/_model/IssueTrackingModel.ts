@@ -36,6 +36,7 @@ export interface IssueListModel {
   id: number;
   issueTitle: string
   issueTypeId: number;
+
   otherIssue: string;
   policyNo: string[];
   issueDescription: string;

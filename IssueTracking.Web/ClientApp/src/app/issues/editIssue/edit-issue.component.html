@@ -1,4 +1,5 @@
-﻿<div class="modal-dialog modal-large">
+﻿
+<div class="modal-dialog modal-large">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" id="close" data-dismiss="modal" (click)="close()">&times;</button>
@@ -10,24 +11,26 @@
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Title *</small></label>
-          <input type="text" class="form-control" formControlName="issueTitle" [(ngModel)]="issueModal.issueTitle">
+          <input type="text" class="form-control" formControlName="issueTitle" >
         </div>
 
-
-        <div class="form-group" *ngIf="selectedIssueType > 0" formGroupName="issueType">
+        <div class="form-group" *ngIf="selectedIssueType>0">
           <label class="nk-label"><small>Issue Type *</small></label>
-          <select class="form-control" formControlName="id"  [(ngModel)]="issueModal.issueTypeId">
-            <option value="0">Choose an Issue Type</option>
+          <select class="form-control" formControlName="issueType"
+                  [(ngModel)]="issueModal.issueTypeId" disabled="disabled">
+            <option value="0">Choose a Issue Type</option>
             <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
           </select>
+
         </div>
-
-        <div class="form-group" *ngIf="selectedIssueType==0" formGroupName="issueType">
+        <div class="form-group" *ngIf="selectedIssueType==0">
           <label class="nk-label"><small>Issue Type *</small></label>
-          <select class="form-control" formControlName="id"  [(ngModel)]="issueModal.issueTypeId">
-            <option value="0">Choose an Issue Type</option>
+          <select class="form-control" formControlName="issueType"
+                  [(ngModel)]="issueModal.issueTypeId">
+            <option value="0">Choose a Issue Type</option>
             <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
           </select>
+
         </div>
 
         <div class="form-group">
@@ -35,10 +38,6 @@
           <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue" [(ngModel)]="issueModal.otherIssue" ></textarea>
         </div>
 
-		<div class="form-group">
-          <label class="nk-label"><small>Policy Number *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Policy Number" formControlName="PolicyNo" [(ngModel)]="issueModal.policyNo"></textarea>
-        </div>
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Description *</small></label>
@@ -48,21 +47,11 @@
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Priority *</small></label>
-          <select class="form-control" formControlName="issuePriority"
-                  [(ngModel)]="issueModal.issuePriority">
+          <select class="form-control" formControlName="issuePriority" [(ngModel)]="issueModal.issuePriority">
             <option value="0">Choose the priority * </option>
             <option [value]="ir.id" *ngFor="let ir of priorityList">{{ir.name}}</option>
           </select>
         </div>
-        <!--
-        <div class="form-group">
-          <label class="nk-label"><small>Issue Status *</small></label>
-          <select class="form-control" formControlName="issueStatus"
-                  [(ngModel)]="issueModal.issueStatus">
-            <option value="0">Choose the status * </option>
-            <option [value]="ir.id" *ngFor="let ir of statusList">{{ir.name}}</option>
-          </select>
-        </div> -->
 
         <div class="form-group">
           <label class="nk-label"><small>Ticket *</small></label>
