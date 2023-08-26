@@ -16,8 +16,8 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal fade in"
-                        data-target="#editIssueModal" (click)="editIssue(0, 1)"> Add Issue
+                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal"
+                        data-target="#editIssueModal" data-backdrop="static" (click)="editIssue(0, 0)"> Add Issue
                 </button>
               </div>
             </div>
@@ -107,7 +107,7 @@
   </div>
 </div>
 
-<div class="modal fade in" id="addIssueModal" role="dialog">
+<div class="modal fade"  id="editIssueModal" role="dialog"  data-show="true">
   <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="getAllIssues()" (closeModal)="closeModal()"  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
 </div>
 

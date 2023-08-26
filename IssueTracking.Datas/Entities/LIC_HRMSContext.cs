@@ -2240,7 +2240,7 @@ namespace IssueTracking.Datas.Entities
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasDefaultValueSql("nextval(('payroll.\"loan_type_seq\"'::text)::regclass)");
+                    .HasDefaultValueSql("nextval(('payroll.\"loan_type_seq\"'::text)::regClass)");
 
                 entity.Property(e => e.Name)
                     .HasColumnName("name")
