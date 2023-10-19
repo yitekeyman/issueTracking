@@ -62,11 +62,11 @@ export class ViewIssueComponent implements OnInit{
         }
         dialog.close()
       },dialog.error);
-     /* }else if(this.issueTypeId!=null){
-      this.issueTrackingService.GetBasicSolutionByIssueType(this.issueTypeId).subscribe(res=>{
-        this.issue=res;
-        dialog.close()
-      },dialog.error);
-    } */}
+      /* }else if(this.issueTypeId!=null){
+       this.issueTrackingService.GetBasicSolutionByIssueType(this.issueTypeId).subscribe(res=>{
+         this.issue=res;
+         dialog.close()
+       },dialog.error);
+     } */}
   }
 }

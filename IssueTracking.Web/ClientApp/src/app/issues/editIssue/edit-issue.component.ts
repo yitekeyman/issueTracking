@@ -1,7 +1,12 @@
-﻿import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from "@angular/core";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+﻿import {AfterViewInit, Component, EventEmitter, Input, NgModule, OnInit, Output, ViewChild} from "@angular/core";
+import {FormBuilder, FormControl, FormGroup, Validators, ValidatorFn} from "@angular/forms";
 import {IssueTrackingService} from "../../_Services/IssueTrackingService";
-import {IssueListModel, ResourceModel} from "../../_model/IssueTrackingModel";
+import {
+  DepartmentSchemaModel,
+  EmployeeModel,
+  IssueListModel,
+  ResourceModel
+} from "../../_model/IssueTrackingModel";
 import dialog from "../../components/dialog";
 import swal from "sweetalert2";
 import {
@@ -9,10 +14,8 @@ import {
   MonacoEditorLoaderService,
   MonacoStandaloneCodeEditor
 } from "@materia-ui/ngx-monaco-editor";
-import {Observable, ReplaySubject, take} from "rxjs";
-import {filter} from "rxjs/operators";
-import {MonacoDiffEditorConstructionOptions} from "@materia-ui/ngx-monaco-editor/lib/interfaces";
 import {Router} from "@angular/router";
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-edit-issue',
@@ -20,8 +23,9 @@ import {Router} from "@angular/router";
   styleUrls: ['./edit-issue.component.scss']
 })
 export class EditIssueComponent implements OnInit {
-  @Input() public selectedIssue = null;
-  @Input() public selectedIssueType = 0;
+  @Input() public selectedIssue: any;
+  @Input() public selectedIssueType = null;
+
   @Output() public loadPage = new EventEmitter();
   @Output() public closeModal = new EventEmitter();
 
@@ -30,6 +34,8 @@ export class EditIssueComponent implements OnInit {
   public issueList = [];
   public issueModal: IssueListModel;
   public resourceModels: ResourceModel[] = [];
+  public department: DepartmentSchemaModel;
+  public employee: EmployeeModel;
   public resourceModel: ResourceModel;
   public addIssueForm: FormGroup;
   public files: File[] = [];
@@ -55,19 +61,6 @@ export class EditIssueComponent implements OnInit {
     });
   }
 
-  /*
-   addIssueForm = new FormGroup({
-    issueTitle: new FormControl(''),
-    issueTypeId: new FormControl(''),
-    issueType: new FormControl(0 , [Validators.required, Validators.min(1)]),
-    otherIssue: new FormControl(''),
-    PolicyNo: new FormControl(''),
-    issueDescription: new FormControl('', Validators.required),
-    issuePriority: new FormControl ('', [Validators.required, Validators.min(1)]),
-    ticket: new FormControl(''),
-    resource: new FormControl('')
-  })
-  */
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService, public router: Router)
   {
 
@@ -82,41 +75,58 @@ export class EditIssueComponent implements OnInit {
     this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issueList = res;
     });
+
+    function policyNoFormatValidator(): ValidatorFn {
+      return (control: FormControl) => {
+        const policyNos: string = control.value.split(',').map((value: string) => value.trim()); // Split the comma-separated values into an array
+        const pattern: RegExp = /^P\/\d{1,3}\/\d{1,4}\/\d{4}\/\d{5}$/;
+
+        // Check each policy number against the pattern
+        for (const policyNo of policyNos) {
+          if (!pattern.test(policyNo)) {
+            return { policyNoFormat: true }; // Return validation error if the format is invalid
+          }
+        }
+
+        // Check for duplicate policy numbers
+        if (new Set(policyNos).size !== policyNos.length) {
+          return { duplicatePolicyNo: true }; // Return validation error if there are duplicate policy numbers
+        }
+
+        return null; // Return null if all policy numbers are valid
+      };
+    }
     this.addIssueForm = this.fb.group({
       issueTitle: [''],
-      issueType: [0, [Validators.required, Validators.min(1)]],
+      issueType: [-1, [Validators.required, Validators.min(1)]],
       otherIssue: [''],
-      PolicyNo: [''],
+      policyNo: ['', [Validators.required, Validators.minLength(1), policyNoFormatValidator()]],
       issueDescription: ['', Validators.required],
-      issuePriority: ['', Validators.required],
-      ticket: [''],
+      issuePriority: [0, Validators.required],
       resource: [''],
     })
-
-
 
   }
   ngOnInit() {
     this.issueModal = {
-      id: 0,
+      id: "",
       issueTitle: '',
-      issueTypeId: this.selectedIssueType,
+      issueTypeId: 0,
       otherIssue: '',
-      policyNo: [''],
-      issueDescription: '',
+      policyNo: '',
+      issueDescription:'',
       issuePriority: 0,
-      ticket: '',
       issueResource: this.resourceModels,
     }
     this.resourceModel = {
       docRef: '',
-      fileName:'',
+      fileName: '',
       data: '',
       mimeType: '',
       index: 0
     };
-    if (this.selectedIssue !=null) {
-      this.issueTrackingService.EditIssue(this.selectedIssue).subscribe(res=>{
+    if (this.selectedIssue != null) {
+      this.issueTrackingService.AddIssue(this.selectedIssue).subscribe(res=> {
         this.issueModal = {
           id: res.id,
           issueTitle: res.issueTitle,
@@ -125,35 +135,22 @@ export class EditIssueComponent implements OnInit {
           policyNo: res.policyNo,
           issueDescription: res.issueDescription,
           issuePriority: res.issuePriority,
-          ticket: res.ticket,
-          issueResource: res.issueResource,
-        };
+          issueResource: res.issueResource
+        }
+
         this.resourceModels = res.issueResource;
-        for(let i=0; i<this.resourceModels.length; i++){
-          let image=this.issueTrackingService.convertBase64ToFile(this.resourceModels[i]);
+        for (let i = 0; i < this.resourceModels.length; i++) {
+          let image = this.issueTrackingService.convertBase64ToFile(this.resourceModels[i]);
           this.files.push(image);
         }
       });
     }
   }
-/*
-  public editIssue(id: any, issueTypeId:any) {
-    this.selectedIssueType=issueTypeId;
-    if (id > 0) {
-      this.isAdd = false;
-      this.isEdit = true;
-      this.selectedIssue = id;
-    } else {
-      this.isEdit = false;
-      this.isAdd = true;
-      this.selectedIssue = null;
 
-    }
-  }
-*/
+  sanitizedUrl: any;
   public saveChanges() {
     dialog.loading();
-    this.issueTrackingService.EditIssue(this.issueModal).subscribe(res => {
+    this.issueTrackingService.AddIssue(this.issueModal).subscribe(res => {
       dialog.close();
       swal({
         type: 'success',
@@ -203,6 +200,7 @@ export class EditIssueComponent implements OnInit {
     this.resourceModels.splice(this.resourceModels.indexOf(event), 1);
   }
 
+
   public resetResourceModel() {
     this.resourceModel = {
       docRef: "",
@@ -212,4 +210,6 @@ export class EditIssueComponent implements OnInit {
       index: 0
     }
   }
+
+
 }

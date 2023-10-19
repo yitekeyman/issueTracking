@@ -34,7 +34,7 @@ const routes: Routes =[
       path: '',
       loadChildren: () => AdminLayoutModule
   }]},
-  {
+  /*{
     path: 'issues',
 
     component: IssuesComponent,
@@ -44,7 +44,7 @@ const routes: Routes =[
         component: EditIssueComponent
       }
     ]
-  },
+  }, */
   {
     path: '**',
     redirectTo: 'login',

@@ -10,7 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es5",
+    "target": "es2015",
     "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "node_modules/@types"
@@ -27,5 +27,12 @@
   "files": [
     "src/main.ts",
     "src/polyfills.ts",
-    ]
+    ],
+
+  "references": [
+    {
+      "path": "../IssueTracking.Web.csproj"
+    },
+
+  ]
 }

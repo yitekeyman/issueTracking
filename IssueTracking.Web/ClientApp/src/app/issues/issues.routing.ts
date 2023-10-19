@@ -18,7 +18,7 @@ export const routes:Routes=[
   },
   {path: 'issues/edit-issue', component:EditIssueComponent},
   {path: 'issues/view-issue', component:ViewIssueComponent},
-  ];
+];
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]

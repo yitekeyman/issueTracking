@@ -28,6 +28,7 @@ namespace IssueTracking.Domain.IssueTracking
 
         void EditBasicIssueSolution(BasicSolutionModel model);
         BasicSolutionReturn GetBasicSolutionById(long id);
+        IssueListReturn GetIssueByTitle(string IssueTitle);
         IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id);
         IList<BasicSolutionReturn> GetAllBasicSolution();
         string GetResourceDoc(string fileName, string mimeType);
@@ -209,7 +210,7 @@ namespace IssueTracking.Domain.IssueTracking
                 issueTypes.Description = issues.Description;
                 var solution = _context.BasicIssueSolution.Where(e => e.IssueTypeId == issues.Id).ToList();
                 var raisedSystem = _context.IssueRaisedSystem.FirstOrDefault(e => e.Id == issues.RaisedSystemId);
-                if (solution.Count>0)
+                if (solution.Count > 0)
                 {
                     foreach (var sol in solution)
                     {
@@ -221,8 +222,8 @@ namespace IssueTracking.Domain.IssueTracking
                         };
                         issueTypes.IssueSolution.Add(sl);
                     }
-                   
-                   
+
+
                 }
 
                 if (raisedSystem != null)
@@ -263,7 +264,7 @@ namespace IssueTracking.Domain.IssueTracking
                     solution.SolutionQuery = model.SolutionQuery;
                     solution.SolutionDescription = model.SolutionDescription;
 
-                    if (model.SolutionResource.Count>0)
+                    if (model.SolutionResource.Count > 0)
                     {
                         var index = 0;
                         foreach (var res in model.SolutionResource)
@@ -309,7 +310,7 @@ namespace IssueTracking.Domain.IssueTracking
                     SolutionQuery = model.SolutionQuery,
                     SolutionDescription = model.SolutionDescription,
                 };
-                if (model.SolutionResource.Count>0)
+                if (model.SolutionResource.Count > 0)
                 {
                     var index = 0;
                     foreach (var res in model.SolutionResource)
@@ -362,14 +363,13 @@ namespace IssueTracking.Domain.IssueTracking
 
             return basicSolution;
         }
-        
-        public IssueListReturn GetIssueById(Guid id) {
-        
-           var issueList = new IssueListReturn();
-           
-           var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
-           if (issue != null)
-           {
+
+        public IssueListReturn GetIssueByTitle(string IssueTitle)
+        {
+            var issueList = new IssueListReturn();
+            var issue = _context.IssuesList.FirstOrDefault(e => e.Id.ToString() == IssueTitle);
+            if (issue != null)
+            {
                 issueList.Id = issue.Id.ToString();
                 issueList.IssueTitle = issue.IssueTitle;
                 issueList.IssueTypeId = issue.IssueTypeId;
@@ -377,33 +377,82 @@ namespace IssueTracking.Domain.IssueTracking
                 issueList.PolicyNo = issue.PolicyNo;
                 issueList.BranchId = GetDepartment(issue.BranchId);
                 issueList.IssueDescription = issue.IssueDescription;
-                issueList.IssueRequestedBy =  GetEmployee(issue.IssueRequestedBy);
+                issueList.IssueRequestedBy = GetEmployee(issue.IssueRequestedBy);
                 issueList.IssueRequestedDate = DateTime.Now;
-                issueList.IssuePriority = _context.IssuePriorityType.First(e=>e.Id==issue.IssuePriority).Name;
-                issueList.IssueStatus = _context.IssueStatusType.First(e=>e.Id==issue.IssueStatus).Name;
+                issueList.IssueRespondBy = GetEmployee(issue.IssueRespondBy);
+                issueList.IssueRespondDate = DateTime.Now;
+                issueList.IssueClosedBy = GetEmployee(issue.IssueClosedBy);
+                issueList.IssueClosedDate = DateTime.Now;
+                issueList.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
+                issueList.IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name;
                 issueList.Ticket = issue.Ticket;
-                issueList.Participant = 1+_context.IssueAssigned.Count(e=>e.IssueId==issue.Id);
-                issueList.Comments = _context.IssueComments.Count(e=>e.IssueId==issue.Id);
-                issueList.NoOfEdit =  _context.DeletedIssuesList.Count(e=>e.OldIssueId==issue.Id);
-                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId??0);
-                 if (!string.IsNullOrEmpty(issue.IssueResource))
-                 {
-                       var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
-                       foreach (var res in imageResource) {
-                           var data = GetResourceDoc(res.DocRef, res.MimeType);
-                           if (!string.IsNullOrEmpty(data))
-                           {
-                               res.Data = data;
-                               issueList.IssueResource.Add(res);
-                           }
-                       }
-                 }
-           }
-        
-           return issueList;
-        
+                issueList.Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id);
+                issueList.Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id);
+                issueList.NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id);
+                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0);
+                if (!string.IsNullOrEmpty(issue.IssueResource))
+                {
+                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
+                    foreach (var res in imageResource)
+                    {
+                        var data = GetResourceDoc(res.DocRef, res.MimeType);
+                        if (!string.IsNullOrEmpty(data))
+                        {
+                            res.Data = data;
+                            issueList.IssueResource.Add(res);
+                        }
+                    }
+                }
+            }
+
+            return issueList;
         }
-   
+        
+        public IssueListReturn GetIssueById(Guid id)
+        {
+            var issueList = new IssueListReturn();
+            var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
+            if (issue != null)
+            {
+                issueList.Id = issue.Id.ToString();
+                issueList.IssueTitle = issue.IssueTitle;
+                issueList.IssueTypeId = issue.IssueTypeId;
+                issueList.OtherIssue = issue.OtherIssue;
+                issueList.PolicyNo = issue.PolicyNo;
+                issueList.BranchId = GetDepartment(issue.BranchId);
+                issueList.IssueDescription = issue.IssueDescription;
+                issueList.IssueRequestedBy = GetEmployee(issue.IssueRequestedBy);
+                issueList.IssueRequestedDate = DateTime.Now;
+                issueList.IssueRespondBy = GetEmployee(issue.IssueRespondBy);
+                issueList.IssueRespondDate = DateTime.Now;
+                issueList.IssueClosedBy = GetEmployee(issue.IssueClosedBy);
+                issueList.IssueClosedDate = DateTime.Now;
+                issueList.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
+                issueList.IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name;
+                issueList.Ticket = issue.Ticket;
+                issueList.Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id);
+                issueList.Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id);
+                issueList.NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id);
+                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0);
+                if (!string.IsNullOrEmpty(issue.IssueResource))
+                {
+                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
+                    foreach (var res in imageResource)
+                    {
+                        var data = GetResourceDoc(res.DocRef, res.MimeType);
+                        if (!string.IsNullOrEmpty(data))
+                        {
+                            res.Data = data;
+                            issueList.IssueResource.Add(res);
+                        }
+                    }
+                }
+            }
+
+            return issueList;
+
+        }
+        
 
         public IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id)
         {
@@ -440,7 +489,8 @@ namespace IssueTracking.Domain.IssueTracking
         private void SaveResource(string fileName, string mimeType, string encodedStr)
         {
             var imgExt = mimeTypeRegx.Match(mimeType).Groups[2].Value;
-            var path = Path.Combine(fileLocation, $"{fileName}.{imgExt}");
+            var path = Path.Combine($"{fileLocation}", $"{fileName}.{imgExt}");
+            //path = path.Replace("\", "/" )
             if (File.Exists(path))
                 return;
             var byteArr = Convert.FromBase64String(encodedStr);
@@ -477,7 +527,7 @@ namespace IssueTracking.Domain.IssueTracking
 
         public void AddIssue(IssuesListModel model)
         {
-            var count = (_context.IssuesList.Count()+1).ToString();
+            var count = (_context.IssuesList.Count() + 1).ToString();
             var pt = "000000";
             var ticket = pt.Substring(0, pt.Length - count.Length) + count;
             var solutionId = _context.BasicIssueSolution.FirstOrDefault(e => e.IssueTypeId == model.IssueTypeId);
@@ -489,21 +539,26 @@ namespace IssueTracking.Domain.IssueTracking
                 OtherIssue = model.OtherIssue,
                 BranchId = Guid.Parse((ReadOnlySpan<char>)_session.DepartmentId),
                 IssueDescription = model.IssueDescription,
+                PolicyNo= model.PolicyNo,
                 IssueRequestedBy = Guid.Parse(_session.UserId),
                 IssueRequestedDate = new DateTime().Ticks,
+                IssueRespondBy = Guid.Parse(_session.UserId),
+                IssueRespondDate = new DateTime().Ticks,
+                IssueClosedBy =  Guid.Parse(_session.UserId),
+                IssueClosedDate = new DateTime().Ticks,
                 IssuePriority = model.IssuePriority,
                 IssueStatus = 1,
                 Ticket = ticket
+                
             };
             if (solutionId != null)
             {
                 issue.IssueRaisedSluId = solutionId.Id;
             }
-            if (model.PolicyNo.Length > 0)
-            {
-                issue.PolicyNo = model.PolicyNo;
-            }
-            if (model.IssueResource.Count>0)
+
+          
+
+            if (model.IssueResource.Count > 0)
             {
                 var index = 0;
                 var resourceModels = new List<ResourceModel>();
@@ -596,25 +651,27 @@ namespace IssueTracking.Domain.IssueTracking
             }
             else
             {
-                throw new AccessDeniedException("Sorry, I can't find any issue registered with this title of '"+model.IssueTitle+"'");
-            } 
+                throw new AccessDeniedException("Sorry, I can't find any issue registered with this title of '" +
+                                                model.IssueTitle + "'");
+            }
         }
 
-        public IList<IssueListReturn> GetAllIssues()
-        {
-            var allIssues = new List<IssueListReturn>();
-            var issues = _context.IssuesList.OrderBy(i => i.Id).ToList();
-            foreach (var issue in issues)
-            {
-                var ai = GetIssueById(issue.Id);
-                if (ai != null &&  int.TryParse(ai.Id, out int id) && id > 0)
-                {
-                    allIssues.Add(ai);
-                }
-            }
-        
-            return allIssues;
-        }
+       public IList<IssueListReturn> GetAllIssues()
+               {
+                   var allIssues = new List<IssueListReturn>();
+                   var issues = _context.IssuesList.OrderBy(i => i.Id).ToList();
+                   foreach (var issue in issues)
+                   {
+                       var ai = GetIssueById(issue.Id);
+                       if (ai != null &&  int.TryParse(ai.Id, out int id) && id > 0)
+                       {
+                           allIssues.Add(ai);
+                       }
+                   }
+               
+                   return allIssues;
+               }
+
         /*
         public IssueListReturnModel GetAllIssues(IssueFilterParameter parameter)
         {
@@ -631,74 +688,81 @@ namespace IssueTracking.Domain.IssueTracking
             return ret;
         }
        */
-        public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter,long status)
+        public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status)
         {
             var ret = new List<IssueListReturn>();
             var issues = new List<IssuesList>();
-                var queryableIssue = _context.IssuesList.Where(e =>
-                    e.IssueStatus == status &&
-                    (string.IsNullOrEmpty(parameter.UserId) || Guid.Parse(parameter.UserId) == e.IssueRequestedBy) &&
-                    (parameter.Priority == 0 || parameter.Priority == e.IssuePriority) &&
-                    (string.IsNullOrEmpty(parameter.Branch) || Guid.Parse(parameter.Branch) == e.BranchId));
+            var queryableIssue = _context.IssuesList.Where(e =>
+                e.IssueStatus == status &&
+                (string.IsNullOrEmpty(parameter.UserId) || Guid.Parse(parameter.UserId) == e.IssueRequestedBy) &&
+                (parameter.Priority == 0 || parameter.Priority == e.IssuePriority) &&
+                (string.IsNullOrEmpty(parameter.Branch) || Guid.Parse(parameter.Branch) == e.BranchId));
 
-                if (parameter.RaisedSystem == 0)
+            if (parameter.RaisedSystem == 0)
+            {
+                if (parameter.Sort == 1)
                 {
-                    if (parameter.Sort == 1)
-                    {
-                        issues = queryableIssue.OrderByDescending(e => e.IssueRequestedDate).ToList();
-                    }else if (parameter.Sort == 2)
-                    {
-                        issues = queryableIssue.OrderBy(e => e.IssueRequestedDate).ToList();
-                    }else if (parameter.Sort == 3)
-                    {
-                         issues = queryableIssue.OrderByDescending(e => e.IssueClosedDate).ToList();
-                    }else if (parameter.Sort == 4)
-                    {
-                        issues = queryableIssue.OrderBy(e => e.IssueClosedDate).ToList();
-                    }
+                    issues = queryableIssue.OrderByDescending(e => e.IssueRequestedDate).ToList();
                 }
-                else
+                else if (parameter.Sort == 2)
                 {
-                    string sort = "";
-                    string query = "";
+                    issues = queryableIssue.OrderBy(e => e.IssueRequestedDate).ToList();
+                }
+                else if (parameter.Sort == 3)
+                {
+                    issues = queryableIssue.OrderByDescending(e => e.IssueClosedDate).ToList();
+                }
+                else if (parameter.Sort == 4)
+                {
+                    issues = queryableIssue.OrderBy(e => e.IssueClosedDate).ToList();
+                }
+            }
+            else
+            {
+                string sort = "";
+                string query = "";
 
-                    var issueTypes = _context.IssueTypeList.Where(e => e.RaisedSystemId == parameter.RaisedSystem)
-                        .ToList();
-                    if (issueTypes.Count > 0)
+                var issueTypes = _context.IssueTypeList.Where(e => e.RaisedSystemId == parameter.RaisedSystem)
+                    .ToList();
+                if (issueTypes.Count > 0)
+                {
+                    query = " WHERE ";
+                    var index = 0;
+                    foreach (var it in issueTypes)
                     {
-                         query = " WHERE ";
-                        var index = 0;
-                        foreach (var it in issueTypes)
+                        if (index == 0)
                         {
-                            if (index == 0)
-                            {
-                                query += $"IssueTypeId={it.Id}";
-                            }
-                            else
-                            {
-                                query += $" or IssueTypeId={it.Id}";
-                            }
-
-                            index++;
+                            query += $"IssueTypeId={it.Id}";
                         }
-                    }
-                    if (parameter.Sort == 1)
-                    {
-                        sort = $" Order By IssueRequestedDate desc";
-                    }else if (parameter.Sort == 2)
-                    {
-                        sort = $" Order By IssueRequestedDate asc";
-                    }else if (parameter.Sort == 3)
-                    {
-                        sort = $" Order By IssueClosedDate desc";
-                    }else if (parameter.Sort == 4)
-                    {
-                        sort = $" Order By IssueClosedDate asc";
-                    }
+                        else
+                        {
+                            query += $" or IssueTypeId={it.Id}";
+                        }
 
-                    issues = queryableIssue.FromSql($"Select * From queryableIssue {query}{sort}").ToList();
+                        index++;
+                    }
                 }
-               
+
+                if (parameter.Sort == 1)
+                {
+                    sort = $" Order By IssueRequestedDate desc";
+                }
+                else if (parameter.Sort == 2)
+                {
+                    sort = $" Order By IssueRequestedDate asc";
+                }
+                else if (parameter.Sort == 3)
+                {
+                    sort = $" Order By IssueClosedDate desc";
+                }
+                else if (parameter.Sort == 4)
+                {
+                    sort = $" Order By IssueClosedDate asc";
+                }
+
+                issues = queryableIssue.FromSql($"Select * From queryableIssue {query}{sort}").ToList();
+            }
+
             foreach (var issue in issues)
             {
                 var iss = new IssueListReturn()
@@ -711,16 +775,17 @@ namespace IssueTracking.Domain.IssueTracking
                     IssueDescription = issue.IssueDescription,
                     BranchId = GetDepartment(issue.BranchId),
                     IssueRequestedBy = GetEmployee(issue.IssueRequestedBy),
-                    IssuePriority = _context.IssuePriorityType.First(e=>e.Id==issue.IssuePriority).Name,
-                    IssueStatus = _context.IssueStatusType.First(e=>e.Id==issue.IssueStatus).Name,
-                    IssueType = GetIssueTypeById(issue.IssueTypeId??0),
+                    IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name,
+                    IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name,
+                    IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0),
                     Ticket = issue.Ticket,
-                    Participant = 1+_context.IssueAssigned.Count(e=>e.IssueId==issue.Id),
-                    Comments = _context.IssueComments.Count(e=>e.IssueId==issue.Id),
-                    NoOfEdit = _context.DeletedIssuesList.Count(e=>e.OldIssueId==issue.Id),
+                    Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id),
+                    Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id),
+                    NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id),
                 };
-               ret.Add(iss);
+                ret.Add(iss);
             }
+
             return ret;
         }
 
@@ -728,10 +793,10 @@ namespace IssueTracking.Domain.IssueTracking
         {
             var comment = new IssueComments()
             {
-               IssueId = Guid.Parse(model.IssueId),
-               IssueComment = model.IssueComment,
-               CommentedBy = Guid.Parse(_session.UserId),
-               CommentDate = model.IssueCommentDate.Date
+                IssueId = Guid.Parse(model.IssueId),
+                IssueComment = model.IssueComment,
+                CommentedBy = Guid.Parse(_session.UserId),
+                CommentDate = model.IssueCommentDate.Date
             };
             if (model.CommentResource.Count > 0)
             {
@@ -740,15 +805,16 @@ namespace IssueTracking.Domain.IssueTracking
                 {
                     var resource = new ResourceModel()
                     {
-                       DocRef = Guid.NewGuid().ToString(),
-                       MimeType = res.MimeType,
-                       FileName = res.FileName,
-                       Data = "",
-                       Index = res.Index
+                        DocRef = Guid.NewGuid().ToString(),
+                        MimeType = res.MimeType,
+                        FileName = res.FileName,
+                        Data = "",
+                        Index = res.Index
                     };
-                    SaveResource(resource.DocRef, resource.MimeType,res.Data);
+                    SaveResource(resource.DocRef, resource.MimeType, res.Data);
                     resourceModels.Add(resource);
                 }
+
                 comment.CommentResource = JsonConvert.SerializeObject(resourceModels);
             }
 
@@ -774,12 +840,12 @@ namespace IssueTracking.Domain.IssueTracking
                     // Update resources 
                     existingComment.CommentResource = JsonConvert.SerializeObject(resourceModels);
                 }
-                
+
                 if (model.IssueStatus != null)
                 {
                     existingComment.IssueStatus = model.IssueStatus.Id;
                 }
-                
+
                 _context.IssueComments.Update(existingComment);
                 _context.SaveChanges();
             }
@@ -788,50 +854,53 @@ namespace IssueTracking.Domain.IssueTracking
                 throw new Exception("Comment not found!");
             }
         }
+
         // To retrieve all comments for a specific issue
-        public IList<IssueCommentsModel> GetAllIssueComments(string issueId)  
+        public IList<IssueCommentsModel> GetAllIssueComments(string issueId)
         {
             var issueGuid = new Guid(issueId);
-        
+
             return _context.IssueComments
                 .Where(c => c.IssueId == issueGuid)
-                .Select(c => new IssueCommentsModel() 
+                .Select(c => new IssueCommentsModel()
                 {
-                    Id = c.Id.ToString(),        
-                    IssueId = c.IssueId.ToString(), 
+                    Id = c.Id.ToString(),
+                    IssueId = c.IssueId.ToString(),
                     IssueComment = c.IssueComment,
                     CommentedBy = c.CommentedBy.ToString(),
-                    IssueCommentDate = c.CommentDate,           
+                    IssueCommentDate = c.CommentDate,
                     CommentResource = JsonConvert.DeserializeObject<List<ResourceModel>>(c.CommentResource),
-                    IssueStatus = new IssueStatusType() 
+                    IssueStatus = new IssueStatusType()
                     {
-                        Id = (long) c.IssueStatus,
+                        Id = (long)c.IssueStatus,
                         Name = _context.IssueStatusType
                             .Where(s => s.Id == c.IssueStatus)
                             .Select(s => s.Name)
-                            .FirstOrDefault(),                 
+                            .FirstOrDefault(),
                         Description = _context.IssueStatusType
-                            .Where(s => s.Id == c.IssueStatus)  
+                            .Where(s => s.Id == c.IssueStatus)
                             .Select(s => s.Description)
                             .FirstOrDefault()
-                    },               
-                    Status = 1           
+                    },
+                    Status = 1
                 })
-                .ToList();      
+                .ToList();
         }
-        
-        public void DeleteIssueComment(string commentId) {
+
+        public void DeleteIssueComment(string commentId)
+        {
 
             var comment = _context.IssueComments.Find(commentId);
-            if(comment == null) {
-                throw new Exception("Comment not found");   
+            if (comment == null)
+            {
+                throw new Exception("Comment not found");
             }
 
             _context.IssueComments.Remove(comment);
             _context.SaveChanges();
 
         }
-        
+
 
         public IList<DepartmentSchemaModel> GetAllBranch()
         {
@@ -841,14 +910,15 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 ret.Add(GetDepartment(br.Id));
             }
+
             return ret;
         }
-        
+
 
         public IList<EmployeeModel> GetAllEmployee()
         {
             var ret = new List<EmployeeModel>();
-            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1).OrderBy(e=>e.FirstName).ToList();
+            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1).OrderBy(e => e.FirstName).ToList();
             foreach (var emp in employee)
             {
                 ret.Add(GetEmployee(emp.Id));
@@ -860,19 +930,21 @@ namespace IssueTracking.Domain.IssueTracking
         public IList<EmployeeModel> GetAllEmployeeByBranchId(string id)
         {
             var ret = new List<EmployeeModel>();
-            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1 && e.DepartmentId==Guid.Parse(id)).OrderBy(e=>e.FirstName).ToList();
+            var employee = _context.Employee.Where(e => e.EmployeeStatus == 1 && e.DepartmentId == Guid.Parse(id))
+                .OrderBy(e => e.FirstName).ToList();
             foreach (var emp in employee)
             {
                 ret.Add(GetEmployee(emp.Id));
             }
 
-            return ret; 
+            return ret;
         }
+
         private IssueListReturn GetSimpleIssueById(Guid id)
         {
             var ret = new IssueListReturn();
             var issue = _context.IssuesList.First(e => e.Id == id);
-            
+
 
             return ret;
         }
@@ -885,10 +957,10 @@ namespace IssueTracking.Domain.IssueTracking
                 Id = dept.Id.ToString(),
                 BranchId = dept.BranchId,
                 DepartmentId = dept.DepartmentId,
-                DepartmentName = _context.Department.First(d=>d.Id==dept.DepartmentId).Name,
-                BranchName = _context.Branches.First(b=>b.Id==dept.BranchId).BraName
+                DepartmentName = _context.Department.First(d => d.Id == dept.DepartmentId).Name,
+                BranchName = _context.Branches.First(b => b.Id == dept.BranchId).BraName
             };
-            
+
             return ret;
         }
 
@@ -903,11 +975,11 @@ namespace IssueTracking.Domain.IssueTracking
                 GrFatherName = employee.GrFatherName,
                 Appellation = employee.Applelation,
                 Title = employee.Title,
-                Position = _context.Possitions.First(p=>p.Id==employee.PossitionId).Name,
+                Position = _context.Possitions.First(p => p.Id == employee.PossitionId).Name,
                 EmpIdNo = employee.EmpIdNo,
                 Phone = employee.Phone,
                 Email = employee.Email,
-                Username = _context.Account.First(e=>e.EmployeeId==employee.Id).Username
+                Username = _context.Account.First(e => e.EmployeeId == employee.Id).Username
             };
             return ret;
         }
@@ -935,10 +1007,10 @@ namespace IssueTracking.Domain.IssueTracking
                 Name = "Assigned To You",
                 Stat = _context.IssueAssigned.Count(e => e.AssignedBy == Guid.Parse(_session.UserId))
             };
-              upperSidebars.Add(assignedToYou);  
+            upperSidebars.Add(assignedToYou);
             return upperSidebars;
         }
-        
+
         private IList<SideBarStat> GetLowerSideBarStat()
         {
             var lowerSidebars = new List<SideBarStat>();
@@ -946,7 +1018,7 @@ namespace IssueTracking.Domain.IssueTracking
             foreach (var system in systems)
             {
                 int issueCount = 0;
-                var issueTypes = _context.IssueTypeList.Where(e=>e.RaisedSystemId==system.Id).ToList();
+                var issueTypes = _context.IssueTypeList.Where(e => e.RaisedSystemId == system.Id).ToList();
                 foreach (var issueType in issueTypes)
                 {
                     int counter = 0;
@@ -956,14 +1028,16 @@ namespace IssueTracking.Domain.IssueTracking
                     }
                     else
                     {
-                        counter = _context.IssuesList.Count(e => e.IssueTypeId == issueType.Id && e.IssueRequestedBy==Guid.Parse(_session.UserId));
+                        counter = _context.IssuesList.Count(e =>
+                            e.IssueTypeId == issueType.Id && e.IssueRequestedBy == Guid.Parse(_session.UserId));
                     }
+
                     issueCount += counter;
                 }
 
                 if (issueCount > 0)
                 {
-                    var sideBarStat=new SideBarStat()
+                    var sideBarStat = new SideBarStat()
                     {
                         Id = system.Id,
                         Name = system.Name,
@@ -972,6 +1046,7 @@ namespace IssueTracking.Domain.IssueTracking
                     lowerSidebars.Add(sideBarStat);
                 }
             }
+
             return lowerSidebars;
         }
     }

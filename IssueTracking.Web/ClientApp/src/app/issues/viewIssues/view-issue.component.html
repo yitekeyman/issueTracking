@@ -39,9 +39,9 @@
           </div>
           <div class="panel-body data-table-list">
             <table class="table table-striped " id="data-table-basic" style="font-size: 12px">
-             <!-- <tr>
-                <td><label> Issue Title: </label> {{issue.issueType.name}}</td>
-              </tr> -->
+              <!-- <tr>
+                 <td><label> Issue Title: </label> {{issue.issueType.name}}</td>
+               </tr> -->
               <tr>
                 <td><label>System Raised: </label> {{issue.issueType.issueTypeId.name}}
                   <small>({{issue.issueType.raisedSystem.description}})</small></td>
@@ -117,4 +117,3 @@
 <div class="modal fade" id="addIssueModal" role="dialog">
   <app-edit-issue> </app-edit-issue>
 </div>
-

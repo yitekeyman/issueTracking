@@ -56,11 +56,11 @@
 /*----------------------------------------*/
 html, body {font-family: 'Roboto', sans-serif;font-weight:400;}
 body {background:#F6F8FA;}
-.floatleft {float:left}
-.floatright {float:right}
-.alignleft {float:left;margin-right:15px;margin-bottom: 15px}
-.alignright {float:right;margin-left:15px;margin-bottom: 15px}
-.aligncenter {display:block;margin:0 auto 15px}
+.floatLeft {float:left}
+.floatRight {float:right}
+.alignLeft {float:left;margin-right:15px;margin-bottom: 15px}
+.alignRight {float:right;margin-left:15px;margin-bottom: 15px}
+.alignCenter {display:block;margin:0 auto 15px}
 a:focus {outline:0px solid}
 img {max-width:100%;height:auto}
 .fix {overflow:hidden}
@@ -510,11 +510,11 @@ ul.notika-menu-wrap li a{
 	background:#fff;
 	display:flex;
 }
-.website-traffic-ctn h2, .curved-ctn h2, .past-day-statis h2, .email-ctn-round h2, .recent-post-title h2, .recent-items-title h2, .realtime-title h2, .contact-hd h2, .animation-ctn-hd h2, .alert-hd h2, .color-hd h2, .tab-hd h2, .wizard-hd h2, .dropdown-trig-hd h2, .modals-hd h2, .accordion-hd h2, .tooltips-hd h2, .popovers-hd h2, .typography-list h2, .typography-heading h2, .typography-in-hd h2, .tpgp-hp-hd h2, .view-mail-hrd h2, .multiupload-sys h2, .basic-tb-hd h2{
+.website-traffic-ctn h2, .curved-ctn h2, .past-day-statis h2, .email-ctn-round h2, .recent-post-title h2, .recent-items-title h2, .realtime-title h2, .contact-hd h2, .animation-ctn-hd h2, .alert-hd h2, .color-hd h2, .tab-hd h2, .wizard-hd h2, .dropdown-trig-hd h2, .modals-hd h2, .accordion-hd h2, .tooltips-hd h2, .popovers-hd h2, .typography-list h2, .typography-heading h2, .typography-in-hd h2, .tpgp-hp-hd h2, .view-mail-hrd h2, .multi-upload-sys h2, .basic-tb-hd h2{
 	font-size:20px;
 	color:#333;
 }
-.website-traffic-ctn p, .curved-ctn p, .recent-post-title p, .recent-post-it-ctn p, .view-ml-rl p, .mail-ads p, .multiupload-sys p{
+.website-traffic-ctn p, .curved-ctn p, .recent-post-title p, .recent-post-it-ctn p, .view-ml-rl p, .mail-ads p, .multi-upload-sys p{
 	font-size:14px;
 	color:#333;
 	margin:0;
@@ -630,24 +630,24 @@ ul.notika-menu-wrap li a{
 	display:flex;
 	margin-top: 40px;
 }
-.email-signle-gp {
+.email-single-gp {
     height: 90px;
 }
 .email-round-pro{
 	width:100%;
 }
 .email-ctn-round h2{
-	margin-bottom:0px;
+	margin-bottom:0;
 	text-align:left;
 }
-.email-statis-wrap {
+.email-status-wrap {
     display: block;
 }
 /*----------------------------------------*/
 /*  7.  Recent Post CSS
 /*----------------------------------------*/
 .realtime-title h2, .recent-post-title h2, .recent-items-title h2{
-	margin-bottom:0px;
+	margin-bottom:0;
 }
 
 .recent-post-it-ctn h2, .realtime-vst-sg h4{
@@ -684,7 +684,7 @@ ul.notika-menu-wrap li a{
 	color:#00c292;
 	transition:all .4s ease 0s;
 }
-.recent-post-items .recent-post-signle:hover .recent-post-it-ctn h2, .blog-ctn .vw-at:hover{
+.recent-post-items .recent-post-single:hover .recent-post-it-ctn h2, .blog-ctn .vw-at:hover{
 	color:#00c292;
 	transition:all .4s ease 0s;
 }
@@ -714,7 +714,7 @@ ul.notika-menu-wrap li a{
 	margin-bottom: 14px;
 }
 .blog-hd-sw{
-	margin: 15px 0px;
+	margin: 15px 0;
 }
 /*----------------------------------------*/
 /*  9.  Recent Items CSS
@@ -2332,23 +2332,23 @@ hr {
 .bt-df-checkbox .radio-checked {
     margin-right: 8px;
 }
-.icheckbox_square-green.checked {
+.checkbox_square-green.checked {
     background-position: -44px 0;
 }
-.icheckbox_square-green.checked.disabled {
+.checkbox_square-green.checked.disabled {
     background-position: -88px 0;
 }
-.iradio_square-green {
+.radio_square-green {
     background-position: -109px 0;
 }
-.iradio_square-green.hover {
+.radio_square-green.hover {
     background-position: -131px 0;
 }
-.iradio_square-green.checked {
+.radio_square-green.checked {
     background-position: -153px 0;
 	transition: all 0.3s ease 0s;
 }
-.iradio_square-green.checked.disabled {
+.radio_square-green.checked.disabled {
     background-position: -197px 0;
 }
 .inline-checkbox-cs {
@@ -2360,7 +2360,7 @@ hr {
 .checkbox.login-checkbox label {
     padding-left: 0px;
 }
-.icheckbox_square-green, .iradio_square-green {
+.checkbox_square-green, .radio_square-green {
     display: inline-block;
     vertical-align: middle;
     margin: 0;
@@ -2371,13 +2371,13 @@ hr {
     border: none;
     cursor: pointer;
 }
-.icheckbox_square-green {
+.checkbox_square-green {
     background-position: 0 0;
 }
-.icheckbox_square-green.hover {
+.checkbox_square-green.hover {
     background-position: -22px 0;
 }
-.icheckbox_square-green.checked {
+.checkbox_square-green.checked {
     background-position: -44px 0;
 	transition: all 0.3s ease 0s;
 }
@@ -2549,14 +2549,14 @@ hr {
 	border: 1px solid #00c292;
 	outline:none;
 }
-.multiupload-sys .dropzone.dropzone-custom{
+.multi-upload-sys .dropzone.dropzone-custom{
 	border: 2px dashed #00c292;
 }
-.multiupload-sys i{
+.multi-upload-sys i{
 	font-size:30px;
 	color:#333;
 }
-.multiupload-sys h2{
+.multi-upload-sys h2{
 	font-size:16px;
 }
 .form-group.cmp-em-mg{
@@ -2848,7 +2848,7 @@ hr {
 .fm-checkbox{
 	margin:10px 0px;
 }
-.iradio_square-green {
+.radio_square-green {
     background-position: -109px 0;
 }
 .form-group.form-elet-mg {
