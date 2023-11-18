@@ -1111,17 +1111,5 @@ namespace IssueTracking.Domain.IssueTracking
 
             return lowerSidebars;
         }
-        
-        /*
-        private string GetEmployeeId()
-        {
-            string employeeId = null;
-            var account = _context.Account.FirstOrDefault(a => a.Username.Equals(_session.Username));
-            if (account != null && account.EmployeeId!=null)
-            {
-                employeeId = account.EmployeeId.ToString();
-            }
-            return employeeId;
-        } */
     }
 }
