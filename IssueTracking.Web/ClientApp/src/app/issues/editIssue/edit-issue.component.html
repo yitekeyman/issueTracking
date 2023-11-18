@@ -3,72 +3,72 @@
     <div class="modal-header">
       <button type="button" class="close" id="close" data-dismiss="modal" (click)="close()">&times;</button>
     </div>
-    <form [formGroup]="addIssueForm" (submit)="saveChanges()">
+    <form [formGroup]="addIssueForm" (ngSubmit)="saveChanges()">
       <div class="modal-body form-element-area mg-b-15">
-        <h2>Add Issue</h2>
+        <h2>Edit Issue</h2>
         <hr>
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Title *</small></label>
-          <input type="text" class="form-control" formControlName="issueTitle" >
-        </div>
-
-        <div class="form-group" *ngIf="selectedIssueType>0">
-          <label class="nk-label"><small>Issue Type *</small></label>
-          <select class="form-control" formControlName="issueType"
-                  [(ngModel)]="issueModal.issueTypeId" disabled="disabled">
-            <option value="0">Choose a Issue Type</option>
-            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
-          </select>
-
-        </div>
-        <div class="form-group" *ngIf="selectedIssueType==0">
-          <label class="nk-label"><small>Issue Type *</small></label>
-          <select class="form-control" formControlName="issueType"
-                  [(ngModel)]="issueModal.issueTypeId">
-            <option value="0">Choose a Issue Type</option>
-            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
-          </select>
-
+          <input type="text" name="Issue Title"  placeholder="Write the title here" class="form-control" formControlName="issueTitle" [(ngModel)]="issueModal.issueTitle" >
         </div>
 
         <div class="form-group">
-          <label class="nk-label"><small>Other Issue *</small></label>
-          <textarea rows="3" class="form-control" placeholder="Write the issue here" formControlName="otherIssue" [(ngModel)]="issueModal.otherIssue" ></textarea>
+          <label class="nk-label"><small>Issue Type *</small></label>
+          <select class="form-control" name="Issue Type" formControlName="issueType"  [(ngModel)]="issueModal.issueTypeId"
+                  disabled="disabled">
+            <option value="0">Choose a Issue Type</option>
+            <option [value]="ir.id" *ngFor="let ir of issueTypeList">{{ir.name}}</option>
+          </select>
+
         </div>
+        <div class="form-group">
+          <label class="nk-label"><small>Other Issue *</small></label>
+          <textarea rows="3" name="Other Issue" class="form-control" placeholder="Write the issue here" formControlName="otherIssue" [(ngModel)]="issueModal.otherIssue" ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="nk-label"><small>Policy Number *</small></label>
+          <input class="form-control" formControlName="policyNo" [(ngModel)]="issueModal.policyNo"
+                 type="text" placeholder="Enter Policy Number">
+          <small class="text-danger" *ngIf="addIssueForm.controls.policyNo.errors?.policyNoFormat">
+            Invalid policy number format. Policy numbers should match the format: P/###/####/####/#####.
+          </small>
+          <small class="text-danger" *ngIf="addIssueForm.controls.policyNo.errors?.duplicatePolicyNo">
+            Duplicate policy numbers found.
+          </small>
+        </div>
+
 
         <div class="form-group">
           <label class="nk-label"><small>Issue Description *</small></label>
-          <textarea rows="6" class="form-control" placeholder="Write Description Here" formControlName="issueDescription"
-                    [(ngModel)]="issueModal.issueDescription"></textarea>
+          <textarea rows="6" name="Issue Description" class="form-control" placeholder="Write Description Here"
+                    formControlName="issueDescription" [(ngModel)]="issueModal.issueDescription">
+          </textarea>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" >
           <label class="nk-label"><small>Issue Priority *</small></label>
-          <select class="form-control" formControlName="issuePriority" [(ngModel)]="issueModal.issuePriority">
-            <option value="0">Choose the priority * </option>
-            <option [value]="ir.id" *ngFor="let ir of priorityList">{{ir.name}}</option>
+          <select class="form-control" name="Issue Priority" formControlName="issuePriority" [(ngModel)]="issueModal.issuePriority" >
+            <option value="0">Choose the priority </option>
+            <option [value]="ir.id" *ngFor="let ir of priorityList"> {{ir.name}}</option>
           </select>
-        </div>
-
-        <div class="form-group">
-          <label class="nk-label"><small>Ticket *</small></label>
-          <input type="text" class="form-control" formControlName="Ticket"  [(ngModel)]="issueModal.ticket">
         </div>
 
         <div class="dropzone-area">
           <div id="dropzone1" class="multi-uploader-cs">
             <label class="nk-label"><small>Do you have a solution resource?</small></label>
-            <div class="custom-dropzone" ngx-dropzone (change)="onSelect($event)">
+            <div class="custom-dropzone" ngx-dropzone (change)="onSelect($event)" >
               <ngx-dropzone-label>
                 <div>
-                  <i class="notika-icon notika-cloud" style="font-size: 45pt"></i>
+                  <i class="notika-icon notika-cloud"  style="font-size: 45pt"></i>
                   <p>Drop files here or click to upload.</p>
                 </div>
               </ngx-dropzone-label>
-              <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"
-                                          [removable]="true" (removed)="onRemove(f)">
+              <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview"  *ngFor="let f of files" [file]="f"
+                                          [removable]="true" (removed)="onRemove(f)" >
                 <ngx-dropzone-label>{{ f.name }}</ngx-dropzone-label>
+
               </ngx-dropzone-image-preview>
             </div>
           </div>
@@ -77,10 +77,8 @@
       </div>
       <div class="modal-footer">
         <button type="reset" class="btn btn-default btn-icon-notika waves-effect">Reset</button>
-        <button type="submit" class="btn btn-default btn-icon-notika waves-effect" *ngIf="issueModal.id > 0"
-                [disabled]="!addIssueForm.valid"><i class="notika-icon notika-checked"></i> UPDATE
-        </button>
-        <button type="submit" class="btn btn-default btn-icon-notika waves-effect" *ngIf="issueModal.id ==0"
+
+        <button type="submit" class="btn btn-default btn-icon-notika waves-effect" *ngIf="issueModal.id ==''"
                 [disabled]="!addIssueForm.valid"><i class="notika-icon notika-checked"></i> ADD NEW
         </button>
       </div>

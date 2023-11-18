@@ -22,3 +22,16 @@ C:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.
 C:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.dll
 C:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
 C:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.genruntimeconfig.cache
+E:\code\issuetracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.deps.json
+E:\code\issuetracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.runtimeconfig.json
+E:\code\issuetracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.runtimeconfig.dev.json
+E:\code\issuetracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.dll
+E:\code\issuetracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.csproj.AssemblyReference.cache
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.GeneratedMSBuildEditorConfig.editorconfig
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.AssemblyInfoInputs.cache
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.AssemblyInfo.cs
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.csproj.CoreCompileInputs.cache
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.dll
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
+E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.genruntimeconfig.cache

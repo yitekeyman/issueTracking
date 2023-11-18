@@ -109,6 +109,7 @@
               "src/assets/js/main.js"
             ],
             "allowedCommonJsDependencies": [
+              "sweetalert2"
             ]
           },
           "configurations": {
@@ -247,6 +248,6 @@
         }
       }
     }
-  },
-  "defaultProject": "now-ui-dashboard-angular"
+  }
+
 }

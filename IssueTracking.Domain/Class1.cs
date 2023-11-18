@@ -6,3 +6,4 @@ namespace IssueTracking.Domain
     {
     }
 }
+

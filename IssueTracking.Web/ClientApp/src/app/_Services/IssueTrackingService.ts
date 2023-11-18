@@ -2,12 +2,21 @@ import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {ApiServices} from "./api.service";
 import {Observable, ReplaySubject} from "rxjs";
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import {IssueListModel, IssueListRetModel, IssueListReturnModel} from "../_model/IssueTrackingModel";
 
 
 @Injectable()
 export class IssueTrackingService{
+  url: string;
 
-  constructor(public apiService:ApiServices, public router:Router){}
+
+  constructor(public apiService:ApiServices, public router:Router, private sanitizer: DomSanitizer, private http: HttpClient){}
+
+  get sanitizedUrl(): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+  }
 
   public login(model:any){
     return this.apiService.post('IssueTracking/Login', model);
@@ -67,12 +76,40 @@ export class IssueTrackingService{
     return result;
   }
 
+/*
   public convertBase64ToFile(base64:any){
     let blob=this.dataURItoBlob(base64);
     const retFile=new File([blob],base64.fileName, {type:base64.mimeType});
     return retFile
   }
+*/
+  public convertBase64ToFile(base64: any): File {
+    const byteCharacters = atob(base64);
+    const byteArrays = [];
 
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+      const slice = byteCharacters.slice(offset, offset + 512);
+      const byteNumbers = new Array(slice.length);
+
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays);
+    const fileName = base64.fileName; // Assuming fileName is a property of the `base64` object
+
+    const urlCreator = window.URL || window.webkitURL;
+    const imageUrl = urlCreator.createObjectURL(blob);
+
+    const sanitizedUrl: SafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(imageUrl);
+    const retFile = new File([blob], fileName, { type: base64.mimeType });
+    retFile['sanitizedUrl'] = sanitizedUrl; // Add sanitizedUrl property to the retFile object
+    return retFile;
+  }
   public dataURItoBlob(dataURI) {
     const byteString = window.atob(dataURI.data);
     const arrayBuffer = new ArrayBuffer(byteString.length);
@@ -83,6 +120,7 @@ export class IssueTrackingService{
     const blob = new Blob([int8Array], { type: dataURI.mimeType });
     return blob;
   }
+
 
   public GetAllIssueStatusTypes(){
     return this.apiService.get(`IssueTracking/GetAllIssueStatusTypes`);
@@ -99,9 +137,16 @@ export class IssueTrackingService{
     return this.apiService.get(`IssueTracking/GetAllIssues`);
   }
 
+  public GetsAllIssues(){
+    return this.apiService.get(`IssueTracking/GetsAllIssues`);
+  }
+
+
   public GetIssueById(model:any){
     return this.apiService.get(`IssueTracking/GetIssueById?id=${model}`);
   }
+
+
   // public GetIssueByStatus(model:any){
   //   return this.apiService.get(`IssueTracking/GetIssueByStatus?status=${model}`);
   // }
@@ -126,4 +171,5 @@ export class IssueTrackingService{
       this.router.navigate(['login']);
     })
   }
+
 }

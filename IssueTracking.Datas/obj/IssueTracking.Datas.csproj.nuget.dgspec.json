@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {}
+    "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {}
   },
   "projects": {
-    "C:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
+    "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "projectUniqueName": "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
         "projectName": "IssueTracking.Datas",
-        "projectPath": "C:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "projectPath": "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\code\\issuetracking\\IssueTracking.Datas\\obj\\",
+        "outputPath": "E:\\code\\issuetracking\\IssueTracking.Datas\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

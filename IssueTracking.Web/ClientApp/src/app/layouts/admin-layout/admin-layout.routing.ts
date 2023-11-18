@@ -28,7 +28,7 @@ export const AdminLayoutRoutes: Routes = [
         path: '',
         loadChildren: () => SettingsModule
       }]},
-   {
+  {
     path: 'issues',
     component: IssuesComponent,
     children: [

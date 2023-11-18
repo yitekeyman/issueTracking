@@ -39,11 +39,11 @@
           </div>
           <div class="panel-body data-table-list">
             <table class="table table-striped " id="data-table-basic" style="font-size: 12px">
-             <!-- <tr>
-                <td><label> Issue Title: </label> {{issue.issueType.name}}</td>
-              </tr> -->
               <tr>
-                <td><label>System Raised: </label> {{issue.issueType.issueTypeId.name}}
+                <td><label>Name: </label> {{issue.issueType.name}}</td>
+              </tr>
+              <tr>
+                <td><label>System Raised: </label> {{issue.issueType.raisedSystem.name}}
                   <small>({{issue.issueType.raisedSystem.description}})</small></td>
               </tr>
               <tr>
@@ -82,9 +82,6 @@
               <tr>
                 <td>{{issue.issuePriority}}</td>
               </tr>
-              <tr>
-                <td>{{issue.ticket}}</td>
-              </tr>
               <tr *ngIf="issue.issueResource?.length>0">
                 <td>
                   <label class="nk-label"><small>Issue Resource</small></label>
@@ -114,7 +111,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="addIssueModal" role="dialog">
+<div class="modal fade" id="editIssueModal" role="dialog">
   <app-edit-issue> </app-edit-issue>
 </div>
 
