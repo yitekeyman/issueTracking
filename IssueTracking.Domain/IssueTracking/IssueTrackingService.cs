@@ -35,11 +35,9 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(string fileName, string mimeType);
         void AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
-        IList<IssueSearchModel> GetAllIssues();
-        //IList<IssuesListModel> GetsAllIssues();
-       // IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
-        //IssueListReturn GetIssueById(Guid id);
-        IssueSearchModel GetIssueById(Guid id);
+        IList<IssueListReturn> GetAllIssues();
+        IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
+        IssueListReturn GetIssueById(Guid id);
 
         void AddIssueComment(IssueCommentsModel model);
         void EditIssueComment(IssueCommentsModel model);
@@ -410,39 +408,8 @@ namespace IssueTracking.Domain.IssueTracking
 
             return issueList;
         }
-        public IssueSearchModel GetIssueById(Guid id)
-        {
-            var ret = new IssueSearchModel();
-            var issue = _context.IssuesList.First(e => e.Id == id);
-            if (issue != null)
-            {
-                ret.Id = issue.Id.ToString();
-                ret.IssueTitle = issue.IssueTitle;
-                ret.IssueType = _context.IssueTypeList.First(e => e.Id == issue.IssueTypeId).Name;
-                ret.OtherIssue = issue.OtherIssue;
-                ret.PolicyNo = issue.PolicyNo;
-                ret.IssueDescription = issue.IssueDescription;
-                ret.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
-                if (!string.IsNullOrEmpty(issue.IssueResource))
-                {
-                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
-                    foreach (var res in imageResource)
-                    {
-                        var data = GetResourceDoc(res.DocRef, res.MimeType);
-                        if (!string.IsNullOrEmpty(data))
-                        {
-                            res.Data = data;
-                            ret.IssueResource.Add(res);
-                        }
-                    }
-                }
-            }
-            return ret;
-        }
-
-       
         
-       /* public IssueListReturn GetIssueById(Guid id)
+        public IssueListReturn GetIssueById(Guid id)
         {
             var issueList = new IssueListReturn();
             var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
@@ -1111,17 +1078,5 @@ namespace IssueTracking.Domain.IssueTracking
 
             return lowerSidebars;
         }
-        
-        /*
-        private string GetEmployeeId()
-        {
-            string employeeId = null;
-            var account = _context.Account.FirstOrDefault(a => a.Username.Equals(_session.Username));
-            if (account != null && account.EmployeeId!=null)
-            {
-                employeeId = account.EmployeeId.ToString();
-            }
-            return employeeId;
-        } */
     }
 }

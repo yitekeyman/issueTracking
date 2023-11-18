@@ -44,11 +44,10 @@ const routes: Routes =[
       {
         path: 'edit-issue',
         component: EditIssueComponent
-
       }
 
     ]
-  },
+  }, */
   {
     path: '**',
     redirectTo: 'login',

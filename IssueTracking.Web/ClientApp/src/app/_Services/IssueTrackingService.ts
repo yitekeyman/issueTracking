@@ -137,11 +137,6 @@ export class IssueTrackingService{
     return this.apiService.get(`IssueTracking/GetAllIssues`);
   }
 
-  public GetsAllIssues(){
-    return this.apiService.get(`IssueTracking/GetsAllIssues`);
-  }
-
-
   public GetIssueById(model:any){
     return this.apiService.get(`IssueTracking/GetIssueById?id=${model}`);
   }
