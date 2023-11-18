@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, } from '@angular/common';
 import { BrowserModule  } from '@angular/platform-browser';
-import { Routes, RouterModule } from '@angular/router';
+import {Routes, RouterModule, Route} from '@angular/router';
 
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import {LoginComponent} from "./login/login.component";
 import {AdminLayoutModule} from "./layouts/admin-layout/admin-layout.module";
 import {IssuesComponent} from "./issues/issues.component";
 import {EditIssueComponent} from "./issues/editIssue/edit-issue.component";
+import {DashboardComponent} from "./dashboard/dashboard.component";
+import {ViewIssueComponent} from "./issues/viewIssues/view-issue.component";
 
 const routes: Routes =[
   {
@@ -30,10 +32,10 @@ const routes: Routes =[
     path: 'LIT',
     component: AdminLayoutComponent,
     children: [
-        {
-      path: '',
-      loadChildren: () => AdminLayoutModule
-  }]},
+      {
+        path: '',
+        loadChildren: () => AdminLayoutModule
+      }]},
   {
     path: 'issues',
 
@@ -42,7 +44,9 @@ const routes: Routes =[
       {
         path: 'edit-issue',
         component: EditIssueComponent
+
       }
+
     ]
   },
   {
@@ -59,6 +63,9 @@ const routes: Routes =[
     RouterModule.forRoot(routes)
   ],
   exports: [
+
   ],
 })
 export class AppRoutingModule { }
+
+

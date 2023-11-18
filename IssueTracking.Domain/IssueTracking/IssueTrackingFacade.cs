@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
@@ -30,9 +30,11 @@ namespace IssueTracking.Domain.IssueTracking
         void EditIssueComment(UserSession session, IssueCommentsModel model);
         IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId);
         void DeleteIssueComment(UserSession session, string commentId);
-        IList<IssueListReturn> GetAllIssues(UserSession session);
-        IssueListReturn GetIssueById(UserSession session, Guid id);
-        IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
+        IList<IssueSearchModel> GetAllIssues(UserSession session);
+       //IList<IssuesListModel> GetsAllIssues(UserSession session);
+        IssueSearchModel GetIssueById(UserSession session, Guid id);
+        
+       // IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
         IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
         IList<EmployeeModel> GetAllEmployee(UserSession session);
         IList<EmployeeModel> GetAllEmployeeByBranchId(UserSession session,string id);
@@ -122,13 +124,15 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetBasicSolutionById(id);
         }
-              
-        public IssueListReturn GetIssueById(UserSession session, Guid id)
+        
+        public IssueSearchModel GetIssueById(UserSession session, Guid id)
         {
            _issueTrackingService.SetSession(session);
            return _issueTrackingService.GetIssueById(id);
         }
-
+     
+        
+        
         public IList<BasicSolutionReturn> GetBasicSolutionByIssueType(UserSession session, long id)
         {
             _issueTrackingService.SetSession(session);
@@ -171,12 +175,12 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.DeleteIssueComment(commentId);
         }
         
-
+/*
         public IList<IssueListReturn> GetIssueByStatus(UserSession session, IssueFilterParameter model, long status)
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetIssueByStatus(model,status);
-        }
+        } */
         
         
         public void AddIssue(UserSession session, IssuesListModel model)
@@ -191,12 +195,17 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssue(model);
         }
 
-        public IList<IssueListReturn> GetAllIssues(UserSession session)
+        public IList<IssueSearchModel> GetAllIssues(UserSession session)
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllIssues();
-        }
-
+        } 
+        /*
+        public IList<IssuesListModel> GetsAllIssues(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetsAllIssues();
+        } */
 
         public IList<DepartmentSchemaModel> GetAllBranch(UserSession session)
         {

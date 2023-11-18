@@ -76,7 +76,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string IssueTitle { get; set; }
         public long? IssueTypeId { get; set; }
         public string OtherIssue { get; set; }
-        public string[] PolicyNo { get; set; }
+        public string PolicyNo { get; set; }
         public string IssueDescription { get; set; }
         public long? IssuePriority { get; set; }
         
@@ -90,14 +90,16 @@ namespace IssueTracking.Domain.IssueTracking
         public string IssueTitle { get; set; }
         public long? IssueTypeId { get; set; }
         public string OtherIssue { get; set; }
-        public string[] PolicyNo { get; set; }
-        
+        public string PolicyNo { get; set; }
         public DepartmentSchemaModel BranchId = new DepartmentSchemaModel();
         public string IssueDescription { get; set; }
         
         public EmployeeModel IssueRequestedBy = new EmployeeModel();
-        
         public DateTime IssueRequestedDate { get; set; }
+        public EmployeeModel IssueRespondBy = new EmployeeModel();
+        public DateTime IssueRespondDate { get; set; }
+        public EmployeeModel IssueClosedBy = new EmployeeModel();
+        public DateTime IssueClosedDate { get; set; }
         public string IssuePriority { get; set; }
         public string IssueStatus { get; set; }
         public string Ticket { get; set; }
@@ -108,6 +110,20 @@ namespace IssueTracking.Domain.IssueTracking
         public IssueTypeReturn IssueType = new IssueTypeReturn();
        
 
+    }
+
+    public class IssueSearchModel
+    {
+        public string Id { get; set; }
+        public string IssueTitle { get; set; }
+        public string IssueType { get; set; }
+        public string OtherIssue { get; set; }
+        public string PolicyNo { get; set; }
+        public string IssueDescription { get; set; }
+        public string IssuePriority { get; set; }
+        public IssueTypeReturn IssueTypes { get; set; }
+        public IList<ResourceModel> IssueResource { get; set; }
+        
     }
 
     public class IssueListReturnModel

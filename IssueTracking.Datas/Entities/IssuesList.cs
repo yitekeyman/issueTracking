@@ -21,14 +21,14 @@ namespace IssueTracking.Datas.Entities
         public string IssueTitle { get; set; }
         public long? IssueTypeId { get; set; }
         public string OtherIssue { get; set; }
-        public string[] PolicyNo { get; set; }
+        public string PolicyNo { get; set; }
         public Guid BranchId { get; set; }
         public string IssueDescription { get; set; }
         public Guid IssueRequestedBy { get; set; }
         public long? IssueRequestedDate { get; set; }
-        public Guid? IssueRespondBy { get; set; }
+        public Guid IssueRespondBy { get; set; }
         public long? IssueRespondDate { get; set; }
-        public Guid? IssueClosedBy { get; set; }
+        public Guid IssueClosedBy { get; set; }
         public long? IssueClosedDate { get; set; }
         public long? IssuePriority { get; set; }
         public long? IssueStatus { get; set; }

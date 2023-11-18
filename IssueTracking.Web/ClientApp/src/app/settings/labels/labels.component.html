@@ -44,15 +44,12 @@
               </tr>
               </thead>
               <tbody *ngIf="pagedItems?.length>0">
-              <tr *ngFor="let row of pagedItems; index as i">
-                <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
-                <td>{{row.name}}</td>
-                <td>{{row.description}}</td>
-                <td>{{row.issueType?.length}}</td>
-
-              </tr>
-
-
+                 <tr *ngFor="let row of pagedItems; index as i">
+                     <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
+                     <td>{{row.name}}</td>
+                     <td>{{row.description}}</td>
+                     <td>{{row.issueType?.length}}</td>
+                 </tr>
               </tbody>
               <tbody *ngIf="pagedItems?.length==0">
               <tr>

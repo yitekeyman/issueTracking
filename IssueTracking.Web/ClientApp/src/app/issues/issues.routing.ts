@@ -3,6 +3,7 @@ import {ViewIssueComponent} from "./viewIssues/view-issue.component";
 import { EditIssueComponent } from './editIssue/edit-issue.component';
 import {IssuesComponent} from "./issues.component";
 import {NgModule} from "@angular/core";
+import {DashboardComponent} from "../dashboard/dashboard.component";
 
 
 export const routes:Routes=[
@@ -17,7 +18,7 @@ export const routes:Routes=[
     ]
   },
   {path: 'issues/edit-issue', component:EditIssueComponent},
-  {path: 'issues/view-issue', component:ViewIssueComponent},
+  {path: 'view-issue/:issueId', component:ViewIssueComponent},
   ];
 @NgModule({
   imports: [RouterModule.forChild(routes)],

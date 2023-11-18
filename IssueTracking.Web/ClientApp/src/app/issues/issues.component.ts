@@ -1,11 +1,12 @@
 ﻿import {Component, OnInit,} from "@angular/core";
-import {IssueFilterParameter, IssueListModel, IssueListReturnModel, ResourceModel} from "../_model/IssueTrackingModel";
+import {IssueFilterParameter, IssueListReturnModel, ResourceModel} from "../_model/IssueTrackingModel";
 import {IssueTrackingService} from "../_Services/IssueTrackingService";
 import {PagerService} from "../_Services/pager.service";
 import {Router} from "@angular/router";
 import dialog from "../components/dialog";
 import {FormBuilder} from "@angular/forms";
 import {EditIssueComponent} from "./editIssue/edit-issue.component";
+import swal from "sweetalert2";
 
 
 @Component({
@@ -21,14 +22,10 @@ export class IssuesComponent implements OnInit{
   public pager: any = {};
   public isAdd = false;
   public isEdit = false;
-  public selectedIssue = 0;
-  public selectedIssueType = 0;
+  public selectedIssue: any;
+  public selectedIssueType: any;
   pagedItems: any[];
-  public pager1: any = {};
-  pagedItems1: any[];
-
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router:Router) {
-
 
   }
 
@@ -36,23 +33,21 @@ export class IssuesComponent implements OnInit{
     this.getAllIssues();
   }
 
-  public getAllIssues(){
+  public getAllIssues() {
+    this.isEdit = false;
+    this.isAdd = false;
+    this.selectedIssue = null;
     dialog.loading();
-    this.closeModal();
     this.issueTrackingService.GetAllIssues().subscribe(res => {
       this.issuesList = res;
-      if (this.issuesList.length> 0) {
-        if (this.pager.currentPage == 0) {
-          this.setPage(1);
-        } else {
-          this.setPage(this.pager.currentPage);
-        }
-      } else {
+      if (this.issuesList.length > 0)
         this.setPage(1);
-      }
       dialog.close();
-    }, dialog.error)
-
+    }, e => {
+      swal({
+        type: 'error', title: 'Oops...', text: e.message
+      });
+    })
   }
 
   public setPage(page: number) {
@@ -66,6 +61,7 @@ export class IssuesComponent implements OnInit{
     this.pagedItems = this.issuesList.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
   }
+
   /*
   public setOpenPage(page: number) {
     if (page < 1 || page > this.pager.totalPages) {
@@ -94,7 +90,7 @@ export class IssuesComponent implements OnInit{
   public openAddIssueForm() {
       this.router.navigate(['/issues/edit-issue']);
   }
-*/
+
   public editIssue(id: any, issueType:any) {
     this.selectedIssueType=issueType;
     if (id > 0) {
@@ -109,9 +105,38 @@ export class IssuesComponent implements OnInit{
     }
   }
 
-  public seeIssueDetails(id:string){
-    this.router.navigate(['/issues/view-issue/', id]);
+  public editIssue(index: any, id: any) {
+    if (index == '1') {
+      this.isAdd = false;
+      this.isEdit = true;
+      this.selectedIssue = id;
+    } else {
+      this.isEdit = false;
+      this.isAdd = true;
+      this.selectedIssue = null;
+    }
   }
+*/
+
+
+  public editIssue(id: any, issueTypeId:any) {
+    this.selectedIssueType=issueTypeId;
+    if (id > 0) {
+      this.isAdd = false;
+      this.isEdit = true;
+      this.selectedIssue = id;
+    } else {
+      this.isEdit = false;
+      this.isAdd = true;
+      this.selectedIssue = null;
+
+    }
+  }
+
+  public seeIssueDetails(id:any){
+    this.router.navigate(['LIT/issues/view-issue', id]);
+  }
+
 
   public closeModal() {
     this.isEdit = false;
@@ -120,5 +145,5 @@ export class IssuesComponent implements OnInit{
     this.selectedIssueType=0;
   }
 
-  protected readonly EditIssueComponent = EditIssueComponent;
+  // protected readonly EditIssueComponent = EditIssueComponent;
 }

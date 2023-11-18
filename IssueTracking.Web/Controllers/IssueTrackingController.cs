@@ -208,8 +208,25 @@ namespace IssueTracking.Web.Controllers
                     stCode = 400;
                 return StatusCode(stCode, new { message = e.InnerException });
             }
+        }  
+        
+        /*
+        [HttpGet]
+        public IActionResult GetsIssueById([FromQuery] Guid id)
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetsIssueById(GetSession(), id));
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.InnerException });
+            }
         }
-
+         */
         [HttpPost]
         public IActionResult EditBasicIssueSolution([FromBody] BasicSolutionModel model)
         {
