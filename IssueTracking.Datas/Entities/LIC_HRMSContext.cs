@@ -18,6 +18,7 @@ namespace IssueTracking.Datas.Entities
         }
 
         public virtual DbSet<Account> Account { get; set; }
+        public virtual DbSet<ActionTracker> ActionTracker { get; set; }
         public virtual DbSet<ActionType> ActionType { get; set; }
         public virtual DbSet<AssEmpTraining> AssEmpTraining { get; set; }
         public virtual DbSet<AssignmentActivity> AssignmentActivity { get; set; }
@@ -71,10 +72,14 @@ namespace IssueTracking.Datas.Entities
         public virtual DbSet<HolidayCalander> HolidayCalander { get; set; }
         public virtual DbSet<IssueAssigned> IssueAssigned { get; set; }
         public virtual DbSet<IssueComments> IssueComments { get; set; }
+        public virtual DbSet<IssueDependancies> IssueDependancies { get; set; }
+        public virtual DbSet<IssueDueDate> IssueDueDate { get; set; }
+        public virtual DbSet<IssueMilestones> IssueMilestones { get; set; }
         public virtual DbSet<IssueNotification> IssueNotification { get; set; }
         public virtual DbSet<IssuePriorityType> IssuePriorityType { get; set; }
         public virtual DbSet<IssueRaisedSystem> IssueRaisedSystem { get; set; }
         public virtual DbSet<IssueStatusType> IssueStatusType { get; set; }
+        public virtual DbSet<IssueTimeTracker> IssueTimeTracker { get; set; }
         public virtual DbSet<IssueTypeList> IssueTypeList { get; set; }
         public virtual DbSet<IssuesList> IssuesList { get; set; }
         public virtual DbSet<LabelList> LabelList { get; set; }
@@ -107,7 +112,6 @@ namespace IssueTracking.Datas.Entities
         public virtual DbSet<Transfer> Transfer { get; set; }
         public virtual DbSet<UserAction> UserAction { get; set; }
         public virtual DbSet<UserRole> UserRole { get; set; }
-        public virtual DbSet<WatchedIssue> WatchedIssue { get; set; }
         public virtual DbSet<Workflow> Workflow { get; set; }
         public virtual DbSet<WorkflowDocument> WorkflowDocument { get; set; }
         public virtual DbSet<WorkflowType> WorkflowType { get; set; }
@@ -119,7 +123,7 @@ namespace IssueTracking.Datas.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseNpgsql("Host=localhost;Database=LIC_HRMS;Username=postgres;Password=mad@2023");
+                optionsBuilder.UseNpgsql("Host=localhost;Database=LIC_HRMS;Username=postgres;Password=admin");
             }
         }
 
@@ -154,6 +158,34 @@ namespace IssueTracking.Datas.Entities
                     .IsRequired()
                     .HasColumnName("username")
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<ActionTracker>(entity =>
+            {
+                entity.ToTable("action_tracker", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ActionDate).HasColumnName("action_date");
+
+                entity.Property(e => e.ActionDetails)
+                    .HasColumnName("action_details")
+                    .HasColumnType("json");
+
+                entity.Property(e => e.ActionType)
+                    .IsRequired()
+                    .HasColumnName("action_type")
+                    .HasMaxLength(150);
+
+                entity.Property(e => e.IssueId).HasColumnName("issue_id");
+
+                entity.Property(e => e.Remark)
+                    .HasColumnName("remark")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
             });
 
             modelBuilder.Entity<ActionType>(entity =>
@@ -1949,6 +1981,57 @@ namespace IssueTracking.Datas.Entities
                     .HasConstraintName("comment_issue_status_fk");
             });
 
+            modelBuilder.Entity<IssueDependancies>(entity =>
+            {
+                entity.ToTable("issue_dependancies", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Dependancies).HasColumnName("dependancies");
+
+                entity.Property(e => e.MajorIssue).HasColumnName("major_issue");
+            });
+
+            modelBuilder.Entity<IssueDueDate>(entity =>
+            {
+                entity.ToTable("issue_due_date", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DueDate)
+                    .HasColumnName("due_date")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.EndTime)
+                    .HasColumnName("end_time")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.IssueId).HasColumnName("issue_id");
+
+                entity.Property(e => e.StartTime)
+                    .HasColumnName("start_time")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.Status).HasColumnName("status");
+            });
+
+            modelBuilder.Entity<IssueMilestones>(entity =>
+            {
+                entity.ToTable("issue_milestones", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.IssueId).HasColumnName("issue_id");
+
+                entity.Property(e => e.MilestoneId).HasColumnName("milestone_id");
+            });
+
             modelBuilder.Entity<IssueNotification>(entity =>
             {
                 entity.ToTable("issue_notification", "issue_tracking");
@@ -2020,6 +2103,27 @@ namespace IssueTracking.Datas.Entities
                 entity.Property(e => e.Name).HasColumnName("name");
             });
 
+            modelBuilder.Entity<IssueTimeTracker>(entity =>
+            {
+                entity.ToTable("issue_time_tracker", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.EndTime).HasColumnName("end_time");
+
+                entity.Property(e => e.IssueId).HasColumnName("issue_id");
+
+                entity.Property(e => e.StartTime).HasColumnName("start_time");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+            });
+
             modelBuilder.Entity<IssueTypeList>(entity =>
             {
                 entity.ToTable("issue_type_list", "issue_tracking");
@@ -2056,7 +2160,7 @@ namespace IssueTracking.Datas.Entities
                 entity.Property(e => e.IssueClosedDate)
                     .HasColumnName("issue_closed_date")
                     .HasDefaultValueSql("0");
-                entity.Property(e => e.IssueTitle).HasColumnName("issue_title");
+
                 entity.Property(e => e.IssueDescription).HasColumnName("issue_description");
 
                 entity.Property(e => e.IssuePriority).HasColumnName("issue_priority");
@@ -2079,6 +2183,10 @@ namespace IssueTracking.Datas.Entities
 
                 entity.Property(e => e.IssueStatus).HasColumnName("issue_status");
 
+                entity.Property(e => e.IssueTitle)
+                    .IsRequired()
+                    .HasColumnName("issue_title");
+
                 entity.Property(e => e.IssueTypeId).HasColumnName("issue_type_id");
 
                 entity.Property(e => e.OtherIssue).HasColumnName("other_issue");
@@ -2097,6 +2205,11 @@ namespace IssueTracking.Datas.Entities
                     .HasForeignKey(d => d.IssuePriority)
                     .HasConstraintName("issue_priority_id_fk");
 
+                entity.HasOne(d => d.IssueRaisedSlu)
+                    .WithMany(p => p.IssuesList)
+                    .HasForeignKey(d => d.IssueRaisedSluId)
+                    .HasConstraintName("issue_raised_slu_id_fk");
+
                 entity.HasOne(d => d.IssueRequestedByNavigation)
                     .WithMany(p => p.IssuesList)
                     .HasForeignKey(d => d.IssueRequestedBy)
@@ -2111,11 +2224,6 @@ namespace IssueTracking.Datas.Entities
                     .WithMany(p => p.IssuesList)
                     .HasForeignKey(d => d.IssueTypeId)
                     .HasConstraintName("issue_type_issue_fk");
-                entity.HasOne(d => d.IssueRaisedSys)
-                    .WithMany(p => p.IssuesList)
-                    .HasForeignKey(d => d.IssueRaisedSluId)
-                    .HasConstraintName("issue_raised_slu_id_fk");
-                
             });
 
             modelBuilder.Entity<LabelList>(entity =>
@@ -2240,7 +2348,7 @@ namespace IssueTracking.Datas.Entities
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
-                    .HasDefaultValueSql("nextval(('payroll.\"loan_type_seq\"'::text)::regClass)");
+                    .HasDefaultValueSql("nextval(('payroll.\"loan_type_seq\"'::text)::regclass)");
 
                 entity.Property(e => e.Name)
                     .HasColumnName("name")
@@ -2332,8 +2440,6 @@ namespace IssueTracking.Datas.Entities
 
                 entity.Property(e => e.DueDate).HasColumnName("due_date");
 
-                entity.Property(e => e.IssueId).HasColumnName("issue_id");
-
                 entity.Property(e => e.Name).HasColumnName("name");
 
                 entity.HasOne(d => d.CreatedByNavigation)
@@ -2341,12 +2447,6 @@ namespace IssueTracking.Datas.Entities
                     .HasForeignKey(d => d.CreatedBy)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("milestones_creater_id_fk");
-
-                entity.HasOne(d => d.Issue)
-                    .WithMany(p => p.Milestones)
-                    .HasForeignKey(d => d.IssueId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("milestones_issue_id_fk");
             });
 
             modelBuilder.Entity<MonthlyAttendance>(entity =>
@@ -3176,33 +3276,6 @@ namespace IssueTracking.Datas.Entities
                     .HasConstraintName("FK_user_role_account");
             });
 
-            modelBuilder.Entity<WatchedIssue>(entity =>
-            {
-                entity.ToTable("watched_issue", "issue_tracking");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
-
-                entity.Property(e => e.IssueId).HasColumnName("issue_id");
-
-                entity.Property(e => e.WatDate).HasColumnName("wat_date");
-
-                entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.WatchedIssue)
-                    .HasForeignKey(d => d.EmployeeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("watched_employee_id_fk");
-
-                entity.HasOne(d => d.Issue)
-                    .WithMany(p => p.WatchedIssue)
-                    .HasForeignKey(d => d.IssueId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("watched_issue_id_fk");
-            });
-
             modelBuilder.Entity<Workflow>(entity =>
             {
                 entity.ToTable("workflow", "workflow");
@@ -3413,7 +3486,7 @@ namespace IssueTracking.Datas.Entities
 
             modelBuilder.HasSequence("sys_par_seq");
         }
-         public void SaveChanges(string username, UserAction userAction)
+          public void SaveChanges(string username, UserAction userAction)
         {
             UserAction.Add(userAction);
             base.SaveChanges();
@@ -3526,7 +3599,7 @@ namespace IssueTracking.Datas.Entities
         public Npgsql.NpgsqlCommand CreateReaderCommand(String sql)
         {
             this.Database.OpenConnection();
-            var con = (Npgsql.NpgsqlConnection) this.Database.GetDbConnection();
+            var con = (Npgsql.NpgsqlConnection)this.Database.GetDbConnection();
 
             var cmd = new Npgsql.NpgsqlCommand(sql, con);
             return cmd;
@@ -3535,7 +3608,7 @@ namespace IssueTracking.Datas.Entities
         public System.Data.DataTable GetDataTable(String sql)
         {
             this.Database.OpenConnection();
-            var con = (Npgsql.NpgsqlConnection) this.Database.GetDbConnection();
+            var con = (Npgsql.NpgsqlConnection)this.Database.GetDbConnection();
             using (var cmd = new Npgsql.NpgsqlCommand(sql, con))
             using (var adapter = new Npgsql.NpgsqlDataAdapter(cmd))
             {

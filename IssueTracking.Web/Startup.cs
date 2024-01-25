@@ -107,7 +107,7 @@ namespace IssueTracking.Web
                 }
             });
 
-            app.UseCors("AllowAllOrigins");
+            app.UseCors("AllowAll");
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
@@ -129,7 +129,7 @@ namespace IssueTracking.Web
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
-                    spa.Options.StartupTimeout = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 30);
+                    //spa.Options.StartupTimeout = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 30);
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });

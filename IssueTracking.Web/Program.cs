@@ -20,7 +20,7 @@ namespace IssueTracking.Web
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls("https://127.0.0.1:5004");
+                .UseUrls("http://0.0.0.0:5004");
         
     }
 }

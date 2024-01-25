@@ -11,8 +11,8 @@ namespace IssueTracking.Domain.IssueTracking
         IssuePriorityType GetPriorityTypeById(UserSession session,long id);
         IList<IssuePriorityType> GetAllPriorityTypes(UserSession session);
         IList<IssueStatusType> GetAllIssueStatusTypes(UserSession session);
-        IssueRaisedSystem GetIssueRaisedSystemById(UserSession session,long id);
-        IList<IssueRaisedSystem> GetAllIssueRaisedSystems(UserSession session);
+        LookupModel GetIssueRaisedSystemById(UserSession session,long id);
+        IList<LookupModel> GetAllIssueRaisedSystems(UserSession session);
         IssueRaisedSystemReturn GetRaisedSystemById(UserSession session,long id);
         IList<IssueRaisedSystemReturn> GetAllRaisedSystems(UserSession session);
         void EditIssueType(UserSession session,IssueTypeList model);
@@ -24,20 +24,39 @@ namespace IssueTracking.Domain.IssueTracking
         IList<BasicSolutionReturn> GetBasicSolutionByIssueType(UserSession session,long id);
         IList<BasicSolutionReturn> GetAllBasicSolution(UserSession session);
         string GetResourceDoc(UserSession session, string fileName, string mimeType);
-        void AddIssue(UserSession session, IssuesListModel model);
+        string AddIssue(UserSession session, IssuesListModel model);
         void EditIssue(UserSession session, IssuesListModel model);
         void AddIssueComment(UserSession session, IssueCommentsModel model);
         void EditIssueComment(UserSession session, IssueCommentsModel model);
-        IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId);
+        IList<IssueCommentReturnModel> GetAllIssueComments(UserSession session, string issueId);
         void DeleteIssueComment(UserSession session, string commentId);
-        IList<IssueSearchModel> GetAllIssues(UserSession session);
+        SearchIssueResult GetAllIssues(UserSession session, QueryParams model);
        //IList<IssuesListModel> GetsAllIssues(UserSession session);
-        IssueSearchModel GetIssueById(UserSession session, Guid id);
+        IssueListReturn GetIssueById(UserSession session, Guid id);
         
        // IList<IssueListReturn> GetIssueByStatus(UserSession session,IssueFilterParameter model, long status);
         IList<DepartmentSchemaModel> GetAllBranch(UserSession session);
         IList<EmployeeModel> GetAllEmployee(UserSession session);
         IList<EmployeeModel> GetAllEmployeeByBranchId(UserSession session,string id);
+        void AssignIssue(UserSession session,AssignIssueModel model);
+        void CloseIssue(UserSession session, string issueId, string remark);
+        void ReopenIssue(UserSession session, string issueId,string remark);
+        string PatchCloseIssue(UserSession session,PatchActionModel model);
+        string PatchReopenIssue(UserSession session, PatchActionModel model);
+        DashboardModel GetDashboard(UserSession session, string deptId);
+        void EditMileStone(UserSession session, MileStonesModel model);
+        IList<MileStonesModelReturn> GetAllMilestones(UserSession session);
+        MileStonesModelReturn GetMilestoneById(UserSession session, string id);
+        void DeleteMilestone(UserSession session, string id);
+        void AddMilestoneToIssue(UserSession session, string issueId, string milestoneId);
+        void RemoveMilestoneFromIssue(UserSession session, string id);
+        void RemoveAssignFromIssue(UserSession session, string id);
+        IList<IssueSearchModel> GetAllDependents(UserSession session, string issueId);
+        void AddDependencyToIssue(UserSession session, string issueId, string depeId);
+        void RemoveDependencyFromIssue(UserSession session, string id);
+        void StartTask(UserSession session, string issueId);
+        void EndTask(UserSession session, string id);
+        void AddDueDate(UserSession session,string issueId, DateTime dueDate);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -71,13 +90,13 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetAllIssueStatusTypes();
         }
 
-        public IssueRaisedSystem GetIssueRaisedSystemById(UserSession session, long id)
+        public LookupModel GetIssueRaisedSystemById(UserSession session, long id)
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetIssueRaisedSystemById(id);
         }
 
-        public IList<IssueRaisedSystem> GetAllIssueRaisedSystems(UserSession session)
+        public IList<LookupModel> GetAllIssueRaisedSystems(UserSession session)
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllIssueRaisedSystems();
@@ -125,7 +144,7 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetBasicSolutionById(id);
         }
         
-        public IssueSearchModel GetIssueById(UserSession session, Guid id)
+        public IssueListReturn GetIssueById(UserSession session, Guid id)
         {
            _issueTrackingService.SetSession(session);
            return _issueTrackingService.GetIssueById(id);
@@ -163,7 +182,7 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssueComment(model);
         }
 
-        public IList<IssueCommentsModel> GetAllIssueComments(UserSession session, string issueId)
+        public IList<IssueCommentReturnModel> GetAllIssueComments(UserSession session, string issueId)
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllIssueComments(issueId);
@@ -183,10 +202,10 @@ namespace IssueTracking.Domain.IssueTracking
         } */
         
         
-        public void AddIssue(UserSession session, IssuesListModel model)
+        public string AddIssue(UserSession session, IssuesListModel model)
         {
             _issueTrackingService.SetSession(session);
-            _issueTrackingService.AddIssue(model);
+            return _issueTrackingService.AddIssue(model);
         }
 
         public void EditIssue(UserSession session, IssuesListModel model)
@@ -195,10 +214,10 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssue(model);
         }
 
-        public IList<IssueSearchModel> GetAllIssues(UserSession session)
+        public SearchIssueResult GetAllIssues(UserSession session, QueryParams model)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetAllIssues();
+            return _issueTrackingService.GetAllIssues(model);
         } 
         /*
         public IList<IssuesListModel> GetsAllIssues(UserSession session)
@@ -224,7 +243,117 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetAllEmployeeByBranchId(id);
         }
-        
-       
+
+        public void AssignIssue(UserSession session, AssignIssueModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AssignIssue(model);
+        }
+
+        public void CloseIssue(UserSession session, string issueId, string remark)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.CloseIssue(issueId,remark);
+        }
+
+        public void ReopenIssue(UserSession session, string issueId, string remark)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.ReopenIssue(issueId,remark);
+        }
+
+        public string PatchCloseIssue(UserSession session, PatchActionModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.PatchCloseIssue(model);
+        }
+
+        public string PatchReopenIssue(UserSession session, PatchActionModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.PatchReopenIssue(model);
+        }
+
+        public DashboardModel GetDashboard(UserSession session, string deptId)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetDashboard(deptId);
+        }
+
+        public void EditMileStone(UserSession session, MileStonesModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.EditMileStone(model);
+        }
+
+        public IList<MileStonesModelReturn> GetAllMilestones(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllMilestones();
+        }
+
+        public MileStonesModelReturn GetMilestoneById(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetMilestoneById(id);
+        }
+
+        public void DeleteMilestone(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.DeleteMilestone(id);
+        }
+
+        public void AddMilestoneToIssue(UserSession session, string issueId, string milestoneId)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AddMilestoneToIssue(issueId, milestoneId);
+        }
+
+        public void RemoveMilestoneFromIssue(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.RemoveMilestoneFromIssue(id);
+        }
+
+        public void RemoveAssignFromIssue(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.RemoveAssignFromIssue(id);
+        }
+
+        public IList<IssueSearchModel> GetAllDependents(UserSession session, string issueId)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetAllDependents(issueId);
+        }
+
+        public void AddDependencyToIssue(UserSession session, string issueId, string depeId)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AddDependencyToIssue(issueId,depeId);
+        }
+
+        public void RemoveDependencyFromIssue(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.RemoveDependencyFromIssue(id);
+        }
+
+        public void StartTask(UserSession session, string issueId)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.StartTask(issueId);
+        }
+
+        public void EndTask(UserSession session, string id)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.EndTask(id);
+        }
+        public void AddDueDate(UserSession session,string issueId, DateTime dueDate){
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.AddDueDate(issueId, dueDate);
+        }
     }
 }

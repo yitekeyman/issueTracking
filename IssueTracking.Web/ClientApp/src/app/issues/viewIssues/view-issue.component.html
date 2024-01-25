@@ -1,26 +1,58 @@
-<div class="breadcomb-area">
+<div class="breadcomb-area" *ngIf="issue!=null">
   <div class="container">
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="breadcomb-list">
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-              <div class="breadcomb-wp">
-                <div class="breadcomb-icon">
-                  <i class="notika-icon notika-app"></i>
-                </div>
-                <div class="breadcomb-ctn">
-                  <h2>View Issue Details</h2>
-
+              <div class="breadcomb-icon">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default "
+                          *ngIf="issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          (click)="IssueClose()">Close
+                  </button>
+                  <button type="button" class="btn btn-default "
+                          *ngIf="issue.issueStatus.id==2 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          (click)="Reopen()">Reopen
+                  </button>
+                  <button data-placement="left" title="Edit Issue" class="btn btn-default " data-toggle="modal"
+                          data-target="#editIssueModal"
+                          *ngIf="issue.issueStatus.id==1 && issue.issueRequestedBy.id==loggedInEmployeeId"
+                          (click)="editIssue(issueId)">Edit
+                  </button>
                 </div>
               </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-placement="left" title="Add Issue" class="btn" data-toggle="modal"
-                        data-target="#addIssueModal" >Add Issue
+                <button data-placement="left" title="Add New Issue" class="btn" data-toggle="modal"
+                        data-target="#editIssueModal" (click)="editIssue(null)">New Issue
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="breadcomb-list" style="border-top:2px solid #eee">
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-9">
+              <div class="breadcomb-wp">
+                <h2><span style="color:rgba(0,0,0,0.3)">#{{issue.ticket}}</span> {{issue.issueTitle}}</h2>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3">
+              <div class="breadcomb-ctn" style="text-align: right">
+                <label>From: </label>{{issue.branchId}}
+                <p><label>Status: </label>{{issue.issueStatus.name}}</p>
+              </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <small>Opened <span
+                title="{{issueTrackingService.convertDate(issue.issueRequestedDate)}}">{{issueTrackingService.timeDifference(issue.issueRequestedDate)}}</span>
+                by {{issue.issueRequestedBy.firstName}} {{issue.issueRequestedBy.fatherName}}
+                , {{issue.comments?.length}}Comments</small>
             </div>
           </div>
         </div>
@@ -30,7 +62,7 @@
 </div>
 
 <div class="invoice-area">
-  <div class="container">
+  <div class="container" *ngIf="issue!=null">
     <div class="row">
       <div class="col-lg-3 col-md-3">
         <div class="panel">
@@ -38,82 +70,386 @@
             <label>Issue Type Details</label>
           </div>
           <div class="panel-body data-table-list">
-            <table class="table table-striped " id="data-table-basic" style="font-size: 12px">
-              <!-- <tr>
-                 <td><label> Issue Title: </label> {{issue.issueType.name}}</td>
-               </tr> -->
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt">
+
               <tr>
                 <td><label>Name: </label> {{issue.issueType.name}}</td>
               </tr>
               <tr>
                 <td><label>System Raised: </label> {{issue.issueType.raisedSystem.name}}
-                  <small>({{issue.issueType.raisedSystem.description}})</small></td>
+                  <small
+                    *ngIf="issue.issueType.raisedSystem.description!=null">({{issue.issueType.raisedSystem.description}}
+                    )</small></td>
               </tr>
               <tr>
                 <td><label>Description: </label> {{issue.issueType.description}}</td>
               </tr>
               <tr>
-                <td><label>Other Solution: </label> <span
-                  *ngIf="issue.issueType.issueSolution?.length>1">have {{issue.issueType.issueSolution.length}}
+                <td><label>Solution: </label> <span
+                  *ngIf="issue.issueType.issueSolution?.length>0">have {{issue.issueType.issueSolution.length}}
                   other solution</span>
-                  <span *ngIf="issue.issueType.issueSolution?.length<=1"> there is no other solution</span>
+                  <span *ngIf="issue.issueType.issueSolution?.length==0"> there is no solution registered</span>
                 </td>
               </tr>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="" style="padding:0">
+            <div class="dropdown breadcomb-report">
+              <button class="btn " data-toggle="dropdown" data-popper-placement="right"
+                      [disabled]="!(issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId))"
+                      aria-expanded="true" style="width: 100%; text-align: left; display: inline-flex"><span
+                style="width: 80%"> Milestones</span> <span style="text-align: right;width: 20%"><i
+                class="fa fa-gear"></i></span>
+              </button>
+              <ul class="dropdown-menu triger-zoomIn-dp" style="max-height: 250px; overflow-y: auto">
+                <li *ngFor="let ass of milestonesList"><a [href]="" [routerLink]=""
+                                                          (click)="addMilestone(ass.id)">{{ass.name}}</a>
+                </li>
+
+              </ul>
+            </div>
+
+            <p *ngIf="issue.milestones?.length==0" style="font-size: 11pt">No Milestone</p>
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.milestones?.length>0">
+
+              <tr *ngFor="let p of issue.milestones">
+                <td><b>{{p.name}}</b> <br>
+                  <small style="padding-left: 5px">Added By:&nbsp;<span
+                    title="{{p.addedBy.firstName}} {{p.addedBy.fatherName}}">{{p.addedBy.username}}</span></small><br>
+                  <span *ngIf="p.dueDate!='0001-01-01T00:00:00'"><small style="padding-left: 5px">Due Date:&nbsp;<span
+                    title="{{issueTrackingService.convertDate(p.dueDate)}}">{{issueTrackingService.dueTimeDifference(p.dueDate)}}</span></small>&nbsp;</span>
+
+                </td>
+                <td class="text-right">
+                  <button class="btn btn-warning btn-xs"
+                          *ngIf="issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          Title="Remove Milestone" (click)="removeMilestone(p.id)"><i
+                    class="notika-icon notika-close"></i></button>
+
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="" style="padding:0">
+            <div class="dropdown breadcomb-report">
+              <button class="btn btn-default" data-toggle="dropdown" data-popper-placement="right"
+                      [disabled]="!(issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId))"
+                      aria-expanded="true" style="width: 100%; text-align: left; display: inline-flex"><span
+                style="width: 80%"><span
+                *ngIf="issue.assigns?.length>0">{{issue.assigns?.length}}</span> Assignes</span> <span
+                style="text-align: right;width: 20%"><i class="fa fa-gear"></i></span>
+              </button>
+              <ul class="dropdown-menu triger-zoomIn-dp" style="max-height: 250px; overflow-y: auto">
+                <li *ngFor="let ass of ITStaff"><a [routerLink]=""
+                                                   (click)="assignStaff(ass.id)">{{ass.firstName}} {{ass.fatherName}}</a>
+                </li>
+
+              </ul>
+            </div>
+
+            <p *ngIf="issue.assigns?.length==0" style="font-size: 11pt">No Assignes</p>
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.assigns?.length>0">
+
+              <tr *ngFor="let p of issue.assigns">
+                <td><b>{{p.assignedTo.firstName}} {{p.assignedTo.fatherName}}</b> <br>
+                  <small style="padding-left: 10px"><i class="fa fa-calendar"> </i>: <span
+                    title="{{issueTrackingService.convertDate(p.assignDate)}}">{{issueTrackingService.timeDifference(p.assignDate)}}</span></small>&nbsp;|
+                  <small style="padding-left: 10px"><i class="fa fa-user">: </i> <span
+                    title="{{p.assignedBy.firstName}} {{p.assignedBy.fatherName}}">{{p.assignedBy.username}}</span></small>
+                </td>
+                <td class="text-right">
+                  <button class="btn btn-warning btn-xs"
+                          *ngIf="issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          title="Remove Assign" (click)="removeAssign(p.id)"><i class="notika-icon notika-close"></i>
+                  </button>
+
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body" style="padding: 5px 10px">
+            <label><span *ngIf="issue.participant?.length>0">{{issue.participant?.length}}</span> Participant </label>
+            <p *ngIf="issue.participant?.length==0">No Participant</p>
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.participant?.length>0">
+
+              <tr *ngFor="let p of issue.participant">
+                <td><span title="{{p.firstName}} {{p.fatherName}}">{{p.username}}</span></td>
+              </tr>
+
+            </table>
+
+
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding: 5px 10px">
+            <label>Time Tracker</label>
+            <button class="btn btn-success" title="Start Task" style="width: 100%" *ngIf="issue.timeTracker.myActiveTask==null" (click)="startTask()">Start Task</button>
+            <button class="btn btn-warning" title="End Task" style="width: 100%" *ngIf="issue.timeTracker.myActiveTask!=null" (click)="endTask(issue.timeTracker.myActiveTask.id)">End Task</button>
+
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.timeTracker!=null">
+              <tr *ngIf="issue.timeTracker.myActiveTask!=null">
+                <td><b>You started task </b> <br>
+                  <small style="padding-left: 5px"><i class="fa fa-user"></i> :&nbsp;<span
+                    title="{{issue.timeTracker.myActiveTask.owner.firstName}} {{issue.timeTracker.myActiveTask.owner.fatherName}}">{{issue.timeTracker.myActiveTask.owner.username}}</span></small> |
+                  <span ><small style="padding-left: 5px">Startd On:&nbsp;<span
+                    title="{{issueTrackingService.convertDate(issue.timeTracker.myActiveTask.startTime)}}">{{issueTrackingService.timeDifference(issue.timeTracker.myActiveTask.startTime)}}</span></small></span>
+
+                </td>
+              </tr>
+              <tr *ngFor="let p of issue.timeTracker.activeTask">
+                <td><b>started task <span
+                  title="{{issueTrackingService.convertDate(p.startTime)}}">{{issueTrackingService.timeDifference(p.startTime)}}</span></b> <br>
+                  <small style="padding-left: 5px"><i class="fa fa-user"></i> :&nbsp;<span
+                    title="{{p.owner.firstName}} {{p.owner.fatherName}}">{{p.owner.username}}</span></small> |
+                  <span ><small style="padding-left: 5px">Startd On:&nbsp;<span
+                    title="{{issueTrackingService.convertDate(p.startTime)}}">{{issueTrackingService.timeDifference(p.startTime)}}</span></small>&nbsp;</span>
+
+                </td>
+              </tr>
+              <tr *ngFor="let p of issue.timeTracker.endedTask">
+                <td><b>Total Spending Time: <span
+                  title="{{issueTrackingService.convertDate(p.startTime)}} to {{issueTrackingService.convertDate(p.endTime)}}">{{issueTrackingService.calculateTimeDiff(p.startTime, p.endTime)}}</span></b> <br>
+                  <small style="padding-left: 5px"><i class="fa fa-user"></i>:&nbsp;<span
+                    title="{{p.owner.firstName}} {{p.owner.fatherName}}">{{p.owner.username}}</span></small> |
+                  <span ><small style="padding-left: 5px">Startd On:&nbsp;<span
+                    title="{{issueTrackingService.convertDate(p.startTime)}}">{{issueTrackingService.timeDifference(p.startTime)}}</span></small>&nbsp;</span>
+
+                </td>
+              </tr>
+
+            </table>
+          </div>
+
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding: 5px 10px">
+            <label>Due Time</label>
+            <p style="font-size: 11pt" *ngIf="issue.dueDate==null">No Due Date set</p>
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.dueDate!=null">
+
+              <tr >
+                <td><b>{{issueTrackingService.convertDate(issue.dueDate.dueDate)}}</b> <br>
+                  <small style="padding-left: 5px">Set By:&nbsp;<span
+                    title="{{issue.dueDate.setBy.firstName}} {{issue.dueDate.setBy.fatherName}}">{{issue.dueDate.setBy.username}}</span></small> |
+                  <span ><small style="padding-left: 5px">Set On:&nbsp;<span
+                    title="{{issueTrackingService.convertDate(issue.dueDate.setBy.startDate)}}">{{issueTrackingService.timeDifference(issue.dueDate.setBy.startDate)}}</span></small>&nbsp;</span>
+
+                </td>
+
+              </tr>
+
+            </table>
+            <div class="input-group">
+              <input type="date" class="form-control" [(ngModel)]="dueDateTime"/>
+              <div class="input-group-addon" style="padding:0">
+                <button class="btn btn-success" (click)="setDueDate()">Add</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="" style="padding:0">
+            <div class="dropdown breadcomb-report">
+              <button class="btn btn-default" data-toggle="dropdown" data-popper-placement="right"
+                      [disabled]="!(issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId))"
+                      aria-expanded="true" style="width: 100%; text-align: left; display: inline-flex"><span
+                style="width: 80%"><span *ngIf="issue.dependencies?.length>0">{{issue.dependencies?.length}}</span> Dependencies</span>
+                <span style="text-align: right;width: 20%"><i class="fa fa-gear"></i></span>
+              </button>
+              <ul class="dropdown-menu triger-zoomIn-dp" style="max-height: 250px; overflow-y: auto">
+                <li *ngFor="let ass of dependentIssuesList"><a [routerLink]=""
+                                                               (click)="addDependency(ass.id)">#{{ass.ticketNo}}</a>
+                </li>
+
+              </ul>
+            </div>
+
+            <p *ngIf="issue.dependencies?.length==0" style="font-size: 11pt">No Dependencies</p>
+            <table class="table table-striped " id="data-table-basic-its" style="font-size: 11pt"
+                   *ngIf="issue.dependencies?.length>0">
+
+              <tr *ngFor="let p of issue.dependencies">
+                <td><b><a routerLink="" (click)="seeIssueDetails(p.dependentIssue.id)">#{{p.dependentIssue.ticketNo}}</a></b>  {{p.dependentIssue.issueTitle}}<br>
+                  <small style="padding-left: 10px"><i class="fa fa-calendar"> </i>: <span
+                    title="{{issueTrackingService.convertDate(p.addedOn)}}">{{issueTrackingService.timeDifference(p.addedOn)}}</span></small>&nbsp;|
+                  <small style="padding-left: 10px"><i class="fa fa-user">: </i> <span
+                    title="{{p.addedBy.firstName}} {{p.addedBy.fatherName}}">{{p.addedBy.username}}</span></small>
+                </td>
+                <td class="text-right">
+                  <button class="btn btn-warning btn-xs"
+                          *ngIf="issue.issueStatus.id==1 && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          title="Remove Dependencies" (click)="removeDependency(p.id)"><i
+                    class="notika-icon notika-close"></i></button>
+
+                </td>
+              </tr>
+
             </table>
           </div>
         </div>
       </div>
       <div class="col-lg-9 col-md-9" style="min-height: 450px;">
-        <div class="panel">
-          <div class="panel-heading">
-            <label>Issue Type Details</label>
-          </div>
-          <div class="panel-body data-table-list">
-            <table class="table" style="font-size: 13px">
-              <tr>
-                <td>{{issue.issueTitle}}</td>
-              </tr>
-              <tr>
-                <td>{{issue.otherIssue}}</td>
-              </tr>
-              <tr>
-                <td>{{issue.policyNo}}</td>
-              </tr>
-              <tr>
-                <td>{{issue.issueDescription}}</td>
-              </tr>
-              <tr>
-                <td>{{issue.issuePriority}}</td>
-              </tr>
-              <tr *ngIf="issue.issueResource?.length>0">
-                <td>
-                  <label class="nk-label"><small>Issue Resource</small></label>
-                  <div class="solution-dropzone">
-                    <div class="row">
-                      <div *ngFor="let image of issue.issueResource;index as i "
-                           [ngClass]="{'col-md-12 solution-dropzone-preview-1':i<1,'col-md-3 solution-dropzone-preview':i>0}">
-                        <a
-                          href="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
-                          target="_blank">
-                          <img
-                            src="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
-                            alt=""/>
-                          <label>{{image.fileName}}</label>
-                        </a>
-                      </div>
-                    </div>
+        <div class="notika-chat-list notika-shadow tb-res-ds-n dk-res-ds">
 
+          <div class="card-box">
+            <div class="chat-conversation">
+              <div class="widgets-chat-scrollbar mCustomScrollbar _mCS_1 mCS-autoHide">
+                <div id="mCSB_1" class="mCustomScrollBox mCS-light-1 mCSB_vertical mCSB_outside"
+                     style="min-height: 350px;" tabindex="0">
+                  <div id="mCSB_1_container" class="mCSB_container" style="position: relative; top: 0px; left: 0px;"
+                       dir="ltr">
+                    <ul class="conversation-list">
+                      <li class="clearfix">
+                        <div class="chat-avatar">
+                          <img src="assets/img/post/1.jpg" alt="male" class="mCS_img_loaded">
+
+                        </div>
+                        <div class="conversation-text">
+                          <div class="ctext-wrap">
+                            <div class="row">
+                              <div class="col-md-8">
+                                <p><span
+                                  title="{{issue.issueRequestedBy.firstName}} {{issue.issueRequestedBy.fatherName}}">{{issue.issueRequestedBy.username}}</span>
+                                  opened
+                                  issue <span
+                                    title="{{issueTrackingService.convertDate(issue.issueRequestedDate)}}">{{issueTrackingService.timeDifference(issue.issueRequestedDate)}}</span>
+                                </p>
+                              </div>
+                              <div class="col-md-4 text-right">
+                                <p><label>Priority: </label>{{issue.issuePriority.name}}</p>
+
+                              </div>
+                            </div>
+
+                            <p class="details">
+                              <span>{{issue.issueDescription}}</span>
+                              <span *ngIf="issue.policyNo!=''"><br>{{issue.policyNo}}</span>
+                            </p>
+                            <div class="row">
+                              <div [ngClass]="i === 0?' col-md-12':'col-md-3'"
+                                   *ngFor="let image of issue.issueResource; index as i">
+                                <a [href]="setLink(image)" target="_blank">
+                                  <img [src]="'data:'+image.mimeType+';base64,'+image.data" style="padding: 10px">
+                                </a>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </li>
+                      <li class="clearfix" *ngIf="issue.actionTrackers?.length>0">
+                        <ul class="tpgp-ctm-angle">
+                          <li *ngFor="let act of issue.actionTrackers" style="padding-left: 100px; font-size: 11pt"><i
+                            class="notika-icon notika-dot"></i> <small> <span
+                            title="{{getAssign(act.remark).firstName}} {{getAssign(act.remark).fatherName}}"> {{getAssign(act.remark).username}}</span>   {{act.actionType}}
+                            <span
+                              title="{{issueTrackingService.convertDate(act.actionDate)}}"> {{issueTrackingService.timeDifference(act.actionDate)}}</span>
+                            by <span
+                              title="{{act.userId.firstName}} {{act.userId.fatherName}}"> {{act.userId.username}}</span></small>
+                          </li>
+
+                        </ul>
+                      </li>
+                      <li class="clearfix" *ngFor="let comment of issue.comments">
+                        <div class="chat-avatar">
+                          <img src="assets/img/post/1.jpg" alt="male" class="mCS_img_loaded">
+
+                        </div>
+                        <div class="conversation-text">
+                          <div class="ctext-wrap">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <p>{{comment.comment.commentedBy.firstName}} {{comment.comment.commentedBy.fatherName}}
+                                  Commented <span
+                                    title="{{issueTrackingService.convertDate(comment.comment.issueCommentDate)}}">{{issueTrackingService.timeDifference(comment.comment.issueCommentDate)}}</span>
+                                </p>
+                              </div>
+
+                            </div>
+
+                            <p class="details">
+                              <span>{{comment.comment.issueComment}}</span>
+                            </p>
+                            <div class="row">
+                              <div [ngClass]="i === 0?' col-md-12':'col-md-3'"
+                                   *ngFor="let image of comment.comment.commentResource; index as i">
+                                <a [href]="setLink(image)" target="_blank">
+                                  <img [src]="'data:'+image.mimeType+';base64,'+image.data" style="padding: 10px">
+                                </a>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
                   </div>
-                </td>
-              </tr>
-            </table>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="panel mg-t-10" style="margin-bottom: 0" *ngIf="issue.issueStatus.id==1">
+          <div class="panel-body">
+            <form [formGroup]="issueCommentForm">
+              <div class="form-group col-md-12">
+              <textarea rows="4" name="Issue Description" class="form-control"
+                        placeholder="Write Your Comment Here" formControlName="issueComment"
+                        [(ngModel)]="issueCommentModel.issueComment"></textarea>
+              </div>
+              <div class="dropzone-area col-md-12">
+                <div id="dropzone1" class="multi-uploader-cs">
+                  <div class="custom-dropzone" ngx-dropzone (change)="onSelect($event)">
+                    <ngx-dropzone-label>
+                      <div>
+                        <i class="notika-icon notika-cloud" style="font-size: 45pt"></i>
+                        <p style="color: #0c1923">Drop files here or click to upload.</p>
+                      </div>
+                    </ngx-dropzone-label>
+                    <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f"
+                                                [removable]="true" (removed)="onRemove(f)">
+                      <ngx-dropzone-label>{{ f.name }}</ngx-dropzone-label>
+
+                    </ngx-dropzone-image-preview>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mg-t-10" style="text-align: right">
+                <div class="btn-group">
+                  <button type="button" (click)="clearCommentForm()"
+                          class="btn btn-default btn-icon-notika waves-effect">Reset
+                  </button>
+                  <button type="button" class="btn btn-primary btn-icon-notika waves-effect"
+                          [disabled]="!issueCommentForm.valid" (click)="saveComment()"> Comment
+                  </button>
+                </div>
+
+              </div>
+            </form>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <div class="modal fade" id="editIssueModal" role="dialog">
-  <app-edit-issue> </app-edit-issue>
+  <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="loadIssuePage()" (closeModal)="closeModal()"
+                  [selectedIssue]="selectedIssue"></app-edit-issue>
 </div>

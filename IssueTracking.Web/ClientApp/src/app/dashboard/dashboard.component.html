@@ -1,27 +1,25 @@
 <div class="breadcomb-area">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="breadcomb-list">
-          <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-              <div class="breadcomb-wp">
-                <div class="breadcomb-icon">
-                  <i class="notika-icon  notika-bar-chart"></i>
-                </div>
-                <div class="breadcomb-ctn">
-                  <h2>Dashboard</h2>
-                  <p>Welcome to LIT <span class="bread-ntd">100 Activities list</span></p>
-                </div>
-              </div>
+    <div class="breadcomb-list">
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <div class="breadcomb-wp">
+            <div class="breadcomb-icon">
+              <i class="notika-icon  notika-bar-chart"></i>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
-              <div class="breadcomb-report">
-
-              </div>
+            <div class="breadcomb-ctn">
+              <h2>Dashboard</h2>
+              <p *ngIf="dashboard!=null"> Total Issues: <span class="bread-ntd">{{dashboard.total}}</span>, &nbsp;&nbsp;Open
+                Issues: <span class="bread-ntd">{{dashboard.open}}</span>, &nbsp;&nbsp;Closed Issues: <span
+                  class="bread-ntd">{{dashboard.closed}}</span></p>
             </div>
           </div>
         </div>
+        <!--        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">-->
+        <!--          <div class="breadcomb-report">-->
+
+        <!--          </div>-->
+        <!--        </div>-->
       </div>
     </div>
   </div>
@@ -30,9 +28,95 @@
 <div class="invoice-area">
   <div class="container">
     <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
         <div class="invoice-wrap" style="min-height: 450px;">
+          <table class="table" *ngIf="dashboard!=null">
+            <tbody *ngIf="dashboard.actions?.length>0">
+            <tr *ngFor="let row of dashboard.actions">
+              <td style="border-top: 1px dashed #00c292">
+                <table style="width: 100%">
+                  <tr>
+                    <td style="vertical-align: top; width:10%;">
+                      <div class="conversation-list">
+                        <div class="chat-avatar">
+                          <img src="assets/img/post/1.jpg" alt="male" class="mCS_img_loaded">
+                        </div>
 
+                      </div>
+                    </td>
+                    <td style="vertical-align: top">
+                      <h4>{{row.userId.firstName}} {{row.actionType}} <a href=""
+                                                                        routerLink="" (click)="seeIssueDetails(row.issue.id)">{{row.issue.issueType}}#{{row.issue.ticketNo}}</a></h4>
+                        <p>{{row.issue.issueTitle}}  {{row.issue.policyNo}}<br/>
+                        <small>{{row.remark}}</small><br/>
+                        <small title="{{issueTrackingService.convertDate(row.actionDate)}}" data-toggle="tooltip" data-placement="bottom" data-original-title="{{convertDate(row.actionDate)}}" aria-describedby="tooltip891370">{{issueTrackingService.timeDifference(row.actionDate)}} </small></p>
+                    </td>
+                    <td style="vertical-align: top; text-align: right; color: #00c292; font-size: 18pt">
+                      <span *ngIf="row.actionTypeId==1 || row.actionTypeId==3 || row.actionTypeId==4"><i class="fa fa-exclamation-circle"></i> </span>
+                      <span *ngIf="row.actionTypeId==2 || row.actionTypeId==5 "><i class="fa fa-check-circle"></i> </span>
+                      <span *ngIf="row.actionTypeId==6"><i class="fa fa-user-plus"></i> </span>
+                      <span *ngIf="row.actionTypeId==7"><i class="fa fa-comments"></i> </span>
+                      <span *ngIf="row.actionTypeId==8"><i class="fa fa-commenting"></i> </span>
+                      <span *ngIf="row.actionTypeId==9"><i class="fa fa-pencil-square-o"></i> </span>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+            </tbody>
+            <tbody *ngIf="dashboard.actions?.length==0">
+            <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+              <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                class="fa fa-exclamation-triangle"></i></div>
+              <h2>Sorry</h2>
+              <p>There is no action performed yet</p>
+            </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="invoice-wrap" style="min-height: 450px;">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="selectedDepartment" (change)="selectBranch()" [disabled]="!(ITDeptId==loggedInDepartmentId)">
+              <option value="">All Branchs/Dept</option>
+              <option *ngFor="let dept of departmentList" [value]="dept.id">
+                <span
+                  *ngIf="dept.branchId==10">{{dept.departmentName}}</span> <span
+                *ngIf="dept.branchId!=10">{{dept.branchName}}</span>
+              </option>
+            </select>
+          </div>
+          <div class="accordion-stn" *ngIf="dashboard!=null">
+            <div class="panel-group" data-collapse-color="nk-green" id="accordionGreen" role="tablist"
+                 aria-multiselectable="true">
+              <div class="panel panel-collapse notika-accrodion-cus" *ngFor="let sideBar of dashboard.raisedSystems">
+                <div class="panel-heading" role="tab">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordionGreen" href="#sys_{{sideBar.system.id}}"
+                       aria-expanded="false" class="collapsed">
+                      <table style="width: 100%">
+                        <tr><td>{{sideBar.system.name}}</td><td style="text-align: right">{{sideBar.system.total}}</td></tr>
+                      </table>
+                    </a>
+                  </h4>
+                </div>
+                <div id="sys_{{sideBar.system.id}}" class="collapse" role="tabpanel" aria-expanded="false"
+                     style="height: 0px;">
+                  <div class="panel-body">
+                    <table class="table table-striped">
+                      <tr><td><b>Open: {{sideBar.system.open}}</b></td><td style="text-align: right;padding: 5px 0;"><b>Closed: {{sideBar.system.closed}}</b></td></tr>
+                    </table>
+                    <table style="width: 100%;font-size: 11pt">
+                      <tr *ngFor="let row of sideBar.issueType"><td style="padding: 5px 0; border-bottom: 1px solid #00c292"><b>{{row.name}}</b></td><td style="text-align: right; font-size: 10pt;border-bottom: 1px solid #00c292">{{row.open}} Open | {{row.closed}} Closed </td></tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp.Extensions;
@@ -19,8 +21,8 @@ namespace IssueTracking.Domain.IssueTracking
         IssuePriorityType GetPriorityTypeById(long id);
         IList<IssuePriorityType> GetAllPriorityTypes();
         IList<IssueStatusType> GetAllIssueStatusTypes();
-        IssueRaisedSystem GetIssueRaisedSystemById(long id);
-        IList<IssueRaisedSystem> GetAllIssueRaisedSystems();
+        LookupModel GetIssueRaisedSystemById(long id);
+        IList<LookupModel> GetAllIssueRaisedSystems();
         IssueRaisedSystemReturn GetRaisedSystemById(long id);
         IList<IssueRaisedSystemReturn> GetAllRaisedSystems();
         void EditIssueType(IssueTypeList model);
@@ -33,23 +35,44 @@ namespace IssueTracking.Domain.IssueTracking
         IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id);
         IList<BasicSolutionReturn> GetAllBasicSolution();
         string GetResourceDoc(string fileName, string mimeType);
-        void AddIssue(IssuesListModel model);
+        string AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
-        IList<IssueSearchModel> GetAllIssues();
+        SearchIssueResult GetAllIssues(QueryParams model);
+
         //IList<IssuesListModel> GetsAllIssues();
-       // IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
-        //IssueListReturn GetIssueById(Guid id);
-        IssueSearchModel GetIssueById(Guid id);
+        IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
+
+        IssueListReturn GetIssueById(Guid id);
+        //IssueSearchModel GetIssueById(Guid id);
 
         void AddIssueComment(IssueCommentsModel model);
         void EditIssueComment(IssueCommentsModel model);
-        IList<IssueCommentsModel> GetAllIssueComments(string issueId);
+        IList<IssueCommentReturnModel> GetAllIssueComments(string issueId);
         void DeleteIssueComment(string commentId);
-        
+
         IList<DepartmentSchemaModel> GetAllBranch();
         IList<EmployeeModel> GetAllEmployee();
         IList<EmployeeModel> GetAllEmployeeByBranchId(string id);
-        
+        void AssignIssue(AssignIssueModel model);
+        void CloseIssue(string issueId, string remark);
+        void ReopenIssue(string issueId, string remark);
+        string PatchCloseIssue(PatchActionModel model);
+        string PatchReopenIssue(PatchActionModel model);
+        DashboardModel GetDashboard(string deptId);
+        void EditMileStone(MileStonesModel model);
+        IList<MileStonesModelReturn> GetAllMilestones();
+        MileStonesModelReturn GetMilestoneById(string id);
+        void DeleteMilestone(string id);
+        void AddMilestoneToIssue(string issueId, string milestoneId);
+        void RemoveMilestoneFromIssue(string id);
+        void RemoveAssignFromIssue(string id);
+        IList<IssueSearchModel> GetAllDependents(string issueId);
+        void AddDependencyToIssue(string issueId, string depeId);
+        void RemoveDependencyFromIssue(string id);
+        void StartTask(string issueId);
+        void EndTask(string id);
+        void AddDueDate(string issueId, DateTime dueDate);
+        void DeleteIssueDueDate(string issueId);
     }
 
     public class IssueTrackingService : IIssueTrackingService
@@ -131,14 +154,22 @@ namespace IssueTracking.Domain.IssueTracking
             return _context.IssueStatusType.OrderBy(e => e.Id).ToList();
         }
 
-        public IssueRaisedSystem GetIssueRaisedSystemById(long id)
+        public LookupModel GetIssueRaisedSystemById(long id)
         {
-            return _context.IssueRaisedSystem.First(i => i.Id == id);
+            var ret = _context.IssueRaisedSystem.First(i => i.Id == id);
+            return new LookupModel() { Id = ret.Id, Name = ret.Description };
         }
 
-        public IList<IssueRaisedSystem> GetAllIssueRaisedSystems()
+        public IList<LookupModel> GetAllIssueRaisedSystems()
         {
-            return _context.IssueRaisedSystem.OrderBy(e => e.Id).ToList();
+            var ret = new List<LookupModel>();
+            var raisedSystem = _context.IssueRaisedSystem.OrderBy(e => e.Name).ToList();
+            foreach (var sys in raisedSystem)
+            {
+                ret.Add(new LookupModel() { Id = sys.Id, Name = sys.Name, Description = sys.Description });
+            }
+
+            return ret;
         }
 
         public IssueRaisedSystemReturn GetRaisedSystemById(long id)
@@ -156,11 +187,10 @@ namespace IssueTracking.Domain.IssueTracking
 
             return issueRaisedSystem;
         }
-
         public IList<IssueRaisedSystemReturn> GetAllRaisedSystems()
         {
             var issueRaisedSystemList = new List<IssueRaisedSystemReturn>();
-            var raisedSystem = _context.IssueRaisedSystem.OrderBy(e => e.Id).ToList();
+            var raisedSystem = _context.IssueRaisedSystem.OrderBy(e => e.Name).ToList();
             foreach (var rs in raisedSystem)
             {
                 issueRaisedSystemList.Add(GetRaisedSystemById(rs.Id));
@@ -217,7 +247,7 @@ namespace IssueTracking.Domain.IssueTracking
                 {
                     foreach (var sol in solution)
                     {
-                        var sl = new BasicIssueSolution()
+                        var sl = new BasicSolutionReturn()
                         {
                             Id = sol.Id,
                             SolutionDescription = sol.SolutionDescription,
@@ -225,13 +255,13 @@ namespace IssueTracking.Domain.IssueTracking
                         };
                         issueTypes.IssueSolution.Add(sl);
                     }
-
-
                 }
 
                 if (raisedSystem != null)
                 {
-                    issueTypes.RaisedSystem = raisedSystem;
+                    issueTypes.RaisedSystem.Id = raisedSystem.Id;
+                    issueTypes.RaisedSystem.Name = raisedSystem.Name;
+                    issueTypes.RaisedSystem.Description = raisedSystem.Description;
                 }
             }
 
@@ -245,7 +275,7 @@ namespace IssueTracking.Domain.IssueTracking
             foreach (var issue in issues)
             {
                 var issueType = GetIssueTypeById(issue.Id);
-                if (issueType != null && issueType.Id > 0)
+                if (issueType != null)
                 {
                     issueTypeList.Add(issueType);
                 }
@@ -367,126 +397,6 @@ namespace IssueTracking.Domain.IssueTracking
             return basicSolution;
         }
 
-        public IssueListReturn GetIssueByTitle(string IssueTitle)
-        {
-            var issueList = new IssueListReturn();
-            var issue = _context.IssuesList.FirstOrDefault(e => e.Id.ToString() == IssueTitle);
-            if (issue != null)
-            {
-                issueList.Id = issue.Id.ToString();
-                issueList.IssueTitle = issue.IssueTitle;
-                issueList.IssueTypeId = issue.IssueTypeId;
-                issueList.OtherIssue = issue.OtherIssue;
-                issueList.PolicyNo = issue.PolicyNo;
-                issueList.BranchId = GetDepartment(issue.BranchId);
-                issueList.IssueDescription = issue.IssueDescription;
-                issueList.IssueRequestedBy = GetEmployee(issue.IssueRequestedBy);
-                issueList.IssueRequestedDate = DateTime.Now;
-                issueList.IssueRespondBy = GetEmployee(issue.IssueRespondBy);
-                issueList.IssueRespondDate = DateTime.Now;
-                issueList.IssueClosedBy = GetEmployee(issue.IssueClosedBy);
-                issueList.IssueClosedDate = DateTime.Now;
-                issueList.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
-                issueList.IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name;
-                issueList.Ticket = issue.Ticket;
-                issueList.Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id);
-                issueList.Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id);
-                issueList.NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id);
-                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0);
-                if (!string.IsNullOrEmpty(issue.IssueResource))
-                {
-                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
-                    foreach (var res in imageResource)
-                    {
-                        var data = GetResourceDoc(res.DocRef, res.MimeType);
-                        if (!string.IsNullOrEmpty(data))
-                        {
-                            res.Data = data;
-                            issueList.IssueResource.Add(res);
-                        }
-                    }
-                }
-            }
-
-            return issueList;
-        }
-        public IssueSearchModel GetIssueById(Guid id)
-        {
-            var ret = new IssueSearchModel();
-            var issue = _context.IssuesList.First(e => e.Id == id);
-            if (issue != null)
-            {
-                ret.Id = issue.Id.ToString();
-                ret.IssueTitle = issue.IssueTitle;
-                ret.IssueType = _context.IssueTypeList.First(e => e.Id == issue.IssueTypeId).Name;
-                ret.OtherIssue = issue.OtherIssue;
-                ret.PolicyNo = issue.PolicyNo;
-                ret.IssueDescription = issue.IssueDescription;
-                ret.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
-                if (!string.IsNullOrEmpty(issue.IssueResource))
-                {
-                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
-                    foreach (var res in imageResource)
-                    {
-                        var data = GetResourceDoc(res.DocRef, res.MimeType);
-                        if (!string.IsNullOrEmpty(data))
-                        {
-                            res.Data = data;
-                            ret.IssueResource.Add(res);
-                        }
-                    }
-                }
-            }
-            return ret;
-        }
-
-       
-        
-       /* public IssueListReturn GetIssueById(Guid id)
-        {
-            var issueList = new IssueListReturn();
-            var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
-            if (issue != null)
-            {
-                issueList.Id = issue.Id.ToString();
-                issueList.IssueTitle = issue.IssueTitle;
-                issueList.IssueTypeId = issue.IssueTypeId;
-                issueList.OtherIssue = issue.OtherIssue;
-                issueList.PolicyNo = issue.PolicyNo;
-                issueList.BranchId = GetDepartment(issue.BranchId);
-                issueList.IssueDescription = issue.IssueDescription;
-                issueList.IssueRequestedBy = GetEmployee(issue.IssueRequestedBy);
-                issueList.IssueRequestedDate = DateTime.Now;
-                issueList.IssueRespondBy = GetEmployee(issue.IssueRespondBy);
-                issueList.IssueRespondDate = DateTime.Now;
-                issueList.IssueClosedBy = GetEmployee(issue.IssueClosedBy);
-                issueList.IssueClosedDate = DateTime.Now;
-                issueList.IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name;
-                issueList.IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name;
-                issueList.Ticket = issue.Ticket;
-                issueList.Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id);
-                issueList.Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id);
-                issueList.NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id);
-                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0);
-                if (!string.IsNullOrEmpty(issue.IssueResource))
-                {
-                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
-                    foreach (var res in imageResource)
-                    {
-                        var data = GetResourceDoc(res.DocRef, res.MimeType);
-                        if (!string.IsNullOrEmpty(data))
-                        {
-                            res.Data = data;
-                            issueList.IssueResource.Add(res);
-                        }
-                    }
-                }
-            }
-
-            return issueList;
-
-        }
-        */
         public IList<BasicSolutionReturn> GetBasicSolutionByIssueType(long id)
         {
             var basicSolution = new List<BasicSolutionReturn>();
@@ -519,46 +429,19 @@ namespace IssueTracking.Domain.IssueTracking
             return basicSolutions;
         }
 
-        private void SaveResource(string fileName, string mimeType, string encodedStr)
+        public IssueListReturn GetIssueByTitle(string issueTitle)
         {
-            var imgExt = mimeTypeRegx.Match(mimeType).Groups[2].Value;
-            var path = Path.Combine($"{fileLocation}", $"{fileName}.{imgExt}");
-            //path = path.Replace("\", "/" )
-            if (File.Exists(path))
-                return;
-            var byteArr = Convert.FromBase64String(encodedStr);
-            BinaryWriter binaryWriter = null;
-            try
+            var issueList = new IssueListReturn();
+            var issue = _context.IssuesList.FirstOrDefault(e => e.IssueTitle.Contains(issueTitle));
+            if (issue != null)
             {
-                binaryWriter = new BinaryWriter(File.OpenWrite(path));
+                issueList = GetIssueById(issue.Id);
+            }
 
-                binaryWriter.Write(byteArr);
-                binaryWriter.Flush();
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            finally
-            {
-                binaryWriter?.Close();
-            }
+            return issueList;
         }
 
-        public string GetResourceDoc(string fileName, string mimeType)
-        {
-            var imageData = string.Empty;
-
-            var imgExt = mimeTypeRegx.Match(mimeType).Groups[2].Value;
-            var path = Path.Combine(fileLocation, $"{fileName}.{imgExt}");
-            var byteArr = File.ReadAllBytes(path);
-            imageData = Convert.ToBase64String(byteArr);
-
-
-            return imageData;
-        }
-
-        public void AddIssue(IssuesListModel model)
+        public string AddIssue(IssuesListModel model)
         {
             var count = (_context.IssuesList.Count() + 1).ToString();
             var pt = "000000";
@@ -568,28 +451,26 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 Id = Guid.NewGuid(),
                 IssueTitle = model.IssueTitle,
-                IssueTypeId = model.IssueTypeId,
+                IssueTypeId = model.IssueTypeId ?? 0,
                 OtherIssue = model.OtherIssue,
                 BranchId = Guid.Parse((ReadOnlySpan<char>)_session.DepartmentId),
                 IssueDescription = model.IssueDescription,
-                PolicyNo= model.PolicyNo,
+                PolicyNo = model.PolicyNo,
                 IssueRequestedBy = Guid.Parse(_session.UserId),
-                IssueRequestedDate = new DateTime().Ticks,
-                IssueRespondBy = Guid.Parse(_session.UserId),
-                IssueRespondDate = new DateTime().Ticks,
-                IssueClosedBy =  Guid.Parse(_session.UserId),
-                IssueClosedDate = new DateTime().Ticks,
+                IssueRequestedDate = DateTime.Now.Ticks,
+                //IssueRespondBy = Guid.Parse(_session.UserId),
+                //IssueRespondDate = new DateTime().Ticks,
+                //IssueClosedBy =  Guid.Parse(_session.UserId),
+                //IssueClosedDate = new DateTime().Ticks,
                 IssuePriority = model.IssuePriority,
                 IssueStatus = 1,
                 Ticket = ticket
-                
             };
             if (solutionId != null)
             {
                 issue.IssueRaisedSluId = solutionId.Id;
             }
 
-          
 
             if (model.IssueResource.Count > 0)
             {
@@ -614,12 +495,16 @@ namespace IssueTracking.Domain.IssueTracking
 
             _context.IssuesList.Add(issue);
             _context.SaveChanges();
+            CreateActionTrackers(issue.Id.ToString(), "Opened Issue", null, null);
+            return issue.Id.ToString();
         }
 
         public void EditIssue(IssuesListModel model)
         {
             var index = _context.DeletedIssuesList.Count(e => e.OldIssueId == Guid.Parse(model.Id)) + 1;
             var oldIssue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(model.Id));
+            var actionType = "Edited Issue";
+
             if (oldIssue != null)
             {
                 var deletedIssue = new DeletedIssuesList()
@@ -641,11 +526,12 @@ namespace IssueTracking.Domain.IssueTracking
                     oldIssue.IssueRaisedSluId = null;
                 }
 
-                oldIssue.IssueTypeId = model.IssueTypeId;
+                oldIssue.IssueTypeId = model.IssueTypeId ?? 0;
                 oldIssue.OtherIssue = model.OtherIssue;
                 oldIssue.IssueTitle = model.IssueTitle;
                 oldIssue.IssueDescription = model.IssueDescription;
                 oldIssue.IssuePriority = model.IssuePriority;
+                oldIssue.PolicyNo = model.PolicyNo;
 
                 if (model.IssueResource.Count > 0)
                 {
@@ -681,6 +567,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.DeletedIssuesList.Add(deletedIssue);
                 _context.IssuesList.Update(oldIssue);
                 _context.SaveChanges();
+                CreateActionTrackers(model.Id, actionType, null, "Issue Edited");
             }
             else
             {
@@ -689,67 +576,174 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
-       /*
-        public IList<IssuesListModel> GetsAllIssues()
+        public IssueListReturn GetIssueById(Guid id)
         {
-            var allIssues = new List<IssuesListModel>();
-            var issues = _context.IssuesList.ToList();
-            foreach (var issue in issues)
+            var issueList = new IssueListReturn();
+            var issue = _context.IssuesList.FirstOrDefault(e => e.Id == id);
+            if (issue != null)
             {
-                var ai = GetsIssueById(issue.Id);
-                if (ai != null && int.TryParse(ai.Id, out int id) && id > 0)
+                issueList.Id = issue.Id.ToString();
+                issueList.IssueTitle = issue.IssueTitle;
+                issueList.IssueTypeId = issue.IssueTypeId;
+                issueList.OtherIssue = issue.OtherIssue;
+                issueList.PolicyNo = issue.PolicyNo;
+                var branch = GetDepartment(issue.BranchId);
+                issueList.BranchId = branch.BranchName;
+                if (branch.BranchId == 10)
                 {
-                  
-                    allIssues.Add(ai);
+                    issueList.BranchId = string.Format("{0}({1})", branch.BranchName, branch.DepartmentName);
+                }
+
+                issueList.IssueDescription = issue.IssueDescription;
+                issueList.IssueRequestedBy = null;
+                if (issue.IssueRequestedBy != Guid.Empty)
+                    issueList.IssueRequestedBy = GetEmployee(issue.IssueRequestedBy);
+                issueList.IssueRequestedDate = new DateTime(issue.IssueRequestedDate ?? 0);
+                issueList.IssueRespondBy = null;
+                if (issue.IssueRespondBy != Guid.Empty)
+                    issueList.IssueRespondBy = GetEmployee(issue.IssueRespondBy);
+                issueList.IssueRespondDate = new DateTime(issue.IssueRespondDate ?? 0);
+                issueList.IssueClosedBy = null;
+                if (issue.IssueClosedBy != Guid.Empty)
+                    issueList.IssueRespondBy = GetEmployee(issue.IssueClosedBy);
+
+                issueList.IssueClosedDate = new DateTime(issue.IssueClosedDate ?? 0);
+                var priority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority);
+                issueList.IssuePriority = new LookupModel()
+                    { Id = priority.Id, Name = priority.Name, Description = priority.Description };
+                var status = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus);
+                issueList.IssueStatus = new LookupModel()
+                    { Id = status.Id, Name = status.Name, Description = status.Description };
+                issueList.Ticket = issue.Ticket;
+                issueList.Participant = GetParticipant(issue.Id);
+                issueList.Assigns = GetAssigned(issue.Id);
+                issueList.Labels = GetIssueLabelsList(issue.Id);
+                issueList.Comments = GetAllIssueComments(issue.Id.ToString());
+                issueList.NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id);
+                issueList.IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0);
+                if (issueList.IssueTypeId == 0)
+                    issueList.IssueType.RaisedSystem = GetRaisedSystem(int.Parse(issue.OtherIssue));
+                issueList.Milestones = GetissueMilestones(issue.Id.ToString());
+                issueList.Dependencies = GetAllIssueDependencies(issue.Id.ToString());
+                issueList.TimeTracker = BuildTimeTracker(issue.Id);
+                issueList.DueDate = GetDueDateReturn(issue.Id);
+                var actionList = _context.ActionTracker.Where(c => c.IssueId == issue.Id)
+                    .OrderByDescending(c => c.ActionDate).ToList();
+                foreach (var action in actionList)
+                {
+                    if (!action.ActionType.Equals("Edited Comment on Issue"))
+                    {
+                        issueList.ActionTrackers.Add(GetActionTrackerById(action.Id));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(issue.IssueResource))
+                {
+                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(issue.IssueResource);
+                    foreach (var res in imageResource)
+                    {
+                        var data = GetResourceDoc(res.DocRef, res.MimeType);
+                        if (!string.IsNullOrEmpty(data))
+                        {
+                            res.Data = data;
+                            issueList.IssueResource.Add(res);
+                        }
+                    }
                 }
             }
 
-            return allIssues;
-        } */
- 
-       public IList<IssueSearchModel> GetAllIssues()
-       {
-           var issuesModel = new List<IssueSearchModel>();
-           IList<IssuesList> issues = new List<IssuesList>();
+            return issueList;
+        }
 
-           issues = _context.IssuesList.ToList();
-           foreach (var iss in issues)
-           {
-               var issl = new IssueSearchModel()
-               {
-                   Id = iss.Id.ToString(),
-                   IssueTitle = iss.IssueTitle,
-                   IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
-                   OtherIssue = iss.OtherIssue,
-                   PolicyNo = iss.PolicyNo,
-                   IssueDescription = iss.IssueDescription,
-                   IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
-                  // IssueType = GetIssueTypeById(iss.IssueTypeId ?? 0),
-                   IssueResource = JsonConvert.DeserializeObject<List<ResourceModel>>(iss.IssueResource),
-               };
-               issuesModel.Add(issl);
-           }
-
-           return issuesModel;
-       }
-    
-
-        /*
-        public IssueListReturnModel GetAllIssues(IssueFilterParameter parameter)
+        public SearchIssueResult GetAllIssues(QueryParams model)
         {
-            var opened = new List<IssueListReturn>();
-            opened.AddRange(GetIssueByStatus(parameter,1));
-            opened.AddRange(GetIssueByStatus(parameter,3));
-            IssueListReturnModel ret = new IssueListReturnModel()
+            var ret = new SearchIssueResult();
+            var issuesModel = new List<IssueSearchModel>();
+            IList<IssuesList> issues = new List<IssuesList>();
+            // var q =
+            //     "SELECT * FROM issue_tracking.issues_list il inner join issue_tracking.labels l ON il.id==l.issue_id inner join issue_tracking.issue_assigned ia on ia.issue_id==il.id inner join issue_tracking.milestones ml on ml.issue_id==il.id WHERE il.issue_status=1 AND (il.issue_description LIKE '%%' OR il.issue_title LIKE '%%' OR il.ticket LIKE '%%' OR il.policy_no LIKE '%%') AND ia.assigned_to='' AND il.issue_requested_by='' AND l.id='' AND il.branch_id='' AND ml.id='' Order by il.ticket asc";
+
+            var query = "SELECT il.* FROM issue_tracking.issues_list il ";
+
+            if (!string.IsNullOrEmpty(model.Assignee) || model.Type == 1)
+                query = string.Format("{0} inner join issue_tracking.issue_assigned ia on ia.issue_id=il.id", query);
+            query = string.Format("{0} WHERE il.issue_status={1}", query, model.State);
+
+            if (!string.IsNullOrEmpty(model.Query))
+                query = string.Format(
+                    "{0}  AND (il.issue_description LIKE '%{1}%' OR il.issue_title LIKE '%{1}%' OR il.ticket LIKE '%{1}%' OR il.policy_no LIKE '%{1}%')",
+                    query, model.Query);
+            if (model.IssueType > -1)
+                query = string.Format("{0} AND il.issue_type_id={1}", query, model.IssueType);
+
+            if (model.Priority > 0)
+                query = string.Format("{0} AND il.issue_priority={1}", query, model.Priority);
+
+            if (model.Type == 1)
             {
-                Opened= opened,
-                Closed = GetIssueByStatus(parameter,2)
-            };
-            ret.UpperSideBarStats = GetUpperSideBarStat();
-            ret.LowerSideBarStats = GetLowerSideBarStat();
+                query = String.Format("{0} AND ia.assigned_to='{1}'", query, _session.UserId);
+            }
+            else if (model.Type == 2)
+            {
+                query = String.Format("{0} AND il.issue_requested_by='{1}'", query, _session.UserId);
+            }
+            else if (!string.IsNullOrEmpty(model.Assignee))
+            {
+                query = string.Format("{0} AND ia.assigned_to='{1}'", query, model.Assignee);
+            }
+
+            if (!string.IsNullOrEmpty(model.Branch))
+                query = String.Format("{0} AND il.branch_id='{1}'", query, model.Branch);
+            if (model.Sort == 1)
+            {
+                query = String.Format("{0} Order by il.ticket DESC", query);
+            }
+            else
+            {
+                query = String.Format("{0} Order by il.ticket ASC", query);
+            }
+
+            issues = _context.IssuesList.FromSql(query).ToList();
+            foreach (var iss in issues)
+            {
+                var department = GetDepartment(iss.BranchId).DepartmentName;
+
+                var issl = new IssueSearchModel()
+                {
+                    Id = iss.Id.ToString(),
+                    TicketNo = iss.Ticket,
+                    IssueTitle = iss.IssueTitle,
+                    IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
+                    OtherIssue = iss.OtherIssue,
+                    PolicyNo = iss.PolicyNo,
+                    IssueDescription = iss.IssueDescription,
+                    IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
+                    OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
+                    OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
+                    Branch = department,
+                    Status = iss.IssueStatus ?? 1,
+                    //IssueResource = JsonConvert.DeserializeObject<List<ResourceModel>>(iss.IssueResource),
+                };
+                issuesModel.Add(issl);
+            }
+
+            ret.IssueList = issuesModel;
+            if (IsItStaffLoggedIn())
+            {
+                ret.OpenedIssue = _context.IssuesList.Count(i => i.IssueStatus == 1);
+                ret.ClosedIssue = _context.IssuesList.Count(i => i.IssueStatus == 2);
+            }
+            else
+            {
+                ret.OpenedIssue = _context.IssuesList.Count(i =>
+                    i.IssueStatus == 1 && i.BranchId == Guid.Parse(_session.DepartmentId));
+                ret.ClosedIssue = _context.IssuesList.Count(i =>
+                    i.IssueStatus == 2 && i.BranchId == Guid.Parse(_session.DepartmentId));
+            }
+
             return ret;
         }
-       */
+
         public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status)
         {
             var ret = new List<IssueListReturn>();
@@ -827,24 +821,7 @@ namespace IssueTracking.Domain.IssueTracking
 
             foreach (var issue in issues)
             {
-                var iss = new IssueListReturn()
-                {
-                    Id = issue.Id.ToString(),
-                    IssueTitle = issue.IssueTitle,
-                    IssueTypeId = issue.IssueTypeId,
-                    OtherIssue = issue.OtherIssue,
-                    PolicyNo = issue.PolicyNo,
-                    IssueDescription = issue.IssueDescription,
-                    BranchId = GetDepartment(issue.BranchId),
-                    IssueRequestedBy = GetEmployee(issue.IssueRequestedBy),
-                    IssuePriority = _context.IssuePriorityType.First(e => e.Id == issue.IssuePriority).Name,
-                    IssueStatus = _context.IssueStatusType.First(e => e.Id == issue.IssueStatus).Name,
-                    IssueType = GetIssueTypeById(issue.IssueTypeId ?? 0),
-                    Ticket = issue.Ticket,
-                    Participant = 1 + _context.IssueAssigned.Count(e => e.IssueId == issue.Id),
-                    Comments = _context.IssueComments.Count(e => e.IssueId == issue.Id),
-                    NoOfEdit = _context.DeletedIssuesList.Count(e => e.OldIssueId == issue.Id),
-                };
+                var iss = GetIssueById(issue.Id);
                 ret.Add(iss);
             }
 
@@ -855,13 +832,15 @@ namespace IssueTracking.Domain.IssueTracking
         {
             var comment = new IssueComments()
             {
+                Id = Guid.NewGuid(),
                 IssueId = Guid.Parse(model.IssueId),
                 IssueComment = model.IssueComment,
                 CommentedBy = Guid.Parse(_session.UserId),
-                CommentDate = model.IssueCommentDate.Date
+                CommentDate = DateTime.Now.Ticks
             };
             if (model.CommentResource.Count > 0)
             {
+                var index = 0;
                 var resourceModels = new List<ResourceModel>();
                 foreach (var res in model.CommentResource)
                 {
@@ -871,7 +850,7 @@ namespace IssueTracking.Domain.IssueTracking
                         MimeType = res.MimeType,
                         FileName = res.FileName,
                         Data = "",
-                        Index = res.Index
+                        Index = index++
                     };
                     SaveResource(resource.DocRef, resource.MimeType, res.Data);
                     resourceModels.Add(resource);
@@ -880,33 +859,54 @@ namespace IssueTracking.Domain.IssueTracking
                 comment.CommentResource = JsonConvert.SerializeObject(resourceModels);
             }
 
-            if (model.IssueStatus != null)
-            {
-                comment.IssueStatus = model.IssueStatus.Id;
-            }
 
             _context.IssueComments.Add(comment);
             _context.SaveChanges();
+            CreateActionTrackers(model.IssueId, "Commented on Issue", null, model.IssueComment);
         }
 
         public void EditIssueComment(IssueCommentsModel model)
         {
+            var actionType = "Edited Comment on Issue";
             var existingComment = _context.IssueComments.FirstOrDefault(c => c.Id == Guid.Parse(model.Id));
+
             if (existingComment != null)
             {
+                var actionDetails = JsonConvert.SerializeObject(existingComment);
+                CreateActionTrackers(existingComment.IssueId.ToString(), actionType, actionDetails,
+                    model.IssueComment);
                 existingComment.IssueComment = model.IssueComment;
-                existingComment.ModifiedDate = model.ModifiedDate.Date;
                 if (model.CommentResource.Count > 0)
                 {
                     var resourceModels = new List<ResourceModel>();
-                    // Update resources 
+                    var index1 = 0;
+                    foreach (var res in model.CommentResource)
+                    {
+                        index1++;
+                        if (string.IsNullOrEmpty(res.DocRef))
+                        {
+                            var resource = new ResourceModel()
+                            {
+                                DocRef = Guid.NewGuid().ToString(),
+                                MimeType = res.MimeType,
+                                FileName = res.FileName,
+                                Data = "",
+                                Index = index1
+                            };
+                            SaveResource(resource.DocRef, resource.MimeType, res.Data);
+                            resourceModels.Add(resource);
+                        }
+                        else
+                        {
+                            res.Data = "";
+                            res.Index = index1;
+                            resourceModels.Add(res);
+                        }
+                    }
+
                     existingComment.CommentResource = JsonConvert.SerializeObject(resourceModels);
                 }
 
-                if (model.IssueStatus != null)
-                {
-                    existingComment.IssueStatus = model.IssueStatus.Id;
-                }
 
                 _context.IssueComments.Update(existingComment);
                 _context.SaveChanges();
@@ -917,41 +917,116 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
-        // To retrieve all comments for a specific issue
-        public IList<IssueCommentsModel> GetAllIssueComments(string issueId)
+        private void SaveResource(string fileName, string mimeType, string encodedStr)
         {
-            var issueGuid = new Guid(issueId);
+            var imgExt = mimeTypeRegx.Match(mimeType).Groups[2].Value;
+            var path = Path.Combine($"{fileLocation}", $"{fileName}.{imgExt}");
+            //path = path.Replace("\", "/" )
+            if (File.Exists(path))
+                return;
+            var byteArr = Convert.FromBase64String(encodedStr);
+            BinaryWriter binaryWriter = null;
+            try
+            {
+                binaryWriter = new BinaryWriter(File.OpenWrite(path));
 
-            return _context.IssueComments
-                .Where(c => c.IssueId == issueGuid)
-                .Select(c => new IssueCommentsModel()
+                binaryWriter.Write(byteArr);
+                binaryWriter.Flush();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                binaryWriter?.Close();
+            }
+        }
+
+        public string GetResourceDoc(string fileName, string mimeType)
+        {
+            var imageData = string.Empty;
+
+            var imgExt = mimeTypeRegx.Match(mimeType).Groups[2].Value;
+            var path = Path.Combine(fileLocation, $"{fileName}.{imgExt}");
+            if (File.Exists(path))
+            {
+                var byteArr = File.ReadAllBytes(path);
+                imageData = Convert.ToBase64String(byteArr);
+            }
+
+            return imageData;
+        }
+
+        // To retrieve all comments for a specific issue
+
+        private IssueCommentReturnModel GetIssueCommentById(string commentId)
+        {
+            var comment = _context.IssueComments.FirstOrDefault(c => c.Id == Guid.Parse(commentId));
+            var issueComments = new IssueCommentReturnModel();
+            if (comment != null)
+            {
+                issueComments.Comment.Id = comment.Id.ToString();
+                issueComments.Comment.IssueId = comment.IssueId.ToString();
+                issueComments.Comment.CommentedBy = GetEmployee(comment.CommentedBy);
+                issueComments.Comment.IssueComment = comment.IssueComment;
+                issueComments.Comment.IssueCommentDate = new DateTime(comment.CommentDate ?? 0);
+                if (!string.IsNullOrEmpty(comment.CommentResource))
                 {
-                    Id = c.Id.ToString(),
-                    IssueId = c.IssueId.ToString(),
-                    IssueComment = c.IssueComment,
-                    CommentedBy = c.CommentedBy.ToString(),
-                    IssueCommentDate = c.CommentDate,
-                    CommentResource = JsonConvert.DeserializeObject<List<ResourceModel>>(c.CommentResource),
-                    IssueStatus = new IssueStatusType()
+                    var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(comment.CommentResource);
+                    foreach (var res in imageResource)
                     {
-                        Id = (long)c.IssueStatus,
-                        Name = _context.IssueStatusType
-                            .Where(s => s.Id == c.IssueStatus)
-                            .Select(s => s.Name)
-                            .FirstOrDefault(),
-                        Description = _context.IssueStatusType
-                            .Where(s => s.Id == c.IssueStatus)
-                            .Select(s => s.Description)
-                            .FirstOrDefault()
-                    },
-                    Status = 1
-                })
-                .ToList();
+                        var data = GetResourceDoc(res.DocRef, res.MimeType);
+                        if (!string.IsNullOrEmpty(data))
+                        {
+                            res.Data = data;
+                            issueComments.Comment.CommentResource.Add(res);
+                        }
+                    }
+                }
+
+                var actionList = _context.ActionTracker.Where(e => e.Remark.Equals(commentId)).ToList();
+                foreach (var action in actionList)
+                {
+                    issueComments.Actions.Add(GetActionTrackerById(action.Id));
+                }
+            }
+
+            return issueComments;
+        }
+
+        private ActionTrackerReturnModel GetActionTrackerById(Guid id)
+        {
+            var actions = _context.ActionTracker.FirstOrDefault(e => e.Id == id);
+            var ret = new ActionTrackerReturnModel();
+            if (actions != null)
+            {
+                ret.Id = actions.Id.ToString();
+                ret.IssueId = actions.IssueId.ToString();
+                ret.UserId = GetEmployee(actions.UserId);
+                ret.ActionType = actions.ActionType;
+                ret.ActionDate = new DateTime(actions.ActionDate);
+                ret.ActionDetails = actions.ActionDetails;
+                ret.Remark = actions.Remark;
+            }
+
+            return ret;
+        }
+
+        public IList<IssueCommentReturnModel> GetAllIssueComments(string issueId)
+        {
+            var issueComments = new List<IssueCommentReturnModel>();
+            var comments = _context.IssueComments.Where(e => e.IssueId == Guid.Parse(issueId)).ToList();
+            foreach (var comm in comments)
+            {
+                issueComments.Add(GetIssueCommentById(comm.Id.ToString()));
+            }
+
+            return issueComments;
         }
 
         public void DeleteIssueComment(string commentId)
         {
-
             var comment = _context.IssueComments.Find(commentId);
             if (comment == null)
             {
@@ -960,14 +1035,13 @@ namespace IssueTracking.Domain.IssueTracking
 
             _context.IssueComments.Remove(comment);
             _context.SaveChanges();
-
         }
-
 
         public IList<DepartmentSchemaModel> GetAllBranch()
         {
             var ret = new List<DepartmentSchemaModel>();
-            var branch = _context.DepartmentSchema.Where(d => d.Status == true).ToList();
+            var branch = _context.DepartmentSchema.Where(d => d.Status == true).OrderBy(d => d.BranchId)
+                .ThenBy(d => d.DepartmentId).ToList();
             foreach (var br in branch)
             {
                 ret.Add(GetDepartment(br.Id));
@@ -975,7 +1049,6 @@ namespace IssueTracking.Domain.IssueTracking
 
             return ret;
         }
-
 
         public IList<EmployeeModel> GetAllEmployee()
         {
@@ -1002,6 +1075,729 @@ namespace IssueTracking.Domain.IssueTracking
             return ret;
         }
 
+        public void AssignIssue(AssignIssueModel model)
+        {
+            var existingAssignment = _context.IssueAssigned.Any(e =>
+                e.IssueId == Guid.Parse(model.IssueId) && e.AssignedTo == Guid.Parse(model.AssignedTo));
+            var actionType = "Assigned User to Issue";
+            if (!existingAssignment)
+            {
+                var assignment = new IssueAssigned()
+                {
+                    Id = Guid.NewGuid(),
+                    AssignedTo = Guid.Parse(model.AssignedTo),
+                    AssignDate = DateTime.Now.Ticks,
+                    IssueId = Guid.Parse(model.IssueId),
+                    AssignedBy = Guid.Parse(_session.UserId)
+                };
+                _context.IssueAssigned.Add(assignment);
+                _context.SaveChanges();
+                CreateActionTrackers(model.IssueId, actionType, null, model.AssignedTo);
+            }
+        }
+
+        public void CloseIssue(string issueId, string remark)
+        {
+            var actionType = "Closed Issue";
+            var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issueId));
+            if (issue != null)
+            {
+                if (issue.IssueStatus == 1)
+                {
+                    var hasDependencies = _context.IssueDependancies.Where(d => d.MajorIssue == Guid.Parse(issueId))
+                        .ToList();
+                    Boolean hasError = false;
+                    string errorMessage = "";
+                    foreach (var dep in hasDependencies)
+                    {
+                        if (_context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 1)
+                        {
+                            hasError = true;
+                            errorMessage = string.Format("{0}, ",
+                                _context.IssuesList.First(e => e.Id == dep.Dependancies).Ticket);
+                        }
+                           
+                    }
+
+                    if (!hasError)
+                    {
+                        issue.IssueClosedBy = Guid.Parse(_session.UserId);
+                        issue.IssueClosedDate = DateTime.Now.Ticks;
+                        issue.IssueStatus = 2;
+                        _context.IssuesList.Update(issue);
+                        _context.SaveChanges();
+                        CloseDueDate(issue.Id);
+                        CloseActiveTask(issue.Id);
+                        CreateActionTrackers(issueId, actionType, null, remark);
+                    }
+                    else
+                    {
+                        errorMessage = string.Format("Dependency issues of {0} are not closed", errorMessage);
+
+                        throw new Exception(errorMessage);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Issue Already closed");
+                }
+            }
+            else
+            {
+                throw new Exception("Issue Not Found");
+            }
+        }
+
+        public void ReopenIssue(string issueId, string remark)
+        {
+            var actionType = "Re-Opened Issue";
+            var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issueId));
+            if (issue != null)
+            {
+                if (issue.IssueStatus == 2)
+                {
+                    issue.IssueStatus = 1;
+                    _context.IssuesList.Update(issue);
+                    _context.SaveChanges();
+                    CreateActionTrackers(issueId, actionType, null, remark);
+                }
+                else
+                {
+                    throw new Exception("Issue Already Open");
+                }
+            }
+            else
+            {
+                throw new Exception("Issue Not Found");
+            }
+        }
+
+        public string PatchCloseIssue(PatchActionModel model)
+        {
+            string ret = "";
+            int success = 0;
+            int failed = 0;
+            var actionType = "Closed Issue By Patch";
+            foreach (var issues in model.CaseList)
+            {
+                var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issues));
+                if (issue != null)
+                {
+                    if (issue.IssueStatus == 1)
+                    {
+                        var hasDependencies = _context.IssueDependancies.Where(d => d.MajorIssue == Guid.Parse(issues))
+                            .ToList();
+                        Boolean hasError = false;
+                        string errorMessage = "";
+                        foreach (var dep in hasDependencies)
+                        {
+                            if (_context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 1)
+                            {
+                                hasError = true;
+                            }
+                           
+                        }
+
+                        if (!hasError)
+                        {
+                            issue.IssueClosedBy = Guid.Parse(_session.UserId);
+                            issue.IssueClosedDate = DateTime.Now.Ticks;
+                            issue.IssueStatus = 2;
+                            _context.IssuesList.Update(issue);
+                            _context.SaveChanges();
+                            CloseDueDate(issue.Id);
+                            CloseActiveTask(issue.Id);
+                            CreateActionTrackers(issues, actionType, null, model.Remark);
+                            success++;
+                        }
+                        else
+                        {
+                            failed++;
+                        }
+                    }
+                    else
+                    {
+                        failed++;
+                    }
+                }
+                else
+                {
+                    failed++;
+                }
+            }
+
+            ret = string.Format("Action Executed, with {1} success and {2} failed out off {0} total requested issues",
+                model.CaseList.Count(), success, failed);
+            return ret;
+        }
+
+        public string PatchReopenIssue(PatchActionModel model)
+        {
+            string ret = "";
+            int success = 0;
+            int failed = 0;
+            var actionType = "Re-Opened Issue by Patch";
+            foreach (var issues in model.CaseList)
+            {
+                var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issues));
+                if (issue != null)
+                {
+                    if (issue.IssueStatus == 2)
+                    {
+                        issue.IssueStatus = 1;
+                        _context.IssuesList.Update(issue);
+                        _context.SaveChanges();
+                        CreateActionTrackers(issues, actionType, null, model.Remark);
+                        success++;
+                    }
+                    else
+                    {
+                        failed++;
+                    }
+                }
+                else
+                {
+                    failed++;
+                }
+            }
+
+            ret = string.Format("Action Executed, with {1} success and {2} failed out off {0} total requested issues",
+                model.CaseList.Count(), success, failed);
+            return ret;
+        }
+
+        public DashboardModel GetDashboard(string deptId)
+        {
+            var ret = new DashboardModel();
+
+            if (!string.IsNullOrEmpty(deptId))
+            {
+                ret.Total = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId));
+                ret.Closed = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId) && i.IssueStatus == 2);
+                ret.Open = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId) && i.IssueStatus == 1);
+
+                var systemRaised = _context.IssueRaisedSystem.ToList();
+                var systems = new List<RaisedSystem>();
+                foreach (var sy in systemRaised)
+                {
+                    var sys = new RaisedSystem();
+                    sys.System.Id = sy.Id;
+                    sys.System.Name = sy.Name;
+                    sys.System.Total = 0;
+                    sys.System.Closed = 0;
+                    sys.System.Open = 0;
+                    var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
+                        .ToList();
+                    foreach (var it in systemIssueTypes)
+                    {
+                        var issueType = new DashboardStat()
+                        {
+                            Id = it.Id,
+                            Name = it.Name,
+                            Total = _context.IssuesList.Count(i =>
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueTypeId > 0) ||
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 &&
+                                 i.OtherIssue == sy.Id.ToString())),
+                            Closed = _context.IssuesList.Count(i =>
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueStatus == 2 &&
+                                 i.IssueTypeId > 0) ||
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 && i.IssueStatus == 2 &&
+                                 i.OtherIssue == sy.Id.ToString())),
+                            Open = _context.IssuesList.Count(i =>
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueStatus == 1 &&
+                                 i.IssueTypeId > 0) ||
+                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 && i.IssueStatus == 1 &&
+                                 i.OtherIssue == sy.Id.ToString()))
+                        };
+
+                        sys.System.Total += issueType.Total;
+                        sys.System.Closed += issueType.Closed;
+                        sys.System.Open += issueType.Open;
+                        sys.IssueType.Add(issueType);
+                    }
+
+                    ret.RaisedSystems.Add(sys);
+                }
+
+                var sql = string.Format(
+                    "SELECT ac.* FROM issue_tracking.action_tracker ac inner join issue_tracking.issues_list il on il.id=ac.issue_id where il.branch_id='{0}' order by ac.action_date desc limit(15);",
+                    deptId);
+                var actions = _context.ActionTracker.FromSql(sql).ToList();
+                foreach (var ac in actions)
+                {
+                    var iss = _context.IssuesList.First(a => a.Id == ac.IssueId);
+                    var issl = new IssueSearchModel()
+                    {
+                        Id = iss.Id.ToString(),
+                        TicketNo = iss.Ticket,
+                        IssueTitle = iss.IssueTitle,
+                        IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
+                        OtherIssue = iss.OtherIssue,
+                        PolicyNo = iss.PolicyNo,
+                        IssueDescription = iss.IssueDescription,
+                        IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
+                        OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
+                        OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
+                        Branch = GetDepartment(iss.BranchId).DepartmentName,
+                        Status = iss.IssueStatus ?? 1,
+                    };
+
+                    var act = new ActionTrackerModel()
+                    {
+                        Id = ac.Id.ToString(),
+                        IssueId = ac.IssueId.ToString(),
+                        ActionDate = new DateTime(ac.ActionDate),
+                        ActionType = ac.ActionType,
+                        Issue = issl,
+                        UserId = GetEmployee(ac.UserId),
+                        Remark = ac.Remark,
+                        ActionDetails = ac.ActionDetails,
+                        ActionTypeId = GetActionTypeId(ac.ActionType)
+                    };
+
+                    if (ac.ActionType.Equals("Assigned User to Issue"))
+                    {
+                        act.Remark = string.Format("Assigned To {0}",
+                            GetEmployee(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).FirstName);
+                    }
+
+                    if (ac.ActionType.Equals("Removed Assigned User from Issue"))
+                        act.Remark = string.Format("{0} Removed from Assign",
+                            GetEmployee(Guid.Parse(ac.Remark)).FirstName);
+
+                    if (ac.ActionType.Equals("Added Milestone to Issue"))
+                        act.Remark = string.Format("Added Milestone is {0}",
+                            GetMilestoneById(ac.Remark).Name);
+
+                    if (ac.ActionType.Equals("Removed Milestone from issue"))
+                        act.Remark = string.Format("Removed Milestone is {0}",
+                            GetMilestoneById(ac.Remark).Name);
+
+                    if (ac.ActionType.Equals("Added Dependencies for Issue"))
+                        act.Remark = string.Format("Dependent Issue is {0}",
+                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
+
+                    if (ac.ActionType.Equals("Removed Dependencies from Issue"))
+                        act.Remark = string.Format("Dependent Issue is {0}",
+                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
+                    ret.Actions.Add(act);
+                }
+            }
+            else
+            {
+                ret.Total = _context.IssuesList.Count();
+                ret.Closed = _context.IssuesList.Count(i => i.IssueStatus == 2);
+                ret.Open = _context.IssuesList.Count(i => i.IssueStatus == 1);
+
+                var systemRaised = _context.IssueRaisedSystem.ToList();
+                var systems = new List<RaisedSystem>();
+                foreach (var sy in systemRaised)
+                {
+                    var sys = new RaisedSystem();
+                    sys.System.Id = sy.Id;
+                    sys.System.Name = sy.Name;
+                    sys.System.Total = 0;
+                    sys.System.Closed = 0;
+                    sys.System.Open = 0;
+                    var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
+                        .ToList();
+                    foreach (var it in systemIssueTypes)
+                    {
+                        var issueType = new DashboardStat()
+                        {
+                            Id = it.Id,
+                            Name = it.Name,
+                            Total = _context.IssuesList.Count(i =>
+                                (i.IssueTypeId == it.Id && i.IssueTypeId > 0) ||
+                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()))),
+                            Closed = _context.IssuesList.Count(i =>
+                                (i.IssueTypeId == it.Id && i.IssueStatus == 2 && i.IssueTypeId > 0) ||
+                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()) && i.IssueStatus == 2)),
+                            Open = _context.IssuesList.Count(i =>
+                                (i.IssueTypeId == it.Id && i.IssueStatus == 1 && i.IssueTypeId > 0) ||
+                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()) && i.IssueStatus == 1))
+                        };
+
+                        sys.System.Total += issueType.Total;
+                        sys.System.Closed += issueType.Closed;
+                        sys.System.Open += issueType.Open;
+                        sys.IssueType.Add(issueType);
+                    }
+
+                    ret.RaisedSystems.Add(sys);
+                }
+
+                var sql =
+                    "SELECT ac.* FROM issue_tracking.action_tracker ac inner join issue_tracking.issues_list il on il.id=ac.issue_id order by ac.action_date desc limit(15);";
+                var actions = _context.ActionTracker.FromSql(sql).ToList();
+                foreach (var ac in actions)
+                {
+                    var iss = _context.IssuesList.First(a => a.Id == ac.IssueId);
+                    var issl = new IssueSearchModel()
+                    {
+                        Id = iss.Id.ToString(),
+                        TicketNo = iss.Ticket,
+                        IssueTitle = iss.IssueTitle,
+                        IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
+                        OtherIssue = iss.OtherIssue,
+                        PolicyNo = iss.PolicyNo,
+                        IssueDescription = iss.IssueDescription,
+                        IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
+                        OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
+                        OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
+                        Branch = GetDepartment(iss.BranchId).DepartmentName,
+                        Status = iss.IssueStatus ?? 1,
+                    };
+
+                    var act = new ActionTrackerModel()
+                    {
+                        Id = ac.Id.ToString(),
+                        IssueId = ac.IssueId.ToString(),
+                        ActionDate = new DateTime(ac.ActionDate),
+                        ActionType = ac.ActionType,
+                        Issue = issl,
+                        UserId = GetEmployee(ac.UserId),
+                        Remark = ac.Remark,
+                        ActionDetails = ac.ActionDetails,
+                        ActionTypeId = GetActionTypeId(ac.ActionType)
+                    };
+
+                    if (ac.ActionType.Equals("Assigned User to Issue"))
+                    {
+                        act.Remark = string.Format("Assigned To {0}",
+                            GetEmployee(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).FirstName);
+                    }
+
+                    if (ac.ActionType.Equals("Removed Assigned User from Issue"))
+                        act.Remark = string.Format("{0} Removed from Assign",
+                            GetEmployee(Guid.Parse(ac.Remark)).FirstName);
+
+                    if (ac.ActionType.Equals("Added Milestone to Issue"))
+                        act.Remark = string.Format("Added Milestone is {0}",
+                            GetMilestoneById(ac.Remark).Name);
+
+                    if (ac.ActionType.Equals("Removed Milestone from issue"))
+                        act.Remark = string.Format("Removed Milestone is {0}",
+                            GetMilestoneById(ac.Remark).Name);
+
+                    if (ac.ActionType.Equals("Added Dependencies for Issue"))
+                        act.Remark = string.Format("Dependent Issue is {0}",
+                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
+
+                    if (ac.ActionType.Equals("Removed Dependencies from Issue"))
+                        act.Remark = string.Format("Dependent Issue is {0}",
+                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
+
+                    ret.Actions.Add(act);
+                }
+            }
+
+
+            return ret;
+        }
+
+        public void EditMileStone(MileStonesModel model)
+        {
+            if (string.IsNullOrEmpty(model.Id))
+            {
+                var mileStone = new Milestones()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = model.Name,
+                    Description = model.Description,
+                    CreatedBy = Guid.Parse(_session.UserId),
+                    CreatedDate = DateTime.Now.Ticks,
+                    DueDate = model.DueDate.Ticks
+                };
+                _context.Milestones.Add(mileStone);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var oldMilestone = _context.Milestones.FirstOrDefault(e => e.Id == Guid.Parse(model.Id));
+                if (oldMilestone != null)
+                {
+                    oldMilestone.Name = model.Name;
+                    oldMilestone.Description = model.Description;
+                    oldMilestone.DueDate = model.DueDate.Ticks;
+
+                    _context.Milestones.Update(oldMilestone);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("I can't find any milestone to edit");
+                }
+            }
+        }
+
+        public IList<MileStonesModelReturn> GetAllMilestones()
+        {
+            var ret = new List<MileStonesModelReturn>();
+
+            var milestones = _context.Milestones.OrderByDescending(m => m.CreatedDate).ToList();
+
+            foreach (var ms in milestones)
+            {
+                ret.Add(GetMilestoneById(ms.Id.ToString()));
+            }
+
+            return ret;
+        }
+
+        public MileStonesModelReturn GetMilestoneById(string id)
+        {
+            var mileStone = _context.Milestones.FirstOrDefault(m => m.Id == Guid.Parse(id));
+            var ret = new MileStonesModelReturn();
+            if (mileStone != null)
+            {
+                ret.Id = mileStone.Id.ToString();
+                ret.Name = mileStone.Name;
+                ret.Description = mileStone.Description;
+                ret.DueDate = new DateTime(mileStone.DueDate ?? 0);
+                ret.CreatedBy = GetEmployee(mileStone.CreatedBy);
+                ret.CreatedDate = new DateTime(mileStone.CreatedDate ?? 0);
+            }
+
+            return ret;
+        }
+
+        public void DeleteMilestone(string id)
+        {
+            var milestone = _context.Milestones.FirstOrDefault(m => m.Id == Guid.Parse(id));
+            if (milestone != null)
+            {
+                var isIssueAva = _context.IssueMilestones.Any(e => e.MilestoneId == milestone.Id);
+                if (!isIssueAva)
+                {
+                    _context.Milestones.Remove(milestone);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("Sorry, there is an issue registered in milestones");
+                }
+            }
+            else
+            {
+                throw new Exception("Sorry, i can't find any milestone for delete");
+            }
+        }
+
+        public void AddMilestoneToIssue(string issueId, string milestoneId)
+        {
+            var isMileAva = _context.IssueMilestones.Any(e =>
+                e.IssueId == Guid.Parse(issueId) && e.MilestoneId == Guid.Parse(milestoneId));
+            if (!isMileAva)
+            {
+                var issueMileStone = new IssueMilestones()
+                {
+                    Id = Guid.NewGuid(),
+                    IssueId = Guid.Parse(issueId),
+                    MilestoneId = Guid.Parse(milestoneId)
+                };
+                _context.IssueMilestones.Add(issueMileStone);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId, "Added Milestone to Issue", null, milestoneId);
+            }
+            else
+            {
+                throw new Exception("The milestone already added to this issue");
+            }
+        }
+
+        public void RemoveMilestoneFromIssue(string id)
+        {
+            var issueMilestone = _context.IssueMilestones.FirstOrDefault(e => e.Id == Guid.Parse(id));
+            if (issueMilestone != null)
+            {
+                CreateActionTrackers(issueMilestone.IssueId.ToString(), "Removed Milestone from issue", null,
+                    issueMilestone.MilestoneId.ToString());
+                _context.IssueMilestones.Remove(issueMilestone);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("sorry i can't find any milestone added to this issue");
+            }
+        }
+
+        public void RemoveAssignFromIssue(string id)
+        {
+            var issueAssign = _context.IssueAssigned.FirstOrDefault(e => e.Id == Guid.Parse(id));
+            if (issueAssign != null)
+            {
+                CreateActionTrackers(issueAssign.IssueId.ToString(), "Removed Assigned User from Issue", null,
+                    issueAssign.AssignedTo.ToString());
+                _context.IssueAssigned.Remove(issueAssign);
+                _context.SaveChanges();
+            }
+        }
+
+        public IList<IssueSearchModel> GetAllDependents(string issueId)
+        {
+            var ret = new List<IssueSearchModel>();
+
+            var dept = _context.IssuesList.First(e => e.Id == Guid.Parse(issueId)).BranchId;
+            var activeIssue = _context.IssuesList
+                .Where(e => e.Id != Guid.Parse(issueId) && e.IssueStatus == 1 && e.BranchId == dept).ToList();
+            foreach (var ai in activeIssue)
+            {
+                var isAva = _context.IssueDependancies.Any(e =>
+                    e.MajorIssue == Guid.Parse(issueId) && e.Dependancies == ai.Id);
+                ret.Add(new IssueSearchModel()
+                {
+                    Id = ai.Id.ToString(),
+                    TicketNo = ai.Ticket,
+                    IssueTitle = ai.IssueTitle,
+                    IssueDescription = ai.IssueDescription,
+                    PolicyNo = ai.PolicyNo,
+                    IssueType = _context.IssueTypeList.First(e => e.Id == ai.IssueTypeId).Name,
+                    OtherIssue = ai.OtherIssue,
+                });
+            }
+
+            return ret;
+        }
+
+        public void AddDependencyToIssue(string issueId, string depeId)
+        {
+            var isAva = _context.IssueDependancies.Any(d =>
+                d.MajorIssue == Guid.Parse(issueId) && d.Dependancies == Guid.Parse(depeId));
+            if (!isAva)
+            {
+                var dep = new IssueDependancies()
+                {
+                    Id = Guid.NewGuid(),
+                    Dependancies = Guid.Parse(depeId),
+                    MajorIssue = Guid.Parse(issueId)
+                };
+
+                _context.IssueDependancies.Add(dep);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId, "Added Dependencies for Issue", null, depeId);
+            }
+            else
+            {
+                throw new Exception("Sorry, the issue already registered as dependencies");
+            }
+        }
+
+        public void RemoveDependencyFromIssue(string id)
+        {
+            var oldDependency = _context.IssueDependancies.FirstOrDefault(e => e.Id == Guid.Parse(id));
+            if (oldDependency != null)
+            {
+                _context.IssueDependancies.Remove(oldDependency);
+                _context.SaveChanges();
+                CreateActionTrackers(oldDependency.MajorIssue.ToString(), "Removed Dependencies from Issue", null,
+                    oldDependency.Dependancies.ToString());
+            }
+            else
+            {
+                throw new Exception("Sorry, i can't find any dependencies to remove");
+            }
+        }
+
+        public void StartTask(string issueId)
+        {
+            var isActiveTaskAva = _context.IssueTimeTracker.Any(t =>
+                t.UserId == Guid.Parse(_session.UserId) && t.IssueId == Guid.Parse(issueId) &&
+                t.Status.Equals("Started"));
+            if (!isActiveTaskAva)
+            {
+                var timeTracker = new IssueTimeTracker()
+                {
+                    Id = Guid.NewGuid(),
+                    IssueId = Guid.Parse(issueId),
+                    UserId = Guid.Parse(_session.UserId),
+                    StartTime = DateTime.Now.Ticks,
+                    Status = "Started",
+                };
+                _context.IssueTimeTracker.Add(timeTracker);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId, "Start Task on Issue", null, timeTracker.Id.ToString());
+            }
+            else
+            {
+                throw new Exception("Sorry, You already have active task");
+            }
+        }
+
+        public void EndTask(string id)
+        {
+            var timeTracker = _context.IssueTimeTracker.FirstOrDefault(t => t.Id == Guid.Parse(id));
+            if (timeTracker != null)
+            {
+                timeTracker.EndTime = DateTime.Now.Ticks;
+                timeTracker.Status = "Ended";
+
+                _context.IssueTimeTracker.Update(timeTracker);
+                _context.SaveChanges();
+                CreateActionTrackers(timeTracker.IssueId.ToString(),"End Task of Issue",null,timeTracker.Id.ToString());
+            }
+            else
+            {
+                throw new Exception("Sorry, I can't find any started task with this id");
+            }
+        }
+
+        public void AddDueDate(string issueId, DateTime dueDate)
+        {
+            var ava = _context.IssueDueDate.FirstOrDefault(i => i.IssueId == Guid.Parse(issueId));
+            if (ava == null)
+            {
+                var dueDateModel = new IssueDueDate()
+                {
+                    Id = Guid.NewGuid(),
+                    IssueId = Guid.Parse(issueId),
+                    StartTime = DateTime.Now.Ticks,
+                    DueDate = dueDate.Ticks,
+
+                };
+                if (DateTime.Now >= dueDate){
+                    dueDateModel.Status = "Inactive";
+                }else
+                {
+                    dueDateModel.Status = "Active";
+                }
+
+                _context.IssueDueDate.Add(dueDateModel);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId,"Set Due Date for Issue", null, dueDateModel.Id.ToString());
+            }
+            else
+            {
+                var oldDueDate = ava;
+                ava.DueDate = dueDate.Ticks;
+                if (DateTime.Now >= dueDate){
+                    ava.Status = "Inactive";
+                }else
+                {
+                    ava.Status = "Active";
+                }
+
+                _context.IssueDueDate.Update(ava);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId, "Update Due Date Of Issue", JsonConvert.SerializeObject(oldDueDate), ava.Id.ToString());
+            }
+        }
+
+        public void DeleteIssueDueDate(string issueId)
+        {
+            var dueDate = _context.IssueDueDate.FirstOrDefault(i => i.IssueId == Guid.Parse(issueId));
+            if (dueDate != null)
+            {
+                var oldDueDate = dueDate;
+                _context.IssueDueDate.Remove(dueDate);
+                _context.SaveChanges();
+                CreateActionTrackers(issueId, "Remove Due Date of Issue", JsonConvert.SerializeObject(oldDueDate), (new DateTime(oldDueDate.DueDate??0)).ToString());
+            }
+            else
+            {
+                throw new Exception("Sorry. I can't find any due date settled for this issue");
+            }
+        }
         private IssueListReturn GetSimpleIssueById(Guid id)
         {
             var ret = new IssueListReturn();
@@ -1035,12 +1831,7 @@ namespace IssueTracking.Domain.IssueTracking
                 FirstName = employee.FirstName,
                 FatherName = employee.FatherName,
                 GrFatherName = employee.GrFatherName,
-                Appellation = employee.Applelation,
-                Title = employee.Title,
-                Position = _context.Possitions.First(p => p.Id == employee.PossitionId).Name,
                 EmpIdNo = employee.EmpIdNo,
-                Phone = employee.Phone,
-                Email = employee.Email,
                 Username = _context.Account.First(e => e.EmployeeId == employee.Id).Username
             };
             return ret;
@@ -1110,6 +1901,309 @@ namespace IssueTracking.Domain.IssueTracking
             }
 
             return lowerSidebars;
+        }
+
+        private void CreateActionTrackers(string issueId, string actionType, string actionDetails, string remark)
+        {
+            var actionTracker = new ActionTracker()
+            {
+                Id = Guid.NewGuid(),
+                IssueId = Guid.Parse(issueId),
+                UserId = Guid.Parse(_session.UserId),
+                ActionDate = DateTime.Now.Ticks,
+                ActionType = actionType,
+                ActionDetails = actionDetails,
+                Remark = remark
+            };
+            _context.ActionTracker.Add(actionTracker);
+            _context.SaveChanges();
+        }
+
+        private IList<EmployeeModel> GetParticipant(Guid issueId)
+        {
+            var ret = new List<EmployeeModel>();
+
+            var issueOwner = GetEmployee(_context.IssuesList.First(i => i.Id == issueId).IssueRequestedBy);
+            ret.Add(issueOwner);
+            var commenter = new List<Guid>();
+            commenter.Add(Guid.Parse(issueOwner.Id));
+            var par = _context.IssueComments.Where(i => i.IssueId == issueId).ToList();
+            foreach (var p in par)
+            {
+                if (!commenter.Contains(p.CommentedBy))
+                {
+                    commenter.Add(p.CommentedBy);
+                    ret.Add(GetEmployee(p.CommentedBy));
+                }
+            }
+
+            return ret;
+        }
+
+        private IList<AssignIssueReturnModel> GetAssigned(Guid issueId)
+        {
+            var emp = new List<AssignIssueReturnModel>();
+            var assignment = _context.IssueAssigned.Where(e => e.IssueId == issueId).ToList();
+            foreach (var ass in assignment)
+            {
+                emp.Add(new AssignIssueReturnModel()
+                {
+                    Id = ass.Id.ToString(),
+                    IssueId = issueId.ToString(),
+                    AssignedTo = GetEmployee(ass.AssignedTo),
+                    AssignedBy = GetEmployee(ass.AssignedBy),
+                    AssignDate = new DateTime(ass.AssignDate ?? 0)
+                });
+            }
+
+            return emp;
+        }
+
+        private IList<LabelList> GetIssueLabelsList(Guid issueId)
+        {
+            var ret = new List<LabelList>();
+
+            var labels = _context.Labels.Where(e => e.IssueId == issueId).ToList();
+            foreach (var label in labels)
+            {
+                var lb = _context.LabelList.First(l => l.Id == label.LabelId);
+                ret.Add(lb);
+            }
+
+            return ret;
+        }
+
+        private bool IsItStaffLoggedIn()
+        {
+            bool ret = false;
+            var department = _context.DepartmentSchema.First(d => d.Id == Guid.Parse(_session.DepartmentId));
+            if (department.BranchId == 10)
+                ret = true;
+            return ret;
+        }
+
+        private IList<IssueMilestonesReturn> GetissueMilestones(string issueId)
+        {
+            var ret = new List<IssueMilestonesReturn>();
+
+            var milestones = _context.IssueMilestones.Where(e => e.IssueId == Guid.Parse(issueId))
+                .OrderByDescending(e => e.Id).ToList();
+            foreach (var ms in milestones)
+            {
+                var actions = _context.ActionTracker.First(e =>
+                    e.IssueId == Guid.Parse(issueId) && e.Remark.Equals(ms.MilestoneId.ToString()));
+                var mile = new IssueMilestonesReturn();
+                mile.Id = ms.Id.ToString();
+                mile.IssueId = ms.IssueId.ToString();
+                mile.MilestoneId = ms.MilestoneId.ToString();
+                mile.Name = GetMilestoneById(mile.MilestoneId).Name;
+                mile.Description = GetMilestoneById(mile.MilestoneId).Description;
+                mile.DueDate = GetMilestoneById(mile.MilestoneId).DueDate;
+                mile.AddedBy = GetEmployee(actions.UserId);
+                mile.AddedOn = new DateTime(actions.ActionDate);
+                ret.Add(mile);
+            }
+
+            return ret;
+        }
+
+        private int GetActionTypeId(string name)
+        {
+            int ret = 0;
+            if (name.Equals("Opened Issue"))
+                ret = 1;
+            else if (name.Equals("Closed Issue"))
+                ret = 2;
+            else if (name.Equals("Re-Opened Issue"))
+                ret = 3;
+            else if (name.Equals("Re-Opened Issue by Patch"))
+                ret = 4;
+            else if (name.Equals("Closed Issue By Patch"))
+                ret = 5;
+            else if (name.Equals("Assigned User to Issue"))
+                ret = 6;
+            else if (name.Equals("Commented on Issue"))
+                ret = 7;
+            else if (name.Equals("Edited Comment on Issue"))
+                ret = 8;
+            else if (name.Equals("Edited Issue"))
+                ret = 9;
+            else if (name.Equals("Added Milestone to Issue"))
+                ret = 10;
+            else if (name.Equals("Removed Milestone from issue"))
+                ret = 11;
+            else if (name.Equals("Removed Assigned User from Issue"))
+                ret = 12;
+            else if (name.Equals("Added Dependencies for Issue"))
+                ret = 13;
+            else if (name.Equals("Removed Dependencies from Issue"))
+                ret = 14;
+            else if (name.Equals("Start Task on Issue"))
+                ret = 15;
+            else if (name.Equals("End Task of Issue"))
+                ret = 16;
+            else if (name.Equals("Set Due Date for Issue"))
+                ret = 17;
+            else if (name.Equals("Update Due Date Of Issue"))
+                ret = 18;
+            else if (name.Equals("Remove Due Date of Issue"))
+                ret = 19;
+            
+            return ret;
+        }
+
+        private LookupModel GetRaisedSystem(int id)
+        {
+            var ret = new LookupModel();
+            var raSystem = _context.IssueRaisedSystem.FirstOrDefault(e => e.Id == id);
+            if (raSystem != null)
+            {
+                ret.Id = raSystem.Id;
+                ret.Name = raSystem.Name;
+                ret.Description = raSystem.Description;
+            }
+
+            return ret;
+        }
+
+        private IList<IssueDependenciesReturn> GetAllIssueDependencies(string issueId)
+        {
+            var ret = new List<IssueDependenciesReturn>();
+
+            var issues = _context.IssueDependancies.Where(e => e.MajorIssue == Guid.Parse(issueId)).ToList();
+            foreach (var issue in issues)
+            {
+                ret.Add(GetIssueDependencies(issue.Id.ToString()));
+            }
+
+            return ret;
+        }
+
+        private IssueDependenciesReturn GetIssueDependencies(string id)
+        {
+            var issueDep = _context.IssueDependancies.First(e => e.Id == Guid.Parse(id));
+            var issue = _context.IssuesList.First(e => e.Id == issueDep.Dependancies);
+            var ret = new IssueDependenciesReturn()
+            {
+                Id = issueDep.Id.ToString(),
+                DependentIssue = new IssueSearchModel()
+                {
+                    Id = issue.Id.ToString(),
+                    TicketNo = issue.Ticket,
+                    IssueTitle = issue.IssueTitle,
+                    IssueDescription = issue.IssueDescription,
+                    PolicyNo = issue.PolicyNo,
+                    IssueType = _context.IssueTypeList.First(e => e.Id == issue.IssueTypeId).Name,
+                    OtherIssue = issue.OtherIssue,
+                }
+            };
+            var actions = _context.ActionTracker.First(e =>
+                e.IssueId == issueDep.MajorIssue && e.Remark.Equals(issueDep.Dependancies.ToString()) &&
+                e.ActionType.Equals("Added Dependencies for Issue"));
+            ret.AddedBy = GetEmployee(actions.UserId);
+            ret.AddedOn = new DateTime(actions.ActionDate);
+            return ret;
+        }
+
+        private TimeTrackerReturn BuildTimeTracker(Guid issueId)
+        {
+            var ret = new TimeTrackerReturn()
+            {
+                MyActiveTask = null
+            };
+            var myActiveTask = _context.IssueTimeTracker.FirstOrDefault(t =>
+                t.IssueId == issueId && t.UserId == Guid.Parse(_session.UserId) && t.Status.Equals("Started"));
+            if (myActiveTask != null)
+            {
+                ret.MyActiveTask = GetTimeTrackerById(myActiveTask.Id);
+            }
+
+            var activeTask = _context.IssueTimeTracker.Where(t => t.IssueId == issueId && t.UserId!=Guid.Parse(_session.UserId) && t.Status.Equals("Started"))
+                .ToList();
+            foreach (var act in activeTask)
+            {
+                ret.ActiveTask.Add(GetTimeTrackerById(act.Id));
+            }
+            
+            var endedTask = _context.IssueTimeTracker.Where(t => t.IssueId == issueId && t.Status.Equals("Ended"))
+                .ToList();
+            foreach (var act in endedTask)
+            {
+                ret.EndedTask.Add(GetTimeTrackerById(act.Id));
+            }
+            
+            return ret;
+        }
+        private TimeTrackerModel GetTimeTrackerById(Guid id)
+        {
+            var timeTracker = _context.IssueTimeTracker.First(t => t.Id == id);
+            var ret = new TimeTrackerModel()
+            {
+                Id = timeTracker.Id.ToString(),
+                IssueId = timeTracker.IssueId.ToString(),
+                StartTime = new DateTime(timeTracker.StartTime),
+                EndTime = new DateTime(timeTracker.EndTime ?? 0),
+                Status = timeTracker.Status,
+                Owner = GetEmployee(timeTracker.UserId)
+
+            };
+            return ret;
+        }
+
+        private void CloseDueDate(Guid issueId)
+        {
+            var dueDate = _context.IssueDueDate.FirstOrDefault(e => e.IssueId == issueId);
+            if (dueDate != null)
+            {
+                dueDate.EndTime = DateTime.Now.Ticks;
+                dueDate.Status = "Inactive";
+                _context.IssueDueDate.Update(dueDate);
+                _context.SaveChanges();
+            }
+        }
+
+        private void CloseActiveTask(Guid issueId)
+        {
+            var taskList = _context.IssueTimeTracker.Where(e => e.IssueId == issueId && e.Status.Equals("Started"));
+            var ret = new List<IssueTimeTracker>();
+            foreach (var tl in taskList)
+            {
+                var task = tl;
+                task.EndTime = DateTime.Now.Ticks;
+                task.Status = "Ended";
+                ret.Add(task);
+            }
+            
+            _context.IssueTimeTracker.UpdateRange(ret);
+            _context.SaveChanges();
+        }
+
+        private DueDateReturn GetDueDateReturn(Guid issueId)
+        {
+            var ret = new DueDateReturn();
+           
+            var dueDate = _context.IssueDueDate.FirstOrDefault(i => i.IssueId == issueId);
+            if (dueDate != null)
+            {
+                var actions = _context.ActionTracker.First(e =>
+                                  e.IssueId == issueId && e.Remark.Equals(dueDate.Id.ToString()) &&
+                              e.ActionType.Equals("Set Due Date for Issue"));
+
+                ret.Id = dueDate.Id.ToString();
+                ret.Status = dueDate.Status;
+                ret.StartDate = new DateTime(dueDate.StartTime ?? 0);
+                ret.EndDate=new DateTime(dueDate.EndTime ?? 0);
+                ret.DueDate = new DateTime(dueDate.DueDate ?? 0);
+                ret.SetBy = GetEmployee(actions.UserId);
+            }
+            else
+            {
+                ret = null;
+            }
+           
+            
+            return ret;
+
         }
     }
 }

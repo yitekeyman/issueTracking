@@ -14,6 +14,8 @@ import {NgxDropzoneModule} from "ngx-dropzone";
 import {MonacoEditorModule} from "@materia-ui/ngx-monaco-editor";
 import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view-basic-solution.component";
 import {IssuesRoutingModule} from "../issues/issues.routing";
+import {MilestonesComponent} from "./milestone/milestones.component";
+import {EditMilestoneComponent} from "./milestone/edit_milestone/edit_milestone.component";
 
 
 @NgModule({
@@ -34,7 +36,8 @@ import {IssuesRoutingModule} from "../issues/issues.routing";
     EditIssueTypeComponent,
     EditBasicSolutionComponent,
     ViewBasicSolutionComponent,
-
+    MilestonesComponent,
+    EditMilestoneComponent
   ]
 })
 export class SettingsModule{

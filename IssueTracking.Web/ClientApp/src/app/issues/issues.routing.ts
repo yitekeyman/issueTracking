@@ -8,7 +8,8 @@ import {DashboardComponent} from "../dashboard/dashboard.component";
 
 export const routes:Routes=[
   {
-    path: 'issues',
+    //path: 'issues?state=:state&q=:query&branch=:branch&type=:type&sort=:sort&labels=:labels&milestones=:milestones&assignee=:assignee',
+    path:'issues',
     component: IssuesComponent,
     children: [
       {
@@ -18,7 +19,7 @@ export const routes:Routes=[
     ]
   },
   {path: 'issues/edit-issue', component:EditIssueComponent},
-  {path: 'view-issue/:issueId', component:ViewIssueComponent},
+  {path: 'issues/view-issue/:issueId', component:ViewIssueComponent},
   ];
 @NgModule({
   imports: [RouterModule.forChild(routes)],

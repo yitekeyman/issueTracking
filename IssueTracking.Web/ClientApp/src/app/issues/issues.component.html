@@ -1,26 +1,37 @@
-﻿﻿<div class="breadcomb-area">
+﻿
+<div class="breadcomb-area" *ngIf="issuesList!=null">
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="breadcomb-list">
-          <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-              <div class="breadcomb-wp">
-                <div class="breadcomb-icon">
-                  <i class="notika-icon notika-edit"></i>
-                </div>
-                <div class="breadcomb-ctn">
-                  <h2>Issues List</h2>
-                </div>
-              </div>
+    <div class="breadcomb-list">
+      <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="breadcomb-wp">
+            <div class="breadcomb-icon">
+              <i class="notika-icon notika-edit"></i>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
-              <div class="breadcomb-report">
-                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal"
-                        data-target="#editIssueModal" data-backdrop="static" (click)="editIssue(0, 0)"> Add Issue
-                </button>
-              </div>
+            <div class="breadcomb-ctn">
+              <h2>Issues List</h2>
             </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="form-group ic-cmp-int form-elet-mg">
+            <div class="">
+              <input type="text" class="form-control" placeholder="Search Issues ..."
+                     [(ngModel)]="queryParams.query"/>
+            </div>
+            <div class="form-ic-cmp">
+              <button class="btn btn-success"
+                      (click)="queryIssues('query',queryParams.query)">Search
+              </button>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="floatRight form-group">
+            <button class="btn btn-success" data-toggle="modal"
+                    data-target="#editIssueModal" data-backdrop="static" (click)="editIssue(null, 0)"> New Issue
+            </button>
           </div>
         </div>
       </div>
@@ -28,68 +39,217 @@
   </div>
 </div>
 
-<div class="invoice-area">
+<div class="invoice-area" *ngIf="issuesList!=null">
   <div class="container">
     <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+        <ul class="nav navbar-nav">
+          <li class="nav-item">
+            <div class="btn-group">
+              <button [ngClass]="queryParams.state==1?'btn btn-success ':'btn btn-outline-success'"
+                      (click)="queryIssues('state',1)"><i class="fa fa-exclamation-circle"></i>&nbsp;<span *ngIf="issuesList!=null">{{issuesList.openedIssue}}</span> Open
+
+              </button>
+              <button [ngClass]="queryParams.state==2?'btn btn-success':'btn btn-outline-success'"
+                      (click)="queryIssues('state',2)"><i class="fa fa-check-circle"></i>&nbsp;<span *ngIf="issuesList!=null">{{issuesList.closedIssue}}</span> Closed
+              </button>
+            </div>
+
+          </li>
+          <li class="nav-item">
+
+          </li>
+        </ul>
+      </div>
+      <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 text-right">
+        <ul class="nav navbar-nav floatRight">
+          <li class="nav-item" >
+            <button class="btn btn-warning" *ngIf="queryParams.state==1 && haveSelected && loggedIdDept==ITDeptId" (click)="patchClose()"><span>Close</span></button>
+          </li>
+          <li class="nav-item" >
+            <button class="btn btn-info" *ngIf="queryParams.state==2 && haveSelected && loggedIdDept==ITDeptId" (click)="patchReopen()"><span>Re-Open</span></button>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default" [disabled]="loggedIdDept!=ITDeptId"><span><i
+              class="fa fa-bank"></i>&nbsp;{{branchName}} &nbsp;<i class="fa fa-angle-down"></i></span></button>
+            <ul role="menu" class="dropdown-menu animated zoomIn"
+                style="right: 0; left:auto; max-height: 250px; overflow-y: auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="queryParams.branch==''?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('branch','')">All Branchs/Dept</a>
+              </li>
+              <li *ngFor="let dept of departmentList" style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="queryParams.branch==dept.id?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('branch',dept.id)"><span
+                  *ngIf="dept.branchId==10">{{dept.departmentName}}</span> <span
+                  *ngIf="dept.branchId!=10">{{dept.branchName}}</span></a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default" [disabled]="issueTypeList?.length==0"><i
+              class="fa fa-exclamation-circle"></i>&nbsp;{{issueTypeName}}&nbsp;<i class="fa fa-angle-down"></i>
+            </button>
+
+            <ul role="menu" class="dropdown-menu animated zoomIn"
+                style="right: 0; left:auto;max-height: 250px; overflow-y: auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="queryParams.issueType==-1?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('issueType',-1)">All Issues</a>
+              </li>
+              <li *ngFor="let lab of issueTypeList" style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="lab.id==queryParams.issueType?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('issueType',lab.id)">{{lab.name}}</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default" [disabled]="priorityList?.length==0"><i class="fa fa-arrow-circle-o-up"></i>&nbsp;{{priorityName}}
+              &nbsp;<i class="fa fa-angle-down"></i></button>
+            <ul role="menu" class="dropdown-menu animated zoomIn"
+                style="right: 0; left:auto;max-height: 250px; overflow-y: auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="queryParams.priority==0?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('priority',0)">All Issues</a>
+              </li>
+              <li *ngFor="let lab of priorityList" style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="lab.id==queryParams.priority?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('priority',lab.id)">{{lab.name}}</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default"><i class="fa fa-users"></i>&nbsp;{{assigneeName}} &nbsp;<i
+              class="fa fa-angle-down"></i></button>
+            <ul role="menu" class="dropdown-menu animated zoomIn"
+                style="right: 0; left:auto;max-height: 250px; overflow-y: auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="queryParams.assignee==''?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('assignee','')">All Assignee</a>
+              </li>
+              <li *ngFor="let ass of employeeList" style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="ass.id==queryParams.assignee?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('assignee',ass.id)">{{ass.firstName}} {{ass.fatherName}}</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default"><i class="fa fa-user-plus"></i>&nbsp;{{typeName}} &nbsp;<i
+              class="fa fa-angle-down"></i></button>
+            <ul role="menu" class="dropdown-menu animated zoomIn" style="right: 0; left:auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="0==queryParams.type?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('type',0)">All Issues</a>
+              </li>
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="1==queryParams.type?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('type',1)">Assigned to you</a>
+              </li>
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="2==queryParams.type?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('type',2)">Created by you</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <button data-toggle="dropdown" role="button" aria-expanded="false"
+                    class="btn btn-default"><i class="fa fa-sort"></i> &nbsp;{{sortName}} &nbsp;<i
+              class="fa fa-angle-down"></i></button>
+            <ul role="menu" class="dropdown-menu animated zoomIn" style="right: 0; left:auto">
+              <li style="border-bottom: 1px dashed #00c292">
+                <a [routerLink]="" [ngClass]="0==queryParams.sort?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('sort',1)">Newest</a>
+              </li>
+              <li style="border-bottom: 1px dashed #eeeeee">
+                <a [routerLink]="" [ngClass]="1==queryParams.sort?'btn-success':''" style="cursor: pointer"
+                   (click)="queryIssues('sort',2)">Oldest</a>
+              </li>
+
+            </ul>
+          </li>
+        </ul>
+      </div>
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="data-table-list wizard-wrap-int" style="min-height: 450px;">
-          <div class="table-responsive">
-            <table id="data-table-basic" class="table table-striped">
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>Issue Title</th>
-                <th>Issue Type</th>
-                <th>Other Issue</th>
-                <th>Policy Number</th>
-                <th>Issue Description</th>
-                <th>Issue Priority</th>
-                <th>Issue Resource</th>
-                <th class="text-right">Action</th>
-              </tr>
-              </thead>
-              <tbody *ngIf="pagedItems?.length>0" style="min-height: 300px">
-              <tr *ngFor="let row of pagedItems; index as i">
-                <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
-                <td>{{row.issueTitle}}</td>
-                <td>{{row.issueType}}</td>
-                <td>{{row.otherIssue}}</td>
-                <td>{{row.policyNo}}</td>
-                <td>{{row.issueDescription}}</td>
-                <td>{{row.issuePriority}}</td>
-                <td><span *ngIf="row.issueResource?.length > 0">Have {{row.issueResource?.length}} File Resource</span> <span *ngIf="row.issueResource?.length==0">No Resource</span></td>
-                <td class="text-right" style = "min-width: 150px">
-                  <div class="btn-group">
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button" (click)="editIssue( row.id, row.issueType.id)"><i class="fa fa-edit"></i>
-                      Edit
-                    </button>
-                    <button class="btn btn-sm "  type="button" (click)="seeIssueDetails(row.id)"><i class="fa fa-eye"></i>
-                      Details
-                    </button>
-                  </div>
-                </td>
-              </tr>
+          <form [formGroup]="memberGroup">
+            <div class="table-responsive" style="min-height: 400px;">
+              <table id="data-table-basic" class="table table-striped" >
+                <thead>
+                <tr>
+                  <th *ngIf="loggedIdDept==ITDeptId">
+                    <input type="checkbox" (change)="checkUncheckAll()" formControlName="checkUncheckAll" *ngIf="issuesList.issueList?.length>0"
+                           [(ngModel)]="isMasterSel">
+                  </th>
+                  <th>Ticket</th>
+                  <th>Issue Title</th>
+                  <th>Issue Type</th>
+                  <th>Policy Number</th>
+                  <th>Branch</th>
+                  <th>Opened By</th>
+                  <th>Date</th>
+                  <th>Issue Priority</th>
+                  <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody *ngIf="issuesList.issueList?.length>0"  formArrayName="listOfMem" style="min-height: 300px">
+                <tr *ngFor="let row of pagedItems; index as i">
+                  <td [formGroupName]="i" *ngIf="loggedIdDept==ITDeptId"><input type="checkbox" formControlName="memberId" (change)="isAllSelected()"
+                             id="mem_{{i}}"></td>
 
-              </tbody>
-              <tbody *ngIf="pagedItems?.length==0">
-              <tr>
-                <td colspan="4" class="text-center">
-                  <div class="panel-body" style="text-align: center; margin: 20px">
-                    <div style="text-align: center; font-size: 50px; color:#00c292"><i
-                      class="fa fa-exclamation-triangle"></i></div>
-                    <h2>Sorry</h2>
-                    <p>There is no record found</p>
-                  </div>
-                </td>
-              </tr>
-              </tbody>
+                  <td>
+                    <div class="btn-group">
+                      <button type="button" (click)="seeIssueDetails(row.id)"
+                              [ngClass]="row.status==1?'btn btn-sm':'btn-warning btn btn-sm'">{{row.ticketNo}}</button>
+                    </div>
 
-            </table>
+                  </td>
+                  <td>{{row.issueTitle}}</td>
+                  <td>{{row.issueType}} <small *ngIf="row.otherIssue!=''"><br>({{row.otherIssue}})</small></td>
+                  <td>{{row.policyNo}}</td>
+                  <td>{{row.branch}}</td>
+                  <td>{{row.openedBy}}</td>
+                  <td>{{row.openingDate |date}}</td>
+                  <td>{{row.issuePriority}}</td>
+                  <td class="text-right" style="min-width: 150px">
+                    <div class="btn-group">
+                      <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueModal" type="button"
+                              (click)="editIssue( row.id, row.issueType.id)" *ngIf="loggedUserName==row.openedBy && queryParams.state==1"><i class="fa fa-edit"></i>
+                        Edit
+                      </button>
+                      <button class="btn btn-sm " type="button" (click)="seeIssueDetails(row.id)"><i
+                        class="fa fa-eye"></i>
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                </tr>
 
-          </div>
-          <div class="wizard-action-pro" *ngIf="pagedItems?.length>0 && pager.totalPages>1">
+                </tbody>
+                <tbody *ngIf="issuesList.issueList?.length==0">
+                <tr>
+                  <td colspan="10" class="text-center">
+                    <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+                      <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                        class="fa fa-exclamation-triangle"></i></div>
+                      <h2>Sorry</h2>
+                      <p>There is no record found</p>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+
+              </table>
+
+            </div>
+          </form>
+          <div class="wizard-action-pro" *ngIf="issuesList.issueList?.length>0">
             <ul class="wizard-nav-ac">
-              <li><a [ngClass]="{'disabled':pager.currentPage === 1} +' button-first a-prevent '" [routerLink]=""
+              <li><a [ngClass]="pager.currentPage === 1?' button-first btn-disabled':'a-prevent'" [routerLink]=" "
                      (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
               <li *ngFor="let page of pager.pages"><a [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
                                                       [routerLink]="" (click)="setPage(page)"><i
@@ -104,18 +264,11 @@
     </div>
   </div>
 </div>
-<style>
-  .invoice-area table {
-    width: 100%;
-  }
-
-  .invoice-area table-responsive {
-    overflow-x: auto;
-  }
-</style>
 
 
-<div class="modal fade"  id="editIssueModal" role="dialog" >
-  <app-edit-issue  *ngIf="isAdd || isEdit" (loadPage)="getAllIssues()" (closeModal)="closeModal()"
-                   [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"> </app-edit-issue>
+
+
+<div class="modal fade" id="editIssueModal" role="dialog">
+  <app-edit-issue *ngIf="isAdd || isEdit" (loadPage)="getAllIssues()" (closeModal)="closeModal()"
+                  [selectedIssue]="selectedIssue" [selectedIssueType]="selectedIssueType"></app-edit-issue>
 </div>

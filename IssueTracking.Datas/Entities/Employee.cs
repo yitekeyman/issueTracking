@@ -18,7 +18,6 @@ namespace IssueTracking.Datas.Entities
             Milestones = new HashSet<Milestones>();
             SimpleTaskEmployee = new HashSet<SimpleTask>();
             SimpleTaskSupervisor = new HashSet<SimpleTask>();
-            WatchedIssue = new HashSet<WatchedIssue>();
         }
 
         public Guid Id { get; set; }
@@ -64,6 +63,5 @@ namespace IssueTracking.Datas.Entities
         public virtual ICollection<Milestones> Milestones { get; set; }
         public virtual ICollection<SimpleTask> SimpleTaskEmployee { get; set; }
         public virtual ICollection<SimpleTask> SimpleTaskSupervisor { get; set; }
-        public virtual ICollection<WatchedIssue> WatchedIssue { get; set; }
     }
 }

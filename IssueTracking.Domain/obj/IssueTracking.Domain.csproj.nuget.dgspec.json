@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\code\\issuetracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj": {}
+    "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj": {}
   },
   "projects": {
-    "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
+    "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "projectUniqueName": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
         "projectName": "IssueTracking.Datas",
-        "projectPath": "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "projectPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "E:\\code\\issuetracking\\IssueTracking.Datas\\obj\\",
+        "outputPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -29,7 +29,6 @@
         },
         "frameworks": {
           "netcoreapp2.2": {
-            "targetAlias": "netcoreapp2.2",
             "projectReferences": {}
           }
         },
@@ -41,7 +40,6 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
-          "targetAlias": "netcoreapp2.2",
           "dependencies": {
             "Microsoft.AspNetCore.All": {
               "target": "Package",
@@ -67,28 +65,21 @@
             }
           },
           "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
+            "net461"
           ],
           "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "warn": true
         }
       }
     },
-    "E:\\code\\issuetracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj": {
+    "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\code\\issuetracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
+        "projectUniqueName": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
         "projectName": "IssueTracking.Domain",
-        "projectPath": "E:\\code\\issuetracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
+        "projectPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
         "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "E:\\code\\issuetracking\\IssueTracking.Domain\\obj\\",
+        "outputPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -106,10 +97,9 @@
         },
         "frameworks": {
           "netcoreapp2.2": {
-            "targetAlias": "netcoreapp2.2",
             "projectReferences": {
-              "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
-                "projectPath": "E:\\code\\issuetracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj"
+              "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
+                "projectPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj"
               }
             }
           }
@@ -122,7 +112,6 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
-          "targetAlias": "netcoreapp2.2",
           "dependencies": {
             "DocumentFormat.OpenXml": {
               "target": "Package",
@@ -156,17 +145,10 @@
             }
           },
           "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
+            "net461"
           ],
           "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.302\\RuntimeIdentifierGraph.json"
+          "warn": true
         }
       }
     }

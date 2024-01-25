@@ -62,9 +62,9 @@
               "src/assets/css/responsive.css"
             ],
             "scripts": [
-              "src/assets/js/vendor/modernizr-2.8.3.min.js",
               "src/assets/js/vendor/jquery-1.12.4.min.js",
               "src/assets/js/bootstrap.min.js",
+              "src/assets/js/vendor/modernizr-2.8.3.min.js",
               "src/assets/js/wow.min.js",
               "src/assets/js/jquery-price-slider.js",
               "src/assets/js/jquery.scrollUp.min.js",

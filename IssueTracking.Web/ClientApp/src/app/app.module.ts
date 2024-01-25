@@ -17,6 +17,7 @@ import {IssuesComponent} from "./issues/issues.component";
 import {IssuesModule} from "./issues/issues.module";
 import {IssuesRoutingModule, routes} from "./issues/issues.routing";
 import {LoginModule} from "./login/login.module";
+import {TimeDifferencePipe} from "./time-difference.pipe";
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import {LoginModule} from "./login/login.module";
   declarations: [
     AppComponent,
     AdminLayoutComponent,
+    TimeDifferencePipe
 
   ],
   providers: [

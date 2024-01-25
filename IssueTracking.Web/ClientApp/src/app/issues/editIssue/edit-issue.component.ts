@@ -14,7 +14,7 @@ import {
   MonacoEditorLoaderService,
   MonacoStandaloneCodeEditor
 } from "@materia-ui/ngx-monaco-editor";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {DatePipe} from "@angular/common";
 
 @Component({
@@ -23,13 +23,16 @@ import {DatePipe} from "@angular/common";
   styleUrls: ['./edit-issue.component.scss']
 })
 export class EditIssueComponent implements OnInit {
-  @Input() public selectedIssue  = 0;
+  @Input() public selectedIssue = null;
   @Input() public selectedIssueType = 0;
   @Output() public loadPage = new EventEmitter();
   @Output() public closeModal = new EventEmitter();
 
   public priorityList = [];
   public issueTypeList = [];
+  public issueRaisedSystemList = [];
+  public selectIssueTypeList = [];
+  public issueRaisedSystem: any = 1;
   public issueList = [];
   public issueModal: IssueListModel;
   public resourceModels: ResourceModel[] = [];
@@ -40,83 +43,75 @@ export class EditIssueComponent implements OnInit {
   public files: File[] = [];
   public isAdd = false;
   public isEdit = false;
+  public actRouting = null;
 
-
-  public editorOptions: MonacoEditorConstructionOptions = {
-    theme: 'vs-dark',
-    language: 'sql',
-    readOnly: false,
-    minimap: {enabled: true}
-  };
-  @ViewChild(MonacoEditorComponent, {static: true})
-  monacoComponent: MonacoEditorComponent;
-
-  editorInit(editor: MonacoStandaloneCodeEditor) {
-    editor.setSelection({
-      startLineNumber: 1,
-      startColumn: 1,
-      endColumn: 50,
-      endLineNumber: 3
-    });
-  }
-
-  constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService, public router: Router)
-  {
-
+  constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService, public router: Router, public activeRouting: ActivatedRoute) {
+    if (this.activeRouting.snapshot.params['issueId']) {
+      this.actRouting = this.activeRouting.snapshot.params['issueId'];
+    }
     this.issueTrackingService.GetAllIssueType().subscribe(res => {
       this.issueTypeList = res;
+      this.changeIssueRaisedSystem();
     });
 
     this.issueTrackingService.GetAllPriorityTypes().subscribe(res => {
       this.priorityList = res;
     });
 
-    this.issueTrackingService.GetAllIssues().subscribe(res => {
-      this.issueList = res;
-    });
+    this.issueTrackingService.GetAllIssueRaisedSystems().subscribe(res => {
+      this.issueRaisedSystemList = res;
+    })
+    // this.issueTrackingService.GetAllIssues().subscribe(res => {
+    //   this.issueList = res;
+    // });
 
     function policyNoFormatValidator(): ValidatorFn {
       return (control: FormControl) => {
-        const policyNos: string = control.value.split(',').map((value: string) => value.trim()); // Split the comma-separated values into an array
-        const pattern: RegExp = /^P\/\d{1,3}\/\d{1,4}\/\d{4}\/\d{5}$/;
+        if (control.value != "") {
+          const policyNos: string = control.value.split(',').map((value: string) => value.trim()); // Split the comma-separated values into an array
+          const pattern: RegExp = /^P\/\d{1,3}\/\d{1,4}\/\d{4}\/\d{5}$/;
+          const pattern2: RegExp = /^C\/\d{1,3}\/\d{1,4}\/\d{4}\/\d{6}$/;
 
-        // Check each policy number against the pattern
-        for (const policyNo of policyNos) {
-          if (!pattern.test(policyNo)) {
-            return { policyNoFormat: true }; // Return validation error if the format is invalid
+          // Check each policy number against the pattern
+          for (const policyNo of policyNos) {
+            if (!pattern.test(policyNo) && !pattern2.test(policyNo)) {
+              return {policyNoFormat: true}; // Return validation error if the format is invalid
+            }
+          }
+
+          // Check for duplicate policy numbers
+          if (new Set(policyNos).size !== policyNos.length) {
+            return {duplicatePolicyNo: true}; // Return validation error if there are duplicate policy numbers
           }
         }
-
-        // Check for duplicate policy numbers
-        if (new Set(policyNos).size !== policyNos.length) {
-          return { duplicatePolicyNo: true }; // Return validation error if there are duplicate policy numbers
-        }
-
         return null; // Return null if all policy numbers are valid
       };
     }
+
     this.addIssueForm = this.fb.group({
-      issueTitle: [''],
-      issueType: [0, [Validators.required, Validators.min(1)]],
-      otherIssue: [''],
-      policyNo: ['', [Validators.required, Validators.minLength(1), policyNoFormatValidator()]],
+      issueTitle: ['', Validators.required],
+      issueRaisedSystem: ['1', Validators.required],
+      issueType: [-1, [Validators.required, Validators.min(0)]],
+      policyNo: ['', [policyNoFormatValidator()]],
       issueDescription: ['', Validators.required],
-      issuePriority: [0, Validators.required],
+      issuePriority: [1, Validators.required],
       resource: [''],
     })
 
   }
+
   ngOnInit() {
     this.issueModal = {
       id: "",
       issueTitle: '',
-      issueTypeId: 0,
+      issueTypeId: -1,
       otherIssue: '',
       policyNo: '',
-      issueDescription:'',
-      issuePriority: 0,
+      issueDescription: '',
+      issuePriority: 1,
       issueResource: this.resourceModels,
     }
+    this.issueRaisedSystem = 1;
     this.resourceModel = {
       docRef: '',
       fileName: '',
@@ -124,8 +119,9 @@ export class EditIssueComponent implements OnInit {
       mimeType: '',
       index: 0
     };
-    if (this.selectedIssue >0) {
-      this.issueTrackingService.GetIssueById(this.selectedIssue).subscribe(res=> {
+    if (this.selectedIssue != null) {
+      dialog.loading();
+      this.issueTrackingService.GetIssueById(this.selectedIssue).subscribe(res => {
         this.issueModal = {
           id: res.id,
           issueTitle: res.issueTitle,
@@ -133,37 +129,90 @@ export class EditIssueComponent implements OnInit {
           otherIssue: res.otherIssue,
           policyNo: res.policyNo,
           issueDescription: res.issueDescription,
-          issuePriority: res.issuePriority,
+          issuePriority: res.issuePriority.id,
           issueResource: res.issueResource,
         };
+        this.issueRaisedSystem = res.issueType.raisedSystem.id;
+        if(res.issueTypeId==0)
+          this.issueRaisedSystem=res.otherIssue;
+        this.changeIssueRaisedSystem();
         this.resourceModels = res.issueResource;
         for (let i = 0; i < this.resourceModels.length; i++) {
           let image = this.issueTrackingService.convertBase64ToFile(this.resourceModels[i]);
           this.files.push(image);
         }
+        dialog.close();
       });
+    } else {
+      this.changeIssueRaisedSystem();
     }
   }
 
-  sanitizedUrl: any;
+  public changeIssueType() {
+    for (let issueType of this.selectIssueTypeList) {
+      if (this.issueModal.issueTypeId == issueType.id) {
+        this.issueModal.issueTitle = issueType.name;
+      }
+    }
+  }
+
+  public changeIssueRaisedSystem() {
+    this.selectIssueTypeList = [];
+    for (let issueType of this.issueTypeList) {
+      if (this.issueRaisedSystem == issueType.raisedSystem.id) {
+        this.selectIssueTypeList.push(issueType);
+      }
+    }
+    for (let issueType of this.issueTypeList) {
+      if (issueType.id == 0) {
+        this.selectIssueTypeList.push(issueType);
+      }
+    }
+  }
+
+  //sanitizedUrl: any;
   public saveChanges() {
     dialog.loading();
-    this.issueTrackingService.AddIssue(this.issueModal).subscribe(res => {
-      dialog.close();
-      swal({
-        type: 'success',
-        title: 'You have Successfully saved Changes',
-        showConfirmButton: false,
-        timer: 1500
-      }).then(value => {
-        this.loadPage.next(true);
-        this.close();
-      });
-    }, e => {
-      swal({
-        type: 'error', title: 'Oops...', text: e.message
-      });
-    })
+    if(this.issueModal.issueTypeId==0)
+      this.issueModal.otherIssue=this.issueRaisedSystem;
+    if (this.issueModal.id == '') {
+      this.issueTrackingService.AddIssue(this.issueModal).subscribe(res => {
+        dialog.close();
+        swal({
+          type: 'success',
+          title: 'You have Successfully saved Changes',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(value => {
+          this.close();
+          this.seeIssueDetails(res);
+          //this.loadPage.next(true);
+
+        });
+      }, e => {
+        swal({
+          type: 'error', title: 'Oops...', text: e.message
+        });
+      })
+    } else {
+      this.issueTrackingService.EditIssue(this.issueModal).subscribe(res => {
+        dialog.close();
+        swal({
+          type: 'success',
+          title: 'You have Successfully saved Changes',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(value => {
+          //this.loadPage.next(true);
+          this.close();
+          this.seeIssueDetails(this.issueModal.id);
+        });
+      }, e => {
+        swal({
+          type: 'error', title: 'Oops...', text: e.message
+        });
+      })
+    }
   }
 
   public close() {
@@ -182,8 +231,8 @@ export class EditIssueComponent implements OnInit {
           this.issueTrackingService.convertFileToBase64(file).subscribe(base64 => {
             this.resourceModel.data = base64;
             this.resourceModel.mimeType = file.type;
-            this.resourceModel.fileName=file.name;
-            let resMod=this.resourceModel;
+            this.resourceModel.fileName = file.name;
+            let resMod = this.resourceModel;
             this.resourceModels.push(resMod);
             this.resetResourceModel();
           })
@@ -198,11 +247,16 @@ export class EditIssueComponent implements OnInit {
     this.resourceModels.splice(this.resourceModels.indexOf(event), 1);
   }
 
+  public seeIssueDetails(id: any) {
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['LIT/issues/view-issue', id]);
+    });
+  }
 
   public resetResourceModel() {
     this.resourceModel = {
       docRef: "",
-      fileName:"",
+      fileName: "",
       data: "",
       mimeType: "",
       index: 0

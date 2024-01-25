@@ -20,15 +20,10 @@ export interface DepartmentSchemaModel {
 
 export interface EmployeeModel {
   id: string;
-  appellation: string;
   firstName: string;
   fatherName: string;
   grFatherName: string;
   empIdNo: string;
-  title: string;
-  position: string;
-  phone: string;
-  email: string;
   username: string;
 }
 
@@ -100,4 +95,42 @@ export interface IssueListReturnModel {
   closed: any[];
   upperSideBarStats: any[];
   lowerSideBarStats: any[];
+}
+
+export interface AssignIssue {
+  id: string;
+  issueId: string;
+  assignedTo: string;
+}
+
+export interface IssueCommentModel {
+  id: string;
+  issueId: string;
+  issueComment: string;
+  commentedBy: EmployeeModel;
+  issueCommentDate: any;
+  commentResource: ResourceModel[];
+}
+
+export interface QueryParams {
+  state: number;
+  query: string;
+  branch: string;
+  type: number;
+  sort: number;
+  issueType: number
+  priority: number
+  assignee: string;
+}
+
+export interface PatchAction {
+  caseList: string[];
+  remark: string;
+}
+
+export interface MilestoneModel {
+  id: string;
+  dueDate: any;
+  name: string;
+  description;
 }

@@ -8,9 +8,8 @@ namespace IssueTracking.Datas.Entities
         public Guid Id { get; set; }
         public Guid? IssueId { get; set; }
         public string IssueComment { get; set; }
-        public DateTime CommentDate { get; set; }
-        public DateTime ModifiedDate { get; set; } // i added this line for editing comments
-        public Guid? CommentedBy { get; set; }
+        public long? CommentDate { get; set; }
+        public Guid CommentedBy { get; set; }
         public string CommentResource { get; set; }
         public long? IssueStatus { get; set; }
         public int? Status { get; set; }

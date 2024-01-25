@@ -54,7 +54,7 @@
 /*----------------------------------------*/
 /*  1.  Theme default CSS
 /*----------------------------------------*/
-html, body {font-family: 'Roboto', sans-serif;font-weight:400;}
+html, body {font-family: 'Roboto', sans-serif;font-weight:400; color: rgba(0,0,0,0.6)}
 body {background:#F6F8FA;}
 .floatLeft {float:left}
 .floatRight {float:right}
@@ -166,13 +166,11 @@ body {}
 .nk-black{
 	background:#000000;
 }
+
 @font-face {
   font-family: 'notika-icon';
-  src:  url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/fonts/notika-icon.eot?qzfrsz');
-  src:  url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/fonts/notika-icon.eot?qzfrsz#iefix') format('embedded-opentype'),
-    url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/fonts/notika-icon.ttf?qzfrsz') format('truetype'),
-    url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/fonts/notika-icon.woff?qzfrsz') format('woff'),
-    url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/fonts/notika-icon.svg?qzfrsz#notika-icon') format('svg');
+  src:  url('/fonts/?qzfrsz');
+  src:  url('/fonts/notika-icon.eot?qzfrsz#iefix') format('embedded-opentype'),url('/fonts/notika-icon.ttf?qzfrsz') format('truetype'), url('/fonts/notika-icon.woff?qzfrsz') format('woff'), url('/fonts/notika-icon.svg?qzfrsz#notika-icon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -902,7 +900,7 @@ ul.notika-menu-wrap li a{
 /*  13.  Chat CSS
 /*----------------------------------------*/
 .conversation-list .chat-avatar img {
-    border-radius: 100%;
+    border-radius: 20%;
 }
 .conversation-list .chat-avatar i {
     font-size: 12px;
@@ -913,7 +911,7 @@ ul.notika-menu-wrap li a{
     float: left;
     font-size: 12px;
     margin-left: 12px;
-    width: 70%;
+    width: 93%;
     text-align: left;
 }
 .conversation-list .ctext-wrap {
@@ -922,8 +920,10 @@ ul.notika-menu-wrap li a{
     background: #f5f5f5;
     border-radius: 3px;
     display: inline-block;
-    padding: 10px;
+    padding: 1px;
     position: relative;
+  width: 100%;
+  box-shadow: 1px 1px 1px 1px rgba(0,0,0,.1);
 }
 .conversation-list .ctext-wrap i {
     color: #343c49;
@@ -935,14 +935,18 @@ ul.notika-menu-wrap li a{
 }
 .conversation-list .ctext-wrap p {
     margin: 0;
-    padding-top: 3px;
     font-size: 14px;
     line-height: 24px;
+    padding: 5px 10px;
+}
+.conversation-list .ctext-wrap .details{
+  background: #FFFFFF;
+  padding: 10px 15px;
 }
 .conversation-list .ctext-wrap:after {
     right: 100%;
-    top: 20%;
-    border: 5px solid rgba(213, 242, 239, 0);
+    top: 15px;
+    border: 10px solid rgba(213, 242, 239, 0);
     content: " ";
     height: 0;
     width: 0;
@@ -1764,6 +1768,9 @@ ul.wizard-nav-ac li .disabled{
 .panel-collapse .panel-heading {
     position: relative;
 }
+.panel .panel-heading{
+  border-bottom: 1px solid #eeeeee;
+}
 .panel-collapse .panel-heading .panel-title>a:after, .panel-collapse .panel-heading .panel-title>a:before{
     position:absolute;
     bottom:0;
@@ -2367,7 +2374,7 @@ hr {
     padding: 0;
     width: 22px;
     height: 22px;
-    background: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/green1.png') no-repeat;
+    background: url('img/green1.png') no-repeat;
     border: none;
     cursor: pointer;
 }
@@ -2970,7 +2977,7 @@ textarea.auto-size {
     background-color: #FFF;
     background-position: right calc(100% - 7px);
     background-repeat: no-repeat;
-    background-image: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/images/select.png');
+   background-image: url('images/select.png');
     pointer-events: none;
     z-index: 5;
 }
@@ -3146,7 +3153,7 @@ textarea.auto-size {
 .chosen-container-multi .chosen-choices li.search-choice .search-choice-close{
 	width: 15px;
     height: 10px;
-    background: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') -38px 1px no-repeat;
+  /*  background: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') -38px 1px no-repeat; */
 	display: inline-block;
     text-align: center;
 	color:#333;
@@ -3169,7 +3176,7 @@ textarea.auto-size {
     background-color: #FFF;
     background-position: right calc(100% - 7px);
     background-repeat: no-repeat;
-    background-image: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/images/select.png');
+  /* background-image: url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/images/select.png'); */
     pointer-events: none;
     z-index: 5;
 }
@@ -4063,7 +4070,7 @@ textarea.auto-size {
     padding: 6px 25px;
 }
 .chosen-container-single .chosen-search input[type="text"]{
-	background: white url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') no-repeat 100% -20px;
+/*	background: white url('E:/code/issuetracking/IssueTracking.Web/ClientApp/src/assets/img/chosen-sprite.png') no-repeat 100% -20px; */
 }
 .modal-footer .btn-primary[disabled]:focus, .modal-footer .btn-primary[disabled]:hover{
 	background: #00c292;
@@ -4583,6 +4590,7 @@ body.box-layout {
 }
 .breadcomb-ctn h2{
 	font-size:20px;
+  margin-top:12px;
 	color:#333;
 }
 .breadcomb-ctn p{
@@ -4591,7 +4599,7 @@ body.box-layout {
 	margin:0px;
 }
 .breadcomb-report{
-	margin: 8px 0px;
+	margin: 2px 0px;
 	text-align: right;
 }
 .breadcomb-report .btn{
@@ -4601,6 +4609,7 @@ body.box-layout {
     border-radius: 3px;
     outline: none;
 }
+
 .breadcomb-report .btn:focus, .breadcomb-report .btn:active, .breadcomb-report .btn:hover{
 	background: #00c292;
     box-shadow: none;
@@ -4624,6 +4633,10 @@ body.box-layout {
 	color:#333;
 	position: relative;
     top: 2px;
+}
+#data-table-basic-its td{
+  border-bottom: 1px dashed #00c292;
+  padding: 2px 10px;
 }
 /*----------------------------------------*/
 /*  59. Notika custom scrollbar CSS
