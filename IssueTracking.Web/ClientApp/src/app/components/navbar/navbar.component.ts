@@ -3,7 +3,7 @@ import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common'
 import {ActivatedRoute, Router} from '@angular/router';
 import Chart from 'chart.js';
 import {IssueTrackingService} from "../../_Services/IssueTrackingService";
-
+import dialog from "../../_shared/dialog";
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -24,6 +24,8 @@ export class NavbarComponent implements OnInit {
   public labels=0;
   public milestones=0;
   public assignee='';
+  public notifications:any;
+  public currentPage:any;
   constructor(location: Location, private element: ElementRef, public router: Router, public activeRouting: ActivatedRoute, public issueTrackingService:IssueTrackingService) {
 
 
@@ -53,6 +55,19 @@ export class NavbarComponent implements OnInit {
 
     // Use the navigate method to set query parameters
     this.router.navigate(['/LIT/issues'], { queryParams });
+  }
+
+  public getNotifications(){
+    dialog.loading();
+    this.issueTrackingService.GetNotification().subscribe(res=>{
+      this.notifications=res;
+      dialog.close();
+    })
+  }
+
+  public setPages(pageName:any){
+    localStorage.setItem('routerLink', pageName);
+    this.currentPage=pageName;
   }
   public logout(){
     this.issueTrackingService.logout();

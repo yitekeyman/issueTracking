@@ -7,6 +7,7 @@ import {DashboardComponent} from '../../dashboard/dashboard.component';
 import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
 import {IssuesRoutingModule} from "../../issues/issues.routing";
+import {NotificationsComponent} from "../../notifications/notifications.component";
 
 
 @NgModule({
@@ -15,12 +16,13 @@ import {IssuesRoutingModule} from "../../issues/issues.routing";
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
     SettingsModule,
-    IssuesRoutingModule
+    IssuesRoutingModule,
 
   ],
   declarations: [
     DashboardComponent,
     SettingsComponent,
+    NotificationsComponent
 
 
   ]

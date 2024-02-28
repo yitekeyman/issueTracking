@@ -10,12 +10,14 @@ import {EditIssueComponent} from "./editIssue/edit-issue.component";
 import {IssuesComponent} from "./issues.component";
 import {SettingsRouting} from "../settings/settings.routing";
 import {HttpClientModule} from "@angular/common/http";
+import {NotificationsComponent} from "../notifications/notifications.component";
 
 @NgModule({
   declarations: [
     ViewIssueComponent,
     EditIssueComponent,
-    IssuesComponent
+    IssuesComponent,
+      
   ],
 
   imports: [

@@ -1,0 +1,16 @@
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Domain.deps.json
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Domain.runtimeconfig.json
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Domain.runtimeconfig.dev.json
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Domain.dll
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Domain.pdb
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Datas.dll
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\bin\Release\netcoreapp2.2\IssueTracking.Datas.pdb
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.csproj.AssemblyReference.cache
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.AssemblyInfoInputs.cache
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.AssemblyInfo.cs
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.csproj.CoreCompileInputs.cache
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.csproj.CopyComplete
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.dll
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.pdb
+C:\Users\user\Pictures\issueTracking\IssueTracking.Domain\obj\Release\netcoreapp2.2\IssueTracking.Domain.genruntimeconfig.cache

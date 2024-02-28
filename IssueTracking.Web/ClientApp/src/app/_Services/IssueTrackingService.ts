@@ -342,6 +342,12 @@ export class IssueTrackingService {
   public AddDueDate(id: any, dueDate:any) {
     return this.apiService.post(`IssueTracking/AddDueDate?issueId=${id}&dueDate=${dueDate}`, null);
   }
+  public GetNotification(){
+    return this.apiService.get(`IssueTracking/GetNotification`);
+  }
+  public MarkReadNotification(model:any){
+    return this.apiService.post(`IssueTracking/MarkReadNotification?notId=${model}`,null);
+  }
   public logout() {
     return this.apiService.post('IssueTracking/Logout', null).subscribe(res => {
       localStorage.removeItem('username');

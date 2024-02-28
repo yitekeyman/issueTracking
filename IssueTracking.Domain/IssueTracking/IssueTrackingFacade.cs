@@ -57,6 +57,8 @@ namespace IssueTracking.Domain.IssueTracking
         void StartTask(UserSession session, string issueId);
         void EndTask(UserSession session, string id);
         void AddDueDate(UserSession session,string issueId, DateTime dueDate);
+        IssueNotificationReturnModel GetNotification(UserSession session);
+        void MarkReadNotification(UserSession session,string notId);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -354,6 +356,17 @@ namespace IssueTracking.Domain.IssueTracking
         public void AddDueDate(UserSession session,string issueId, DateTime dueDate){
             _issueTrackingService.SetSession(session);
             _issueTrackingService.AddDueDate(issueId, dueDate);
+        }
+        public IssueNotificationReturnModel GetNotification(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetNotification();
+        }
+
+        public void MarkReadNotification(UserSession session, string notId)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.MarkReadNotification(notId);
         }
     }
 }

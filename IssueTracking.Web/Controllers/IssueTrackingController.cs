@@ -853,5 +853,33 @@ namespace IssueTracking.Web.Controllers
                 return StatusCode(stCode, new { message = e.Message });
             }
         }
+        
+         
+        [HttpGet]
+        public IActionResult GetNotification()
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetNotification(GetSession()));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new {message = e.Message});
+            }
+        }
+        
+        [HttpPost]
+        public IActionResult MarkReadNotification([FromQuery] string notId)
+        {
+            try
+            {
+                _iIssueTrackingFacade.MarkReadNotification(GetSession(), notId);
+                return Json(new {message = "success"});
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new {message = e.Message});
+            }
+        }
     }
 }

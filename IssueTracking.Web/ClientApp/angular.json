@@ -109,7 +109,8 @@
               "src/assets/js/main.js"
             ],
             "allowedCommonJsDependencies": [
-              "sweetalert2"
+              "sweetalert2",
+              "jquery"
             ]
           },
           "configurations": {

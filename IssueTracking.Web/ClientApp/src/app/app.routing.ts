@@ -30,6 +30,11 @@ const routes: Routes =[
   },
   {
     path: 'LIT',
+    redirectTo: 'LIT/notifications',
+    pathMatch: 'full'
+  },
+  {
+    path: 'LIT',
     component: AdminLayoutComponent,
     children: [
       {

@@ -26,7 +26,7 @@ import {EditMilestoneComponent} from "./milestone/edit_milestone/edit_milestone.
     ReactiveFormsModule,
     NgxDropzoneModule,
     MonacoEditorModule,
-    IssuesRoutingModule
+    IssuesRoutingModule,
   ],
   declarations: [
     BasicSolutionComponent,

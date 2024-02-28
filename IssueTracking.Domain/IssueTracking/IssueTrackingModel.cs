@@ -125,6 +125,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string Id { get; set; }
         public string IssueId { get; set; }
         public string AssignedTo { get; set; }
+        public DateTime AssignDate { get; set; }
     }
     public class AssignIssueReturnModel
     {
@@ -370,5 +371,29 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime DueDate { get; set; }
         public string Status { get; set; }
         public EmployeeModel SetBy = new EmployeeModel();
+    }
+    
+    public class NotificationModel
+    {
+        public string Id { get; set; }
+        public string NotificationTitle { get; set; }
+        public string NotificationDetail { get; set; }
+        public string NotificationFrom { get; set; }
+        public string NotificationTo { get; set; }
+        public DateTime NotificationDate { get; set; }
+        public bool Status { get; set; }
+        public string IssueId { get; set; }
+        
+    }
+
+    public enum NotificationType
+    {
+        MyCases = 1
+    }
+
+    public class IssueNotificationReturnModel
+    {
+        public int UnreadNotification { get; set; }
+        public IList<NotificationModel> Notifications = new List<NotificationModel>();
     }
 }
