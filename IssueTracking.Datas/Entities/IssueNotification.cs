@@ -10,7 +10,7 @@ namespace IssueTracking.Datas.Entities
         public string NotificationDetail { get; set; }
         public Guid? NotificationFrom { get; set; }
         public Guid? NotificationTo { get; set; }
-        public long NotificationDate { get; set; }
+        public long? NotificationDate { get; set; }
         public bool Status { get; set; }
         public Guid? IssueId { get; set; }
 
