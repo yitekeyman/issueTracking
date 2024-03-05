@@ -1089,7 +1089,7 @@ namespace IssueTracking.Domain.IssueTracking
                 {
                     Id = Guid.NewGuid(),
                     AssignedTo = Guid.Parse(model.AssignedTo),
-                    AssignDate = model.AssignDate.Ticks,
+                    AssignDate = DateTime.Now.Ticks,
                     IssueId = Guid.Parse(model.IssueId),
                     AssignedBy = Guid.Parse(_session.UserId)
                 };
@@ -1109,7 +1109,7 @@ namespace IssueTracking.Domain.IssueTracking
                         NotificationDetail = $"You have been assigned to Issue: {assignedIssue.IssueTitle} ",
                         NotificationFrom = assignedIssue.IssueRequestedBy,
                         NotificationTo = assignment.AssignedTo,
-                        NotificationDate = new DateTime(assignment.AssignDate ?? 0).Ticks,
+                        NotificationDate = new DateTime(assignedIssue.IssueRequestedDate ?? 0).Ticks,
                         IssueId = assignedIssue.Id,
                         Status = false,
                     };
@@ -2256,7 +2256,7 @@ namespace IssueTracking.Domain.IssueTracking
                         NotificationFrom = username,
                         NotificationTo = nt.NotificationTo.ToString(),
                         IssueId = nt.IssueId.ToString(),
-                        NotificationDate = new DateTime(nt.NotificationDate).Date,
+                        NotificationDate = new DateTime(nt.NotificationDate ?? 0).Date,
                         Status = false,
                         
                     };

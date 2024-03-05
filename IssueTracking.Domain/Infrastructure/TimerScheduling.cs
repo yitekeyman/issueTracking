@@ -93,7 +93,7 @@ namespace IssueTracking.Domain.Infrastructure
                             NotificationFrom = activeIssue.IssueRequestedBy,
                             NotificationTo = activeIssue.IssueRespondBy,
                             NotificationDate = new DateTime(activeIssue.IssueRequestedDate ?? 0).Ticks,
-                            IssueId = ia.IssueId, 
+                            IssueId = issue.Id, 
                             Status = false,
                         };
                         notificationList.Add(notif);

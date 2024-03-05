@@ -20,7 +20,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class ViewIssueComponent implements OnInit {
   public issue: any = null;
-  public issueId: any = null;
+  public issueId: string;
   public issueTypeId: any = null;
   public url = configs.url;
   public files: File[] = [];
@@ -40,6 +40,7 @@ export class ViewIssueComponent implements OnInit {
   public isAdd=false;
   public selectedIssue=null;
   public dueDateTime:any;
+  public viewIssue = true;
 
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, public activeRouting: ActivatedRoute, private monacoLoaderService: MonacoEditorLoaderService, public router:Router) {
     if (this.activeRouting.snapshot.params['issueId']) {
@@ -62,6 +63,7 @@ export class ViewIssueComponent implements OnInit {
 
   ngOnInit() {
     this.loadIssuePage();
+    this.issueId = this.activeRouting.snapshot.params['issueId'];
     this.dueDateTime=null;
     this.commentedBy = {
       id: this.loggedInEmployeeId,

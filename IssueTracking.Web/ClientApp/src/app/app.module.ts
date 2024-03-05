@@ -9,6 +9,7 @@ import { ComponentsModule } from './components/components.module';
 import { AppComponent } from './app.component';
 import {LoginComponent} from "./login/login.component";
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+import {NotificationsComponent} from "./notifications/notifications.component";
 import {IssueTrackingService} from "./_Services/IssueTrackingService";
 import {ApiServices} from "./_Services/api.service";
 import {PagerService} from "./_Services/pager.service";
@@ -20,6 +21,7 @@ import {LoginModule} from "./login/login.module";
 import {TimeDifferencePipe} from "./time-difference.pipe";
 import {DialogModule} from "./_shared/dialog/dialog.module";
 import {DialogService} from "./_shared/dialog/dialog.service";
+import {NotificationService} from "./_Services/notification.service";
 
 @NgModule({
   imports: [
@@ -38,14 +40,16 @@ import {DialogService} from "./_shared/dialog/dialog.service";
   declarations: [
     AppComponent,
     AdminLayoutComponent,
-    TimeDifferencePipe
+    TimeDifferencePipe,
+    NotificationsComponent
 
   ],
   providers: [
     ApiServices,
     IssueTrackingService,
     PagerService,
-    DialogService
+    DialogService,
+    NotificationService
   ],
   bootstrap: [AppComponent]
 })

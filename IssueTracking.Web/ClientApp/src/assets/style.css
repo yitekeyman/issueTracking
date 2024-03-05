@@ -169,8 +169,8 @@ body {}
 
 @font-face {
   font-family: 'notika-icon';
-  src:  url('/fonts/?qzfrsz');
-  src:  url('/fonts/notika-icon.eot?qzfrsz#iefix') format('embedded-opentype'),url('/fonts/notika-icon.ttf?qzfrsz') format('truetype'), url('/fonts/notika-icon.woff?qzfrsz') format('woff'), url('/fonts/notika-icon.svg?qzfrsz#notika-icon') format('svg');
+  
+  src:  url('../assets/fonts/notika-icon.eot?qzfrsz#iefix') format('embedded-opentype'),url('../assets/fonts/notika-icon.ttf?qzfrsz') format('truetype'), url('../assets/fonts/notika-icon.woff?qzfrsz') format('woff'), url('../assets/fonts/notika-icon.svg?qzfrsz#notika-icon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -2374,7 +2374,7 @@ hr {
     padding: 0;
     width: 22px;
     height: 22px;
-    background: url('img/green1.png') no-repeat;
+    background: url('../assets/img/green1.png') no-repeat;
     border: none;
     cursor: pointer;
 }
@@ -2977,7 +2977,7 @@ textarea.auto-size {
     background-color: #FFF;
     background-position: right calc(100% - 7px);
     background-repeat: no-repeat;
-   background-image: url('images/select.png');
+   background-image: url('../assets/images/select.png');
     pointer-events: none;
     z-index: 5;
 }

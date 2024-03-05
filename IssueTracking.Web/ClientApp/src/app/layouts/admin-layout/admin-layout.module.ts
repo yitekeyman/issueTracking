@@ -22,7 +22,7 @@ import {NotificationsComponent} from "../../notifications/notifications.componen
   declarations: [
     DashboardComponent,
     SettingsComponent,
-    NotificationsComponent
+  
 
 
   ]

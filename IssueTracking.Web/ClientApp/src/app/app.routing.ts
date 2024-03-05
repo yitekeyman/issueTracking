@@ -10,6 +10,7 @@ import {IssuesComponent} from "./issues/issues.component";
 import {EditIssueComponent} from "./issues/editIssue/edit-issue.component";
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {ViewIssueComponent} from "./issues/viewIssues/view-issue.component";
+import {NotificationsComponent} from "./notifications/notifications.component";
 
 const routes: Routes =[
   {
@@ -30,7 +31,7 @@ const routes: Routes =[
   },
   {
     path: 'LIT',
-    redirectTo: 'LIT/notifications',
+    component: NotificationsComponent,
     pathMatch: 'full'
   },
   {
@@ -49,6 +50,11 @@ const routes: Routes =[
       {
         path: 'edit-issue',
         component: EditIssueComponent
+
+      },
+      {
+        path: 'view-issue',
+        component: ViewIssueComponent
 
       }
 

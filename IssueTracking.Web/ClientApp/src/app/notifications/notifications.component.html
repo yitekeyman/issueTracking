@@ -75,9 +75,9 @@
                                             </tr>
                                             </thead>
                                             <tbody *ngFor="let item of pagedItems;index as i;" >
-                                            <tr [ngStyle]= " {'font-weight':'bold'}" (click)="showNotDetails(item.id, item.issueId)" style="cursor: pointer">
+                                            <tr [ngStyle]= " item.status && {'font-weight':'bold'}" (click)="showNotDetails(item.id, item.issueId)" style="cursor: pointer">
                                                 <td style="">{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
-                                                 <td style="">{{item.notificationDate| date}}</td>
+                                                 <td style="">{{item.notificationDate | date}}</td>
                                                 <td style="">{{item.notificationFrom}}</td>
                                                 <td style="">{{item.notificationDetail}}</td>
 

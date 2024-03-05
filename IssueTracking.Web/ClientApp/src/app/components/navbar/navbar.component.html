@@ -108,7 +108,7 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="mobile-menu">
-          <nav id="dropdown">
+          <nav id="collapse">
             <ul class="mobile-menu-nav">
 
               <li><a href="#">Dashboard</a>
@@ -119,8 +119,8 @@
               </li>
 
 
-              <li><a data-toggle="collapse" data-target="#Miscellaneousmob" href="#">App views</a>
-                <ul id="Miscellaneousmob" class="collapse dropdown-header-top">
+              <li><a data-toggle="collapse" data-target="#navHeaderCollapse" href="#">App views</a>
+                <ul id="navHeaderCollapse" class="collapse navbar-default">
                   <li><a href="#">Issue Raised System</a>
                   </li>
                   <li><a href="#">Issue Type's</a>
@@ -154,8 +154,8 @@
           <li routerLinkActive="active"><a data-toggle="tab" href="#Interface" routerLink="/LIT/issues"><i class="notika-icon notika-edit"></i> Issues</a>
           </li>
           <li routerLinkActive="active" ><a data-toggle="tab" href="#Appviews" routerLink="/LIT/settings"><i class="notika-icon notika-app"></i> Settings</a>
-          </li>
-          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification" (click)="setPages('Notification')">  <span class="notika-icon notika-alarm" aria-hidden="true"></span><span class="mini-click-non">  Notification  </span><span class="badge badge-primary" *ngIf=" notifications.unreadNotification>0">{{notifications.unreadNotification}}</span> </a>
+          </li>y
+          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification" (click)="setPages('Notification')">  <span class="notika-icon notika-alarm" aria-hidden="true"></span><span class="mini-click-non">  Notification  </span><span class="badge badge-dark" *gIf=" notifications.unreadNotification>0">{{notifications.unreadNotification}}</span> </a>
           </li>
 
         </ul>

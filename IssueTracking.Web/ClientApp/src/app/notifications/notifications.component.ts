@@ -18,7 +18,8 @@ export class NotificationsComponent implements OnInit{
         this.pager=localStorage.getItem('routerLink');
     }
     ngOnInit() {
-        this.getNotifications();
+        this.getNotifications(); 
+        
     }
 
     public getNotifications(){
@@ -51,7 +52,7 @@ export class NotificationsComponent implements OnInit{
     public showNotDetails(notId:string, issueId:any){
         dialog.loading();
         this.issueTrackingService.MarkReadNotification(notId);
-        this.router.navigate(['/issues/view-issue/', issueId]);
+        this.router.navigate(['/LIT/issues/view-issue/', issueId]);
     }
 }
 
