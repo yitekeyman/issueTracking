@@ -154,8 +154,8 @@
           <li routerLinkActive="active"><a data-toggle="tab" href="#Interface" routerLink="/LIT/issues"><i class="notika-icon notika-edit"></i> Issues</a>
           </li>
           <li routerLinkActive="active" ><a data-toggle="tab" href="#Appviews" routerLink="/LIT/settings"><i class="notika-icon notika-app"></i> Settings</a>
-          </li>y
-          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification" (click)="setPages('Notification')">  <span class="notika-icon notika-alarm" aria-hidden="true"></span><span class="mini-click-non">  Notification  </span><span class="badge badge-dark" *gIf=" notifications.unreadNotification>0">{{notifications.unreadNotification}}</span> </a>
+          </li>
+          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification" (click)="setPages('Notification')">  <span class="notika-icon notika-alarm" aria-hidden="true"></span><span class="mini-click-non">  Notification  </span><span class="badge badge-primary" *ngIf=" notifications.unreadNotification>0">{{notifications.unreadNotification}}</span> </a>
           </li>
 
         </ul>
