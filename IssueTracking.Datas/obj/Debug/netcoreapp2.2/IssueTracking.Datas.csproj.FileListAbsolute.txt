@@ -35,3 +35,16 @@ E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.
 E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.dll
 E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
 E:\code\issuetracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.genruntimeconfig.cache
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.deps.json
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.runtimeconfig.json
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.runtimeconfig.dev.json
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.dll
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\bin\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.csproj.AssemblyReference.cache
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.AssemblyInfoInputs.cache
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.AssemblyInfo.cs
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.csproj.CoreCompileInputs.cache
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.dll
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.pdb
+C:\Users\Mahder1\OneDrive\Documents\issueTracking\IssueTracking.Datas\obj\Debug\netcoreapp2.2\IssueTracking.Datas.genruntimeconfig.cache

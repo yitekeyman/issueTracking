@@ -1,0 +1,117 @@
+<div class="data-table-area mg-b-15" style="min-height: calc(99vh - 75px)">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="sparkline13-list" >
+          <div class="sparkline13-hd">
+            <div class="main-sparkline13-hd">
+
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-10">
+                  <div class="breadcome-heading">
+                    <h3><span class="fa fa-bell"></span> Notification <span class="table-project-n">List</span></h3>
+                  </div>
+                </div>
+                <!--
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="breadcome-heading">
+                        <div class="text-center" *ngIf="notifications.length >0">
+                            <small> {{notifications.length}}  Record Found</small>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                  <div class="breadcome-heading">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="sparkline13-graph" style="border-top: 2px solid #eee">
+            <div class="datatable-dashv1-list custom-datatable-overright">
+
+              <div class="bootstrap-table">
+
+                <div class="fixed-table-container" style="padding-bottom: 0px;height: calc(84vh - 98px);overflow-x: auto;">
+
+                  <div class="fixed-table-body">
+                    <div class="fixed-table-loading" *ngIf="notifications?.length==0" style="margin-top: 50px; text-align: center;">
+
+                      <h1 style="font-size: 54pt; opacity: 0.3"><span class="fa fa-exclamation-triangle"></span></h1>
+                      <p>There is no issue found</p>
+                    </div>
+
+                    <table id="table" data-toggle="table"
+                           data-show-columns="true" data-show-pagination-switch="true" data-show-refresh="true"
+                           data-key-events="true" data-show-toggle="true" data-resizable="true" data-cookie="true"
+                           data-cookie-id-table="saveId" data-show-export="true" data-click-to-select="true"
+                           data-toolbar="#toolbar" class="table table-hover table-striped JColResizer"
+                           *ngIf="notifications?.length>0">
+                      <thead>
+                      <tr>
+                        <th data-field="id" tabindex="0">
+                          <div class="th-inner ">No</div>
+                          <div class="fht-cell"></div>
+                        </th>
+                        <th data-field="email" tabindex="0">
+                          <div class="th-inner ">Date</div>
+                          <div class="fht-cell"></div>
+                        </th>
+                        <th data-field="email" tabindex="0">
+                          <div class="th-inner ">From</div>
+                          <div class="fht-cell"></div>
+                        </th>
+                        <th data-field="phone" tabindex="0">
+                          <div class="th-inner ">Notifications</div>
+
+                          <div class="fht-cell"></div>
+                        </th>
+                      </tr>
+                      </thead>
+                      <tbody *ngFor="let item of pagedItems;index as i;" >
+                      <tr [ngStyle]= "item.status && {'font-weight':'bold'}" (click)="showNotDetails(item.id, item.issueId)" style="cursor: pointer">
+                        <td style="">{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
+                        <td style="">{{item.notificationDate| date}}</td>
+                        <td style="">{{item.notificationFrom}}</td>
+                        <td style="">{{item.notificationDetail}}</td>
+
+                      </tr>
+
+                      </tbody>
+                    </table>
+                  </div>
+
+
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+          <div class="fixed-table-pagination" style="border-top: 2px solid #eee;">
+
+            <div class="">
+              <ul class="pagination" *ngIf="pager.pages && pager.pages.length" style="margin-bottom: 0; margin-top: 0.5rem">
+                <li [ngClass]="{disabled:pager.currentPage === 1} +' page-item'"><a [routerLink]="" class="page-link"
+                                                                                    (click)="setPage(pager.currentPage - 1)">‹</a>
+                </li>
+                <li  *ngFor="let page of pager.pages"
+                     [ngClass]="{active:pager.currentPage === page}+' page-item'"><a [routerLink]="" class="page-link"
+                                                                                     (click)="setPage(page)">{{page}}</a></li>
+
+                <li  [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' page-next'"><a
+                  [routerLink]="" class="page-link" (click)="setPage(pager.currentPage + 1)">›</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

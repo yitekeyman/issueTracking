@@ -4,6 +4,9 @@
     "framework": {
       "name": "Microsoft.AspNetCore.All",
       "version": "2.2.0"
+    },
+    "configProperties": {
+      "System.Reflection.Metadata.MetadataUpdater.IsSupported": false
     }
   }
 }

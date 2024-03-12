@@ -10,6 +10,7 @@ import {IssuesComponent} from "./issues/issues.component";
 import {EditIssueComponent} from "./issues/editIssue/edit-issue.component";
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {ViewIssueComponent} from "./issues/viewIssues/view-issue.component";
+import {NotificationsComponent} from "./notifications/notifications.component";
 
 const routes: Routes =[
   {
@@ -28,6 +29,13 @@ const routes: Routes =[
     redirectTo: 'LIT/dashboard',
     pathMatch: 'full'
   },
+
+  {
+    path: 'LIT',
+    component: NotificationsComponent,
+    pathMatch: 'full'
+  },
+
   {
     path: 'LIT',
     component: AdminLayoutComponent,

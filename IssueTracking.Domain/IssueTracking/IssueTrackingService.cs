@@ -76,6 +76,8 @@ namespace IssueTracking.Domain.IssueTracking
         void DeleteIssueDueDate(string issueId);
         IList<EmployeeModel> GetPhoneBook(PhoneBookSearchParam model);
         IList<DepartmentSchemaModel> GetHeadOfficeDept();
+        IssueNotificationReturnModel GetNotification();
+        void MarkReadNotification(string notId);
         void ForwardIssue(IssueForwardModel model);
     }
 
@@ -1105,6 +1107,7 @@ namespace IssueTracking.Domain.IssueTracking
             var existingAssignment = _context.IssueAssigned.Any(e =>
                 e.IssueId == Guid.Parse(model.IssueId) && e.AssignedTo == Guid.Parse(model.AssignedTo));
             var actionType = "Assigned User to Issue";
+
             if (!existingAssignment)
             {
                 var assignment = new IssueAssigned()
@@ -1115,9 +1118,32 @@ namespace IssueTracking.Domain.IssueTracking
                     IssueId = Guid.Parse(model.IssueId),
                     AssignedBy = Guid.Parse(_session.UserId)
                 };
+
                 _context.IssueAssigned.Add(assignment);
                 _context.SaveChanges();
-                CreateActionTrackers(model.IssueId, actionType, null, model.AssignedTo);
+
+                var assignedIssue = _context.IssuesList.FirstOrDefault(c => c.Id == assignment.IssueId);
+                if (assignedIssue != null)
+                {
+                    var username = _context.Account.First(e => e.EmployeeId == assignment.AssignedBy).Username;
+
+                    var notif = new IssueNotification()
+                    {
+                        Id = Guid.NewGuid(),
+                        NotificationTitle = assignedIssue.IssueTitle,
+                        NotificationDetail = $"You have been assigned to Issue: {assignedIssue.IssueTitle} ",
+                        NotificationFrom = assignedIssue.IssueRequestedBy,
+                        NotificationTo = assignment.AssignedTo,
+                        NotificationDate = new DateTime(assignment.AssignDate ?? 0).Ticks,
+                        IssueId = assignedIssue.Id,
+                        Status = false,
+                    };
+
+                    _context.IssueNotification.Add(notif);
+                    _context.SaveChanges();
+
+                    CreateActionTrackers(model.IssueId, actionType, null, model.AssignedTo);
+                }
             }
         }
 
@@ -2336,6 +2362,61 @@ namespace IssueTracking.Domain.IssueTracking
 
 
             return ret;
+        }
+        
+        public IssueNotificationReturnModel GetNotification()
+        {
+            var ret = new IssueNotificationReturnModel();
+            var notifFrom = GetEmployeeId();
+            if (!string.IsNullOrEmpty(notifFrom))
+            {
+                var notfi = new List<NotificationModel>();
+                ret.UnreadNotification =
+                    _context.IssueNotification.Count(n => n.NotificationTo == Guid.Parse(notifFrom) && n.Status == false);
+                var notifications = _context.IssueNotification.Where(n => n.NotificationTo == Guid.Parse(notifFrom))
+                    .OrderByDescending(n => n.NotificationDate).ToList();
+                
+                foreach (var nt in notifications)
+                {
+                    var username=_context.Account.First(e => e.EmployeeId == nt.NotificationFrom).Username;
+                    var notification = new NotificationModel()
+                    {
+                        Id = nt.Id.ToString(),
+                        NotificationTitle = nt.NotificationTitle,
+                        NotificationDetail = $"You have been assigned to Issue : " + nt.NotificationTitle,
+                        NotificationFrom = username,
+                        NotificationTo = nt.NotificationTo.ToString(),
+                        IssueId = nt.IssueId.ToString(),
+                        NotificationDate = new DateTime(nt.NotificationDate ?? 0).Date,
+                        Status = false,
+                        
+                    };
+                   notfi.Add(notification);
+                }
+
+                ret.Notifications = notfi;
+            }
+            
+            return ret;
+        }
+
+        public void MarkReadNotification(string notId)
+        {
+            var notification = _context.IssueNotification.First(n => n.Id == Guid.Parse(notId));
+            notification.Status = true;
+            _context.IssueNotification.Update(notification);
+            _context.SaveChanges();
+        }
+        
+        private string GetEmployeeId()
+        {
+            string employeeId = null;
+            var users = _context.Account.FirstOrDefault(a => a.Username.Equals(_session.Username));
+            if (users != null && users.EmployeeId!=null)
+            {
+                employeeId = users.EmployeeId.ToString();
+            }
+            return employeeId;
         }
 
         private IssueForwardModelReturn GetForwardIssue(string id)

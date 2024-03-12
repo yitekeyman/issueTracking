@@ -18,6 +18,10 @@ import {IssuesModule} from "./issues/issues.module";
 import {IssuesRoutingModule, routes} from "./issues/issues.routing";
 import {LoginModule} from "./login/login.module";
 import {TimeDifferencePipe} from "./time-difference.pipe";
+import {DialogModule} from "./_shared/dialog/dialog.module";
+import {DialogService} from "./_shared/dialog/dialog.service";
+import {NotificationService} from "./_Services/notification.service";
+import {NotificationsComponent} from "./notifications/notifications.component";
 
 @NgModule({
   imports: [
@@ -29,19 +33,22 @@ import {TimeDifferencePipe} from "./time-difference.pipe";
     RouterModule.forChild(routes),
     AppRoutingModule,
     NgxDropzoneModule,
-
+    DialogModule,
 
   ],
   declarations: [
     AppComponent,
     AdminLayoutComponent,
-    TimeDifferencePipe
+    TimeDifferencePipe,
+    NotificationsComponent
 
   ],
   providers: [
     ApiServices,
     IssueTrackingService,
-    PagerService
+    PagerService,
+    DialogService,
+    NotificationService
   ],
   bootstrap: [AppComponent]
 })

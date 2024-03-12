@@ -12,9 +12,11 @@ import {SettingsComponent} from "../../settings/settings.component";
 import {SettingsModule} from "../../settings/settings.module";
 import {IssuesModule} from "../../issues/issues.module";
 import {IssuesComponent} from "../../issues/issues.component";
+import {NotificationsComponent} from "../../notifications/notifications.component";
 
 export const AdminLayoutRoutes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
+  {path:'notification', component:NotificationsComponent},
   {
     path: 'settings',
     redirectTo: 'settings/issue-raised-system',

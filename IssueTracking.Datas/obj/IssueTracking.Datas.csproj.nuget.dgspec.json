@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {}
+    "C:\\Users\\Mahder1\\OneDrive\\Documents\\issueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {}
   },
   "projects": {
-    "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
+    "C:\\Users\\Mahder1\\OneDrive\\Documents\\issueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "projectUniqueName": "C:\\Users\\Mahder1\\OneDrive\\Documents\\issueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
         "projectName": "IssueTracking.Datas",
-        "projectPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
-        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\Personal\\IssueTracking\\IssueTracking.Datas\\obj\\",
+        "projectPath": "C:\\Users\\Mahder1\\OneDrive\\Documents\\issueTracking\\IssueTracking.Datas\\IssueTracking.Datas.csproj",
+        "packagesPath": "C:\\Users\\Mahder1\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Mahder1\\OneDrive\\Documents\\issueTracking\\IssueTracking.Datas\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Mahder1\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,6 +29,7 @@
         },
         "frameworks": {
           "netcoreapp2.2": {
+            "targetAlias": "netcoreapp2.2",
             "projectReferences": {}
           }
         },
@@ -40,6 +41,7 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
+          "targetAlias": "netcoreapp2.2",
           "dependencies": {
             "Microsoft.AspNetCore.All": {
               "target": "Package",
@@ -65,10 +67,22 @@
             }
           },
           "imports": [
-            "net461"
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
-          "warn": true
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win-x64": {
+          "#import": []
         }
       }
     }
