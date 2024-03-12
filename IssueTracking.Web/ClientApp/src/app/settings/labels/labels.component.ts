@@ -11,6 +11,7 @@ export class LabelsComponent implements OnInit{
   public labelList=[];
   public pager: any = {};
   pagedItems: any[];
+
   constructor(public issueTrackingService:IssueTrackingService, public pagerService:PagerService) {
   }
   ngOnInit() {

@@ -16,6 +16,10 @@ import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view
 import {IssuesRoutingModule} from "../issues/issues.routing";
 import {MilestonesComponent} from "./milestone/milestones.component";
 import {EditMilestoneComponent} from "./milestone/edit_milestone/edit_milestone.component";
+import {PhoneBookComponent} from "./phoneBook/phoneBook.component";
+import {
+  MinViewBasicSolutionComponent
+} from "./basicSolution/viewBasicSolution/min-view-basic-solution/min-view-basic-solution.component";
 
 
 @NgModule({
@@ -37,7 +41,9 @@ import {EditMilestoneComponent} from "./milestone/edit_milestone/edit_milestone.
     EditBasicSolutionComponent,
     ViewBasicSolutionComponent,
     MilestonesComponent,
-    EditMilestoneComponent
+    EditMilestoneComponent,
+    PhoneBookComponent,
+    MinViewBasicSolutionComponent
   ]
 })
 export class SettingsModule{

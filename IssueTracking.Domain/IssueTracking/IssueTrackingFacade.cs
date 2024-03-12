@@ -17,7 +17,7 @@ namespace IssueTracking.Domain.IssueTracking
         IList<IssueRaisedSystemReturn> GetAllRaisedSystems(UserSession session);
         void EditIssueType(UserSession session,IssueTypeList model);
         IssueTypeReturn GetIssueTypeById(UserSession session,long id);
-        IList<IssueTypeReturn> GetAllIssueType(UserSession session);
+        IList<IssueTypeReturn> GetAllIssueType(UserSession session, long systemRaisedId);
 
         void EditBasicIssueSolution(UserSession session,BasicSolutionModel model);
         BasicSolutionReturn GetBasicSolutionById(UserSession session,long id);
@@ -57,6 +57,9 @@ namespace IssueTracking.Domain.IssueTracking
         void StartTask(UserSession session, string issueId);
         void EndTask(UserSession session, string id);
         void AddDueDate(UserSession session,string issueId, DateTime dueDate);
+        IList<EmployeeModel> GetPhoneBook(UserSession session, PhoneBookSearchParam model);
+        IList<DepartmentSchemaModel> GetHeadOfficeDept(UserSession session);
+        void ForwardIssue(UserSession session, IssueForwardModel model);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -126,10 +129,10 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetIssueTypeById(id);
         }
 
-        public IList<IssueTypeReturn> GetAllIssueType(UserSession session)
+        public IList<IssueTypeReturn> GetAllIssueType(UserSession session,long systemRaisedId)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetAllIssueType();
+            return _issueTrackingService.GetAllIssueType(systemRaisedId);
         }
 
         public void EditBasicIssueSolution(UserSession session, BasicSolutionModel model)
@@ -354,6 +357,24 @@ namespace IssueTracking.Domain.IssueTracking
         public void AddDueDate(UserSession session,string issueId, DateTime dueDate){
             _issueTrackingService.SetSession(session);
             _issueTrackingService.AddDueDate(issueId, dueDate);
+        }
+
+        public IList<EmployeeModel> GetPhoneBook(UserSession session, PhoneBookSearchParam model)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetPhoneBook(model);
+        }
+
+        public IList<DepartmentSchemaModel> GetHeadOfficeDept(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetHeadOfficeDept();
+        }
+
+        public void ForwardIssue(UserSession session, IssueForwardModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.ForwardIssue(model);
         }
     }
 }

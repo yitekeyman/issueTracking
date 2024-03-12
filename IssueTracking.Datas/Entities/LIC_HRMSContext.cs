@@ -69,6 +69,7 @@ namespace IssueTracking.Datas.Entities
         public virtual DbSet<EmployeeProfile> EmployeeProfile { get; set; }
         public virtual DbSet<ExternalTrainee> ExternalTrainee { get; set; }
         public virtual DbSet<FormulaVariable> FormulaVariable { get; set; }
+        public virtual DbSet<ForwardTo> ForwardTo { get; set; }
         public virtual DbSet<HolidayCalander> HolidayCalander { get; set; }
         public virtual DbSet<IssueAssigned> IssueAssigned { get; set; }
         public virtual DbSet<IssueComments> IssueComments { get; set; }
@@ -122,7 +123,7 @@ namespace IssueTracking.Datas.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http: //go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseNpgsql("Host=localhost;Database=LIC_HRMS;Username=postgres;Password=admin");
             }
         }
@@ -1882,6 +1883,31 @@ namespace IssueTracking.Datas.Entities
                     .HasMaxLength(50);
             });
 
+            modelBuilder.Entity<ForwardTo>(entity =>
+            {
+                entity.ToTable("forward_to", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ForwardDate).HasColumnName("forward_date");
+
+                entity.Property(e => e.ForwardFrom).HasColumnName("forward_from");
+
+                entity.Property(e => e.ForwardToDept).HasColumnName("forward_to_dept");
+
+                entity.Property(e => e.ForwardToEmp).HasColumnName("forward_to_emp");
+
+                entity.Property(e => e.IssueId).HasColumnName("issue_id");
+
+                entity.Property(e => e.IssueResource)
+                    .HasColumnName("issue_resource")
+                    .HasColumnType("json");
+
+                entity.Property(e => e.Remark).HasColumnName("remark");
+            });
+
             modelBuilder.Entity<HolidayCalander>(entity =>
             {
                 entity.ToTable("holiday_calander", "employee");
@@ -2154,6 +2180,8 @@ namespace IssueTracking.Datas.Entities
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.BranchId).HasColumnName("branch_id");
+
+                entity.Property(e => e.ForwardTo).HasColumnName("forward_to");
 
                 entity.Property(e => e.IssueClosedBy).HasColumnName("issue_closed_by");
 
@@ -3486,7 +3514,8 @@ namespace IssueTracking.Datas.Entities
 
             modelBuilder.HasSequence("sys_par_seq");
         }
-          public void SaveChanges(string username, UserAction userAction)
+
+        public void SaveChanges(string username, UserAction userAction)
         {
             UserAction.Add(userAction);
             base.SaveChanges();

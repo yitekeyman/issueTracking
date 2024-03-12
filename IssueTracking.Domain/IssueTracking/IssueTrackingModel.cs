@@ -80,6 +80,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string PolicyNo { get; set; }
         public string IssueDescription { get; set; }
         public long? IssuePriority { get; set; }
+        public string ForwardTo { get; set; }
         
         public IList<ResourceModel> IssueResource = new List<ResourceModel>();
     }
@@ -93,6 +94,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string OtherIssue { get; set; }
         public string PolicyNo { get; set; }
         public string BranchId { get; set; }
+        public DepartmentSchemaModel ForwardTo = new DepartmentSchemaModel();
         public string IssueDescription { get; set; }
 
         public EmployeeModel IssueRequestedBy = new EmployeeModel();
@@ -116,7 +118,8 @@ namespace IssueTracking.Domain.IssueTracking
         public int NoOfEdit { get; set; }
         public IList<ResourceModel> IssueResource = new List<ResourceModel>();
         public IssueTypeReturn IssueType = new IssueTypeReturn();
-        
+        public IList<IssueForwardModelReturn> Forwards = new List<IssueForwardModelReturn>();
+
 
     }
 
@@ -162,6 +165,8 @@ namespace IssueTracking.Domain.IssueTracking
     {
         public int OpenedIssue { get; set; }
         public int ClosedIssue { get; set; }
+        public int PendingIssue { get; set; }
+        public int CancelledIssue { get; set; }
 
         public IList<IssueSearchModel> IssueList = new List<IssueSearchModel>();
     }
@@ -190,6 +195,15 @@ namespace IssueTracking.Domain.IssueTracking
         public string GrFatherName { get; set; }
         public string EmpIdNo { get; set; }
         public string Username { get; set; }
+        public string PhoneNo { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class PhoneBookSearchParam
+    {
+        public string EmpIdNo { get; set; }
+        public string Name { get; set; }
+        public string DepartmentId { get; set; }
     }
 
     public class IssueCommentsModel
@@ -215,6 +229,7 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime ActionDate { get; set; }
         public EmployeeModel UserId { get; set; }
         public string ActionType { get; set; }
+        public int ActionTypeId { get; set; }
         public string ActionDetails { get; set; }
         public string Remark { get; set; }
     }
@@ -370,5 +385,29 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime DueDate { get; set; }
         public string Status { get; set; }
         public EmployeeModel SetBy = new EmployeeModel();
+    }
+
+    public class IssueForwardModel
+    {
+        public string Id { get; set; }
+        public string IssueId { get; set; }
+        public string ForwardToDept { get; set; }
+        public string ForwardToEmp { get; set; }
+        public string Remark { get; set; }
+        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
+
+    }
+    
+    public class IssueForwardModelReturn
+    {
+        public string Id { get; set; }
+        public string IssueId { get; set; }
+        public EmployeeModel ForwardFrom = new EmployeeModel();
+        public DepartmentSchemaModel ForwardToDept = new DepartmentSchemaModel();
+        public EmployeeModel ForwardToEmp = new EmployeeModel();
+        public string Remark { get; set; }
+        public DateTime ForwardDate { get; set; }
+        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
+
     }
 }

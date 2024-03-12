@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace IssueTracking.Domain.IssueTracking
         IList<IssueRaisedSystemReturn> GetAllRaisedSystems();
         void EditIssueType(IssueTypeList model);
         IssueTypeReturn GetIssueTypeById(long id);
-        IList<IssueTypeReturn> GetAllIssueType();
+        IList<IssueTypeReturn> GetAllIssueType(long systemRaisedId);
 
         void EditBasicIssueSolution(BasicSolutionModel model);
         BasicSolutionReturn GetBasicSolutionById(long id);
@@ -73,6 +74,9 @@ namespace IssueTracking.Domain.IssueTracking
         void EndTask(string id);
         void AddDueDate(string issueId, DateTime dueDate);
         void DeleteIssueDueDate(string issueId);
+        IList<EmployeeModel> GetPhoneBook(PhoneBookSearchParam model);
+        IList<DepartmentSchemaModel> GetHeadOfficeDept();
+        void ForwardIssue(IssueForwardModel model);
     }
 
     public class IssueTrackingService : IIssueTrackingService
@@ -187,6 +191,7 @@ namespace IssueTracking.Domain.IssueTracking
 
             return issueRaisedSystem;
         }
+
         public IList<IssueRaisedSystemReturn> GetAllRaisedSystems()
         {
             var issueRaisedSystemList = new List<IssueRaisedSystemReturn>();
@@ -251,7 +256,7 @@ namespace IssueTracking.Domain.IssueTracking
                         {
                             Id = sol.Id,
                             SolutionDescription = sol.SolutionDescription,
-                            SolutionQuery = sol.SolutionQuery
+                            SolutionQuery = sol.SolutionQuery,
                         };
                         issueTypes.IssueSolution.Add(sl);
                     }
@@ -268,10 +273,14 @@ namespace IssueTracking.Domain.IssueTracking
             return issueTypes;
         }
 
-        public IList<IssueTypeReturn> GetAllIssueType()
+        public IList<IssueTypeReturn> GetAllIssueType(long systemRaisedId)
         {
             var issueTypeList = new List<IssueTypeReturn>();
-            var issues = _context.IssueTypeList.OrderBy(e => e.Id).ToList();
+
+            var issues = _context.IssueTypeList.OrderBy(e => e.RaisedSystemId).ThenBy(e => e.Name).ToList();
+            if (systemRaisedId > -1)
+                issues = _context.IssueTypeList.Where(e => e.RaisedSystemId == systemRaisedId).OrderBy(e => e.Name)
+                    .ToList();
             foreach (var issue in issues)
             {
                 var issueType = GetIssueTypeById(issue.Id);
@@ -464,13 +473,18 @@ namespace IssueTracking.Domain.IssueTracking
                 //IssueClosedDate = new DateTime().Ticks,
                 IssuePriority = model.IssuePriority,
                 IssueStatus = 1,
-                Ticket = ticket
+                Ticket = ticket,
+                ForwardTo = Guid.Parse(model.ForwardTo)
             };
             if (solutionId != null)
             {
                 issue.IssueRaisedSluId = solutionId.Id;
             }
 
+            if (!model.ForwardTo.Equals("f48cb514-8e36-4a87-a2e0-49042c096c99"))
+            {
+                issue.IssueStatus = 3;
+            }
 
             if (model.IssueResource.Count > 0)
             {
@@ -495,7 +509,7 @@ namespace IssueTracking.Domain.IssueTracking
 
             _context.IssuesList.Add(issue);
             _context.SaveChanges();
-            CreateActionTrackers(issue.Id.ToString(), "Opened Issue", null, null);
+            CreateActionTrackers(issue.Id.ToString(), "Created Issue", null, null);
             return issue.Id.ToString();
         }
 
@@ -532,6 +546,7 @@ namespace IssueTracking.Domain.IssueTracking
                 oldIssue.IssueDescription = model.IssueDescription;
                 oldIssue.IssuePriority = model.IssuePriority;
                 oldIssue.PolicyNo = model.PolicyNo;
+                oldIssue.ForwardTo = Guid.Parse(model.ForwardTo);
 
                 if (model.IssueResource.Count > 0)
                 {
@@ -627,8 +642,10 @@ namespace IssueTracking.Domain.IssueTracking
                 issueList.Dependencies = GetAllIssueDependencies(issue.Id.ToString());
                 issueList.TimeTracker = BuildTimeTracker(issue.Id);
                 issueList.DueDate = GetDueDateReturn(issue.Id);
+                issueList.ForwardTo = GetDepartment(issue.ForwardTo);
+                issueList.Forwards = GetAllIssueForward(issue.Id);
                 var actionList = _context.ActionTracker.Where(c => c.IssueId == issue.Id)
-                    .OrderByDescending(c => c.ActionDate).ToList();
+                    .OrderBy(c => c.ActionDate).ToList();
                 foreach (var action in actionList)
                 {
                     if (!action.ActionType.Equals("Edited Comment on Issue"))
@@ -732,6 +749,8 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 ret.OpenedIssue = _context.IssuesList.Count(i => i.IssueStatus == 1);
                 ret.ClosedIssue = _context.IssuesList.Count(i => i.IssueStatus == 2);
+                ret.PendingIssue = _context.IssuesList.Count(i => i.IssueStatus == 3);
+                ret.CancelledIssue = _context.IssuesList.Count(i => i.IssueStatus == 4);
             }
             else
             {
@@ -739,6 +758,11 @@ namespace IssueTracking.Domain.IssueTracking
                     i.IssueStatus == 1 && i.BranchId == Guid.Parse(_session.DepartmentId));
                 ret.ClosedIssue = _context.IssuesList.Count(i =>
                     i.IssueStatus == 2 && i.BranchId == Guid.Parse(_session.DepartmentId));
+                ret.PendingIssue = _context.IssuesList.Count(i =>
+                    i.IssueStatus == 3 && (i.BranchId == Guid.Parse(_session.DepartmentId) ||
+                                           i.ForwardTo == Guid.Parse(_session.DepartmentId)));
+                ret.CancelledIssue = _context.IssuesList.Count(i =>
+                    i.IssueStatus == 4 && i.BranchId == Guid.Parse(_session.DepartmentId));
             }
 
             return ret;
@@ -862,7 +886,7 @@ namespace IssueTracking.Domain.IssueTracking
 
             _context.IssueComments.Add(comment);
             _context.SaveChanges();
-            CreateActionTrackers(model.IssueId, "Commented on Issue", null, model.IssueComment);
+            CreateActionTrackers(model.IssueId, "Commented on Issue", null, comment.Id.ToString());
         }
 
         public void EditIssueComment(IssueCommentsModel model)
@@ -1008,6 +1032,7 @@ namespace IssueTracking.Domain.IssueTracking
                 ret.ActionDate = new DateTime(actions.ActionDate);
                 ret.ActionDetails = actions.ActionDetails;
                 ret.Remark = actions.Remark;
+                ret.ActionTypeId = GetActionTypeId(actions.ActionType);
             }
 
             return ret;
@@ -1116,7 +1141,6 @@ namespace IssueTracking.Domain.IssueTracking
                             errorMessage = string.Format("{0}, ",
                                 _context.IssuesList.First(e => e.Id == dep.Dependancies).Ticket);
                         }
-                           
                     }
 
                     if (!hasError)
@@ -1195,7 +1219,6 @@ namespace IssueTracking.Domain.IssueTracking
                             {
                                 hasError = true;
                             }
-                           
                         }
 
                         if (!hasError)
@@ -1287,6 +1310,7 @@ namespace IssueTracking.Domain.IssueTracking
                     sys.System.Closed = 0;
                     sys.System.Open = 0;
                     var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
+                        .OrderBy(e => e.Name)
                         .ToList();
                     foreach (var it in systemIssueTypes)
                     {
@@ -1380,6 +1404,9 @@ namespace IssueTracking.Domain.IssueTracking
                     if (ac.ActionType.Equals("Removed Dependencies from Issue"))
                         act.Remark = string.Format("Dependent Issue is {0}",
                             GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
+                    if (ac.ActionType.Equals("Issue Forwarded To"))
+                        act.Remark = string.Format("Forwarded to {0}",
+                            GetForwardIssue(ac.Remark).ForwardToDept.DepartmentName);
                     ret.Actions.Add(act);
                 }
             }
@@ -1400,6 +1427,7 @@ namespace IssueTracking.Domain.IssueTracking
                     sys.System.Closed = 0;
                     sys.System.Open = 0;
                     var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
+                        .OrderBy(i => i.Name)
                         .ToList();
                     foreach (var it in systemIssueTypes)
                     {
@@ -1734,7 +1762,8 @@ namespace IssueTracking.Domain.IssueTracking
 
                 _context.IssueTimeTracker.Update(timeTracker);
                 _context.SaveChanges();
-                CreateActionTrackers(timeTracker.IssueId.ToString(),"End Task of Issue",null,timeTracker.Id.ToString());
+                CreateActionTrackers(timeTracker.IssueId.ToString(), "End Task of Issue", null,
+                    timeTracker.Id.ToString());
             }
             else
             {
@@ -1753,33 +1782,37 @@ namespace IssueTracking.Domain.IssueTracking
                     IssueId = Guid.Parse(issueId),
                     StartTime = DateTime.Now.Ticks,
                     DueDate = dueDate.Ticks,
-
                 };
-                if (DateTime.Now >= dueDate){
+                if (DateTime.Now >= dueDate)
+                {
                     dueDateModel.Status = "Inactive";
-                }else
+                }
+                else
                 {
                     dueDateModel.Status = "Active";
                 }
 
                 _context.IssueDueDate.Add(dueDateModel);
                 _context.SaveChanges();
-                CreateActionTrackers(issueId,"Set Due Date for Issue", null, dueDateModel.Id.ToString());
+                CreateActionTrackers(issueId, "Set Due Date for Issue", null, dueDateModel.Id.ToString());
             }
             else
             {
                 var oldDueDate = ava;
                 ava.DueDate = dueDate.Ticks;
-                if (DateTime.Now >= dueDate){
+                if (DateTime.Now >= dueDate)
+                {
                     ava.Status = "Inactive";
-                }else
+                }
+                else
                 {
                     ava.Status = "Active";
                 }
 
                 _context.IssueDueDate.Update(ava);
                 _context.SaveChanges();
-                CreateActionTrackers(issueId, "Update Due Date Of Issue", JsonConvert.SerializeObject(oldDueDate), ava.Id.ToString());
+                CreateActionTrackers(issueId, "Update Due Date Of Issue", JsonConvert.SerializeObject(oldDueDate),
+                    ava.Id.ToString());
             }
         }
 
@@ -1791,13 +1824,16 @@ namespace IssueTracking.Domain.IssueTracking
                 var oldDueDate = dueDate;
                 _context.IssueDueDate.Remove(dueDate);
                 _context.SaveChanges();
-                CreateActionTrackers(issueId, "Remove Due Date of Issue", JsonConvert.SerializeObject(oldDueDate), (new DateTime(oldDueDate.DueDate??0)).ToString());
+                CreateActionTrackers(issueId, "Remove Due Date of Issue", JsonConvert.SerializeObject(oldDueDate),
+                    (new DateTime(oldDueDate.DueDate ?? 0)).ToString());
             }
             else
             {
                 throw new Exception("Sorry. I can't find any due date settled for this issue");
             }
         }
+
+
         private IssueListReturn GetSimpleIssueById(Guid id)
         {
             var ret = new IssueListReturn();
@@ -1832,7 +1868,9 @@ namespace IssueTracking.Domain.IssueTracking
                 FatherName = employee.FatherName,
                 GrFatherName = employee.GrFatherName,
                 EmpIdNo = employee.EmpIdNo,
-                Username = _context.Account.First(e => e.EmployeeId == employee.Id).Username
+                Username = _context.Account.First(e => e.EmployeeId == employee.Id).Username,
+                PhoneNo = employee.Phone,
+                Email = employee.Email
             };
             return ret;
         }
@@ -1940,6 +1978,98 @@ namespace IssueTracking.Domain.IssueTracking
             return ret;
         }
 
+        public IList<EmployeeModel> GetPhoneBook(PhoneBookSearchParam model)
+        {
+            IList<EmployeeModel> ret = new List<EmployeeModel>();
+            var employees = _context.Employee.Where(e =>
+                    (string.IsNullOrEmpty(model.Name) || e.FirstName.ToLower().Contains(model.Name.ToLower()) ||
+                     e.FatherName.ToLower().Contains(model.Name.ToLower()) ||
+                     e.GrFatherName.ToLower().Contains(model.Name.ToLower()))
+                    && (string.IsNullOrEmpty(model.EmpIdNo) || e.EmpIdNo.ToLower().Contains(model.EmpIdNo.ToLower()))
+                    && (string.IsNullOrEmpty(model.DepartmentId) || e.DepartmentId == Guid.Parse(model.DepartmentId))
+                    && (e.EmployeeStatus == 1)).OrderBy(e => e.FirstName)
+                .ThenBy(e => e.FirstName).ToList();
+
+            foreach (var emp in employees)
+            {
+                ret.Add(GetEmployee(emp.Id));
+            }
+
+            return ret;
+        }
+
+        public IList<DepartmentSchemaModel> GetHeadOfficeDept()
+        {
+            var ret = new List<DepartmentSchemaModel>();
+            var dept = _context.DepartmentSchema.Where(e => e.BranchId == 10).ToList();
+            foreach (var dp in dept)
+            {
+                ret.Add(GetDepartment(dp.Id));
+            }
+
+            return ret;
+        }
+
+        public void ForwardIssue(IssueForwardModel model)
+        {
+            var issue = _context.IssuesList.FirstOrDefault(e => e.Id == Guid.Parse(model.IssueId));
+            if (issue != null)
+            {
+                if (issue.IssueStatus == 2)
+                    throw new AccessDeniedException("Sorry, Issue already Closed");
+                if (issue.IssueStatus == 4)
+                    throw new AccessDeniedException("Sorry, Issue already Cancelled");
+                if (issue.ForwardTo == Guid.Parse(model.ForwardToDept))
+                    throw new AccessDeniedException("Sorry, Issue forward to the current location");
+
+                var forwardModel = new ForwardTo()
+                {
+                    Id = Guid.NewGuid(),
+                    IssueId = Guid.Parse(model.IssueId),
+                    ForwardFrom = Guid.Parse(_session.UserId),
+                    ForwardToDept = Guid.Parse(model.ForwardToDept),
+                    Remark = model.Remark,
+                    ForwardDate = DateTime.Now.Ticks,
+                };
+                if (!string.IsNullOrEmpty(model.ForwardToEmp))
+                    forwardModel.ForwardToEmp = Guid.Parse(model.ForwardToEmp);
+
+                if (model.IssueResource.Count > 0)
+                {
+                    var index = 0;
+                    var resourceModels = new List<ResourceModel>();
+                    foreach (var res in model.IssueResource)
+                    {
+                        var resource = new ResourceModel()
+                        {
+                            DocRef = Guid.NewGuid().ToString(),
+                            FileName = res.FileName,
+                            MimeType = res.MimeType,
+                            Data = "",
+                            Index = index++
+                        };
+                        SaveResource(resource.DocRef, resource.MimeType, res.Data);
+                        resourceModels.Add(resource);
+                    }
+
+                    forwardModel.IssueResource = JsonConvert.SerializeObject(resourceModels);
+                }
+
+                issue.ForwardTo = Guid.Parse(model.ForwardToDept);
+                if (model.ForwardToDept.Equals("f48cb514-8e36-4a87-a2e0-49042c096c99"))
+                    issue.IssueStatus = 1;
+
+                _context.IssuesList.Update(issue);
+                _context.ForwardTo.Add(forwardModel);
+                _context.SaveChanges();
+                CreateActionTrackers(issue.Id.ToString(), "Issue Forwarded To", null, forwardModel.Id.ToString());
+            }
+            else
+            {
+                throw new AccessDeniedException("Sorry, I can't find any issue registered with this id");
+            }
+        }
+
         private IList<AssignIssueReturnModel> GetAssigned(Guid issueId)
         {
             var emp = new List<AssignIssueReturnModel>();
@@ -2010,7 +2140,7 @@ namespace IssueTracking.Domain.IssueTracking
         private int GetActionTypeId(string name)
         {
             int ret = 0;
-            if (name.Equals("Opened Issue"))
+            if (name.Equals("Created Issue"))
                 ret = 1;
             else if (name.Equals("Closed Issue"))
                 ret = 2;
@@ -2048,7 +2178,9 @@ namespace IssueTracking.Domain.IssueTracking
                 ret = 18;
             else if (name.Equals("Remove Due Date of Issue"))
                 ret = 19;
-            
+            else if (name.Equals("Issue Forwarded To"))
+                ret = 20;
+
             return ret;
         }
 
@@ -2118,22 +2250,24 @@ namespace IssueTracking.Domain.IssueTracking
                 ret.MyActiveTask = GetTimeTrackerById(myActiveTask.Id);
             }
 
-            var activeTask = _context.IssueTimeTracker.Where(t => t.IssueId == issueId && t.UserId!=Guid.Parse(_session.UserId) && t.Status.Equals("Started"))
+            var activeTask = _context.IssueTimeTracker.Where(t =>
+                    t.IssueId == issueId && t.UserId != Guid.Parse(_session.UserId) && t.Status.Equals("Started"))
                 .ToList();
             foreach (var act in activeTask)
             {
                 ret.ActiveTask.Add(GetTimeTrackerById(act.Id));
             }
-            
+
             var endedTask = _context.IssueTimeTracker.Where(t => t.IssueId == issueId && t.Status.Equals("Ended"))
                 .ToList();
             foreach (var act in endedTask)
             {
                 ret.EndedTask.Add(GetTimeTrackerById(act.Id));
             }
-            
+
             return ret;
         }
+
         private TimeTrackerModel GetTimeTrackerById(Guid id)
         {
             var timeTracker = _context.IssueTimeTracker.First(t => t.Id == id);
@@ -2145,7 +2279,6 @@ namespace IssueTracking.Domain.IssueTracking
                 EndTime = new DateTime(timeTracker.EndTime ?? 0),
                 Status = timeTracker.Status,
                 Owner = GetEmployee(timeTracker.UserId)
-
             };
             return ret;
         }
@@ -2173,7 +2306,7 @@ namespace IssueTracking.Domain.IssueTracking
                 task.Status = "Ended";
                 ret.Add(task);
             }
-            
+
             _context.IssueTimeTracker.UpdateRange(ret);
             _context.SaveChanges();
         }
@@ -2181,18 +2314,18 @@ namespace IssueTracking.Domain.IssueTracking
         private DueDateReturn GetDueDateReturn(Guid issueId)
         {
             var ret = new DueDateReturn();
-           
+
             var dueDate = _context.IssueDueDate.FirstOrDefault(i => i.IssueId == issueId);
             if (dueDate != null)
             {
                 var actions = _context.ActionTracker.First(e =>
-                                  e.IssueId == issueId && e.Remark.Equals(dueDate.Id.ToString()) &&
-                              e.ActionType.Equals("Set Due Date for Issue"));
+                    e.IssueId == issueId && e.Remark.Equals(dueDate.Id.ToString()) &&
+                    e.ActionType.Equals("Set Due Date for Issue"));
 
                 ret.Id = dueDate.Id.ToString();
                 ret.Status = dueDate.Status;
                 ret.StartDate = new DateTime(dueDate.StartTime ?? 0);
-                ret.EndDate=new DateTime(dueDate.EndTime ?? 0);
+                ret.EndDate = new DateTime(dueDate.EndTime ?? 0);
                 ret.DueDate = new DateTime(dueDate.DueDate ?? 0);
                 ret.SetBy = GetEmployee(actions.UserId);
             }
@@ -2200,10 +2333,50 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 ret = null;
             }
-           
-            
-            return ret;
 
+
+            return ret;
+        }
+
+        private IssueForwardModelReturn GetForwardIssue(string id)
+        {
+            var ret = new IssueForwardModelReturn();
+            var forward = _context.ForwardTo.First(e => e.Id == Guid.Parse(id));
+            ret.Id = forward.Id.ToString();
+            ret.IssueId = forward.IssueId.ToString();
+            ret.ForwardDate = new DateTime(forward.ForwardDate);
+            ret.Remark = forward.Remark;
+            ret.ForwardFrom = GetEmployee(forward.ForwardFrom);
+            ret.ForwardToDept = GetDepartment(forward.ForwardToDept);
+            if (!string.IsNullOrEmpty(forward.IssueResource))
+            {
+                var imageResource = JsonConvert.DeserializeObject<IList<ResourceModel>>(forward.IssueResource);
+                foreach (var res in imageResource)
+                {
+                    var data = GetResourceDoc(res.DocRef, res.MimeType);
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        res.Data = data;
+                        ret.IssueResource.Add(res);
+                    }
+                }
+            }
+
+            ret.ForwardToEmp = null;
+            if (forward.ForwardToEmp != null)
+                ret.ForwardToEmp = GetEmployee(forward.ForwardToEmp);
+            return ret;
+        }
+
+        private IList<IssueForwardModelReturn> GetAllIssueForward(Guid id)
+        {
+            var ret = new List<IssueForwardModelReturn>();
+            var forwards = _context.ForwardTo.Where(e => e.IssueId == id).OrderBy(e => e.ForwardDate).ToList();
+            foreach (var issueFor in forwards)
+            {
+                ret.Add(GetForwardIssue(issueFor.Id.ToString()));
+            }
+            return ret;
         }
     }
 }

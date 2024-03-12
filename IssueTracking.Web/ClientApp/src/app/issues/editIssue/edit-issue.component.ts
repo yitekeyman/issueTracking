@@ -44,12 +44,14 @@ export class EditIssueComponent implements OnInit {
   public isAdd = false;
   public isEdit = false;
   public actRouting = null;
+  public headOffice=[];
+  public ITDeptId = "f48cb514-8e36-4a87-a2e0-49042c096c99";
 
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService, public router: Router, public activeRouting: ActivatedRoute) {
     if (this.activeRouting.snapshot.params['issueId']) {
       this.actRouting = this.activeRouting.snapshot.params['issueId'];
     }
-    this.issueTrackingService.GetAllIssueType().subscribe(res => {
+    this.issueTrackingService.GetAllIssueType(-1).subscribe(res => {
       this.issueTypeList = res;
       this.changeIssueRaisedSystem();
     });
@@ -64,7 +66,9 @@ export class EditIssueComponent implements OnInit {
     // this.issueTrackingService.GetAllIssues().subscribe(res => {
     //   this.issueList = res;
     // });
-
+    this.issueTrackingService.GetHeadOfficeDept().subscribe(res=>{
+      this.headOffice=res;
+    })
     function policyNoFormatValidator(): ValidatorFn {
       return (control: FormControl) => {
         if (control.value != "") {
@@ -96,6 +100,7 @@ export class EditIssueComponent implements OnInit {
       issueDescription: ['', Validators.required],
       issuePriority: [1, Validators.required],
       resource: [''],
+      forwardTo:['']
     })
 
   }
@@ -110,6 +115,7 @@ export class EditIssueComponent implements OnInit {
       issueDescription: '',
       issuePriority: 1,
       issueResource: this.resourceModels,
+      forwardTo:this.ITDeptId
     }
     this.issueRaisedSystem = 1;
     this.resourceModel = {
@@ -131,6 +137,7 @@ export class EditIssueComponent implements OnInit {
           issueDescription: res.issueDescription,
           issuePriority: res.issuePriority.id,
           issueResource: res.issueResource,
+          forwardTo:res.forwardTo
         };
         this.issueRaisedSystem = res.issueType.raisedSystem.id;
         if(res.issueTypeId==0)

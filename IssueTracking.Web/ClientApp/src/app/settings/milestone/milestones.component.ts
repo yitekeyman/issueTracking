@@ -14,7 +14,13 @@ export class MilestonesComponent implements OnInit{
   public isEdit = false;
   public isAdd = false;
   public selectedMilestone: any;
+  public ITDeptId = "f48cb514-8e36-4a87-a2e0-49042c096c99";
+  public loggedInEmployeeId: string;
+  public loggedInDepartmentId: string | "";
+
   constructor(public issueTrackingServices:IssueTrackingService, public pagerService: PagerService) {
+    this.loggedInEmployeeId = localStorage.getItem('userId');
+    this.loggedInDepartmentId = localStorage.getItem("departmentId");
   }
   ngOnInit() {
     this.getAllMilestones();

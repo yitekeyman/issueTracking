@@ -16,7 +16,7 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-placement="left" title="Basic Solution" class="btn" data-toggle="modal"
+                <button data-placement="left" title="Basic Solution" class="btn" data-toggle="modal" *ngIf="loggedInDepartmentId==ITDeptId"
                         data-target="#editIssueTypeModal" (click)="editBasicSolution(0,0)">Add Solution</button>
               </div>
             </div>
@@ -56,7 +56,7 @@
                 <td><span *ngIf="row.solutionResource?.length>0">Have {{row.solutionResource?.length}} File Resource</span> <span *ngIf="row.solutionResource?.length==0">No Resource</span></td>
                 <td class="text-right">
                   <div class="btn-group">
-                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editBasicSolution( row.id, row.issueType.id)"><i class="fa fa-edit"></i>
+                    <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editBasicSolution( row.id, row.issueType.id)" *ngIf="loggedInDepartmentId==ITDeptId"><i class="fa fa-edit"></i>
                       Edit
                     </button>
                     <button class="btn btn-sm "  type="button" (click)="seeBasicSolution(row.id)"><i class="fa fa-eye"></i>

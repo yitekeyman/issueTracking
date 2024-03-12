@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import dialog from "../../components/dialog";
 import {IssueTrackingService} from "../../_Services/IssueTrackingService";
 import {PagerService} from "../../_Services/pager.service";
+import {Router} from "@angular/router";
 @Component({
   selector: 'app-issue-type-list',
   templateUrl: './issue-type-list.component.html'
@@ -15,8 +16,17 @@ export class IssueTypeListComponent implements OnInit {
   public selectedIssueType: any;
   public selectedSolution: any;
   public isAddSolution = false;
-
-  constructor(public issueTrackingService: IssueTrackingService, public pagerService: PagerService) {
+  public ITDeptId = "f48cb514-8e36-4a87-a2e0-49042c096c99";
+  public loggedInEmployeeId: string;
+  public loggedInDepartmentId: string | "";
+  public issueRaisedSystemList=[];
+  public raisedSystem=-1;
+  constructor(public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router:Router) {
+    this.loggedInEmployeeId = localStorage.getItem('userId');
+    this.loggedInDepartmentId = localStorage.getItem("departmentId");
+    this.issueTrackingService.GetAllIssueRaisedSystems().subscribe(res=>{
+      this.issueRaisedSystemList=res;
+    })
   }
 
   ngOnInit() {
@@ -26,9 +36,9 @@ export class IssueTypeListComponent implements OnInit {
   public getIssueTypes() {
     dialog.loading();
     this.closeModal();
-    this.issueTrackingService.GetAllIssueType().subscribe(res => {
+    this.issueTrackingService.GetAllIssueType(this.raisedSystem).subscribe(res => {
       this.issueTypeList = res;
-      if (this.issueTypeList.length > 0) {
+      if (this.issueTypeList.length > 0 && this.raisedSystem==-1) {
         if (this.pager.currentPage == 0) {
           this.setPage(1);
         } else {
@@ -42,9 +52,9 @@ export class IssueTypeListComponent implements OnInit {
   }
 
   public setPage(page: number) {
-    if (page < 1 || page > this.pager.totalPages) {
-      return;
-    }
+    // if (page < 1 || page > this.pager.totalPages) {
+    //   return;
+    // }
 
     this.pager = this.pagerService.getPager(this.issueTypeList.length, page);
 
@@ -76,5 +86,10 @@ export class IssueTypeListComponent implements OnInit {
     this.isAdd = false;
     this.isAddSolution = false;
     this.selectedIssueType = null;
+  }
+
+  public seeSolutionDetails(id: any) {
+    this.router.navigate(['LIT/settings/basic-solution-issue-type', id]);
+
   }
 }

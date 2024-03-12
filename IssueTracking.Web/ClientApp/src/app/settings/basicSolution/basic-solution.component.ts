@@ -16,7 +16,12 @@ export class BasicSolutionComponent implements OnInit{
   public isAdd = false;
   public selectedSolution: any;
   public selectedIssueType:any;
+  public ITDeptId = "f48cb514-8e36-4a87-a2e0-49042c096c99";
+  public loggedInEmployeeId: string;
+  public loggedInDepartmentId: string | "";
   constructor(public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router:Router) {
+    this.loggedInEmployeeId = localStorage.getItem('userId');
+    this.loggedInDepartmentId = localStorage.getItem("departmentId");
   }
   ngOnInit() {
     this.getAllBasicSolutions();

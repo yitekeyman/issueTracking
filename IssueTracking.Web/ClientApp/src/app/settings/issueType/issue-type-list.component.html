@@ -17,7 +17,7 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal"
+                <button data-placement="left" title="Add Issue Type" class="btn" data-toggle="modal" *ngIf="loggedInDepartmentId==ITDeptId"
                         data-target="#editIssueTypeModal" (click)="editIssueType(0, null)">Add Issue Type
                 </button>
               </div>
@@ -41,9 +41,12 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Description</th>
-                <th>Raised System</th>
+                <th style="width: 15%"><select class="form-control-sm" [(ngModel)]="raisedSystem" (change)="getIssueTypes()">
+                  <option value="-1"> All Raised System</option>
+                  <option *ngFor="let sys of issueRaisedSystemList" [value]="sys.id" > {{sys.name}}</option>
+                </select></th>
                 <th>Solutions</th>
-                <th class="text-right">Action</th>
+                <th class="text-right" *ngIf="loggedInDepartmentId==ITDeptId">Action</th>
 
               </tr>
               </thead>
@@ -53,8 +56,8 @@
                 <td>{{row.name}}</td>
                 <td>{{row.description}}</td>
                 <td>{{row.raisedSystem.name}}</td>
-                <td><span *ngIf="row.issueSolution?.length>0"><a [routerLink]="">have {{row.issueSolution?.length}} Solution</a></span><span *ngIf="row.issueSolution?.length==0">No Solution</span></td>
-                <td class="text-right">
+                <td><span *ngIf="row.issueSolution?.length>0"><a  (click)="seeSolutionDetails(row.id)">have {{row.issueSolution?.length}} Solution</a></span><span *ngIf="row.issueSolution?.length==0">No Solution</span></td>
+                <td class="text-right" *ngIf="loggedInDepartmentId==ITDeptId">
                   <div class="btn-group">
                     <button class="btn btn-sm " data-toggle="modal" data-target="#editIssueTypeModal" type="button" (click)="editIssueType(1, row)"><i class="fa fa-edit"></i>
                       Edit

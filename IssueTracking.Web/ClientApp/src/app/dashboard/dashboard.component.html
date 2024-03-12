@@ -96,8 +96,8 @@
                   <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordionGreen" href="#sys_{{sideBar.system.id}}"
                        aria-expanded="false" class="collapsed">
-                      <table style="width: 100%">
-                        <tr><td>{{sideBar.system.name}}</td><td style="text-align: right">{{sideBar.system.total}}</td></tr>
+                      <table style="width: 100%; font-size: 12pt">
+                        <tr><td style="font-size: 12pt">{{sideBar.system.name}}</td><td style="text-align: right; font-size: 12pt">{{sideBar.system.total}}</td></tr>
                       </table>
                     </a>
                   </h4>
@@ -105,11 +105,11 @@
                 <div id="sys_{{sideBar.system.id}}" class="collapse" role="tabpanel" aria-expanded="false"
                      style="height: 0px;">
                   <div class="panel-body">
-                    <table class="table table-striped">
-                      <tr><td><b>Open: {{sideBar.system.open}}</b></td><td style="text-align: right;padding: 5px 0;"><b>Closed: {{sideBar.system.closed}}</b></td></tr>
+                    <table class="table table-striped" style="font-size: 11pt">
+                      <tr><td><b><i class="fa fa-exclamation-circle" style="color: #FF9800"></i> Open: {{sideBar.system.open}}</b></td><td style="text-align: right;padding: 5px 0;"><b><i class="fa fa-check-circle" style="color: #4CAF50"></i> Closed: {{sideBar.system.closed}}</b></td></tr>
                     </table>
-                    <table style="width: 100%;font-size: 11pt">
-                      <tr *ngFor="let row of sideBar.issueType"><td style="padding: 5px 0; border-bottom: 1px solid #00c292"><b>{{row.name}}</b></td><td style="text-align: right; font-size: 10pt;border-bottom: 1px solid #00c292">{{row.open}} Open | {{row.closed}} Closed </td></tr>
+                    <table style="width: 100%;font-size: 10pt">
+                      <tr *ngFor="let row of sideBar.issueType"><td style="padding: 5px 0; border-bottom: 1px solid #00c292"><b>{{row.name}}</b></td><td style="text-align: right; font-size: 9pt;border-bottom: 1px solid #00c292; width:30%">{{row.open}} <i class="fa fa-exclamation-circle" style="color: #FF9800"></i> | {{row.closed}} <i class="fa fa-check-circle" style="color: #4CAF50"></i> </td></tr>
                     </table>
                   </div>
                 </div>

@@ -58,9 +58,16 @@ export interface IssueListModel {
   issueDescription: string;
   issuePriority: number;
   issueResource: ResourceModel[];
-
+  forwardTo:string;
 }
-
+export interface IssueForwardModel{
+  id:string;
+  issueId:string;
+  forwardToDept:string;
+  forwardToEmp:string;
+  remark:string;
+  issueResource: ResourceModel[];
+}
 export interface IssueListRetModel {
   id: number;
   issueTitle: string;
@@ -133,4 +140,9 @@ export interface MilestoneModel {
   dueDate: any;
   name: string;
   description;
+}
+export interface PhoneBookSearchParam{
+  empIdNo:string;
+  name:string;
+  departmentId:string;
 }

@@ -32,6 +32,7 @@ namespace IssueTracking.Datas.Entities
         public string Ticket { get; set; }
         public string IssueTitle { get; set; }
         public string PolicyNo { get; set; }
+        public Guid ForwardTo { get; set; }
 
         public virtual DepartmentSchema Branch { get; set; }
         public virtual IssuePriorityType IssuePriorityNavigation { get; set; }

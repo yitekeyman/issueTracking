@@ -50,7 +50,7 @@ export class EditBasicSolutionComponent implements OnInit {
   }
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, private monacoLoaderService: MonacoEditorLoaderService) {
 
-    this.issueTrackingService.GetAllIssueType().subscribe(res => {
+    this.issueTrackingService.GetAllIssueType(-1).subscribe(res => {
       this.issueTypeList = res;
     });
     this.solutionEditorForm = this.fb.group({

@@ -1,0 +1,108 @@
+<div class="invoice-area" *ngIf="basicSolution?.length >0">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3 col-md-3">
+        <div class="panel">
+          <div class="panel-heading bg-au">
+            <label>Issue Type Details</label>
+          </div>
+          <div class="panel-body data-table-list">
+            <table  id="data-table-basic-its" style="font-size: 10pt;">
+              <tr>
+                <td><label>Name: </label> {{basicSolution[0].issueType.name}}</td>
+              </tr>
+              <tr>
+                <td><label>System Raised: </label> {{basicSolution[0].issueType.raisedSystem.name}}</td>
+              </tr>
+              <tr>
+                <td><label>Description: </label> {{basicSolution[0].issueType.description}}</td>
+              </tr>
+              <tr *ngIf="basicSolutionId!=null">
+                <td><label>Availabel Solution: </label>
+                  <span *ngIf="basicSolution[0].issueType.issueSolution?.length>1">
+                    <span *ngFor="let s of basicSolution[0].issueType.issueSolution">
+                      <p *ngIf="s.id!=basicSolutionId">
+                        <a style="cursor: pointer" (click)="seeSolutionDetails(s.id)">{{s.solutionDescription}}</a>
+                      </p>
+                    </span>
+                  </span>
+                  <span *ngIf="basicSolution[0].issueType.issueSolution?.length<=1">There is no Another Solution</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9 col-md-9" style="min-height: 450px;">
+        <div class="panel" *ngFor="let sol of basicSolution; index as i">
+          <div class="panel-heading">
+            <div class="row">
+            <div class="col-md-9">
+              <label>Basic Solution <span *ngIf="basicSolution?.length>1">{{i+1}}</span> Details</label>
+            </div>
+            <div class="col-md-3 text-right">
+              <button data-placement="left" title="Basic Solution" class="btn btn-sm btn-success" data-toggle="modal" *ngIf="loggedInDepartmentId==ITDeptId"
+                      data-target="#editIssueTypeModal" (click)="editBasicSolution(sol.id)">Edit Solution</button>
+            </div>
+            </div>
+          </div>
+          <div class="panel-body data-table-list">
+            <table class="table table-striped" id="data-table-basic-its" style="font-size: 12pt">
+              <tr>
+                <td>{{sol.solutionDescription}}<br><br></td>
+              </tr>
+              <tr *ngIf="sol.solutionQuery!=''">
+                <td> <label class="nk-label"><small>Solution SQL Query</small></label></td>
+              </tr>
+              <tr *ngIf="sol.solutionQuery!=''">
+                <td>
+                  <div class="form-group ">
+
+                    <div class="editor-container" fxLayout="column">
+
+                      <ngx-monaco-editor fxFlex [options]="editorOptions" (init)="editorInit($event)"
+                                         [(ngModel)]="sol.solutionQuery">
+                      </ngx-monaco-editor>
+                    </div>
+
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="sol.solutionResource?.length>0">
+                <td><label class="nk-label">Solution Resource</label></td>
+              </tr>
+              <tr *ngIf="sol.solutionResource?.length>0">
+                <td>
+
+                  <div class="row">
+                    <div [ngClass]="i === 0 && sol.solutionResource[0].mimeType.substring(0,5)==='image'?' col-md-12':'col-md-3'" style="text-align: center"
+                         *ngFor="let image of sol.solutionResource; index as i">
+                      <a [href]="setLink(image)" target="_blank" style="text-align: center">
+                        <span *ngIf="image.mimeType.substring(0,5)=='image'">
+                          <img [src]="'data:'+image.mimeType+';base64,'+image.data" style="padding: 10px">
+                        </span>
+                        <span *ngIf="image.mimeType=='application/pdf'">
+                            <i class="fa fa-file-pdf-o" style="font-size: 52pt;padding: 20px 20px 7px"></i>
+                            <p style="font-size: 11pt;">{{image.fileName}}</p>
+                        </span>
+                        <span *ngIf="image.mimeType.substring(0,11)=='application' && image.mimeType!='application/pdf'" style="">
+
+                            <i class="fa fa-file-archive-o" style="font-size: 52pt;padding: 20px 20px 7px"></i>
+                            <p style="font-size: 11pt;">{{image.fileName}}</p>
+                        </span>
+                      </a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editIssueTypeModal" role="dialog">
+  <app-edit-basic-solution *ngIf="isEdit" (loadPage)="loadSolutionPage()" (closeModal)="closeModal()"  [selectedSolution]="selectedSolution"></app-edit-basic-solution>
+</div>

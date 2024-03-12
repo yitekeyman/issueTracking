@@ -38,6 +38,7 @@ export class ViewIssueComponent implements OnInit {
   public dependentIssuesList=[];
   public isEdit=false;
   public isAdd=false;
+  public isForward=false;
   public selectedIssue=null;
   public dueDateTime:any;
 
@@ -412,9 +413,16 @@ export class ViewIssueComponent implements OnInit {
       this.selectedIssue=selectedIssue;
     }
   }
+
+  public forwardIssue(){
+    this.isEdit = false;
+    this.isAdd = false;
+    this.isForward=true;
+  }
   public closeModal() {
     this.isEdit = false;
     this.isAdd = false;
+    this.isForward=false;
     this.selectedIssue = null;
   }
 
@@ -555,5 +563,8 @@ export class ViewIssueComponent implements OnInit {
       this.router.navigate(['LIT/issues/view-issue', id]);
     });
 
+  }
+  public seeSolutionDetails(id: any) {
+      this.router.navigate(['/LIT/settings/view-basic-solution', id]);
   }
 }

@@ -1,0 +1,130 @@
+<div class="breadcomb-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="breadcomb-list">
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+              <div class="breadcomb-wp">
+                <div class="breadcomb-icon">
+                  <i class="notika-icon notika-app"></i>
+                </div>
+                <div class="breadcomb-ctn">
+                  <h2>PhoneBook</h2>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+              <div class="breadcomb-report">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="invoice-area">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="data-table-list wizard-wrap-int">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="panel">
+                <div class="panel-heading">
+                  <label>Search Employee</label>
+                </div>
+                <div class="panel-body" style="padding: 5px 10px">
+                  <form [formGroup]="searchForm" (submit)="getPhonebook()">
+                    <div class="form-group">
+                      <label><small>Employee Id</small></label>
+                      <input type="text" class="form-control" formControlName="empId"
+                             [(ngModel)]="searchPhoneBook.empIdNo">
+                    </div>
+                    <div class="form-group">
+                      <label><small>Employee Name</small></label>
+                      <input type="text" class="form-control" formControlName="name" [(ngModel)]="searchPhoneBook.name">
+                    </div>
+                    <div class="form-group">
+                      <label><small>Branch/Department</small></label>
+                      <select class="form-control" formControlName="department"
+                              [(ngModel)]="searchPhoneBook.departmentId">
+                        <option value="">Select One...</option>
+                        <option *ngFor="let dept of departmentList" [value]="dept.id">
+                            <span *ngIf="dept.branchId==10">{{dept.departmentName}}</span> <span *ngIf="dept.branchId!=10">{{dept.branchName}}</span>
+                        </option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+
+                      <button type="submit" class="btn btn-success" style="width: 100%">Search</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-9" >
+              <div class="table-responsive" style="min-height: 450px">
+                <table id="data-table-basic" class="table table-striped">
+                  <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Employee Name</th>
+                    <th>Employee Id</th>
+                    <th *ngIf="loggedInDepartmentId==ITDeptId">Username</th>
+                    <th>Phone No</th>
+                    <th>Email</th>
+
+                  </tr>
+                  </thead>
+                  <tbody *ngIf="pagedItems?.length>0" >
+                  <tr *ngFor="let row of pagedItems; index as i">
+                    <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
+                    <td>{{row.firstName}} {{row.fatherName}} {{row.grFatherName}}</td>
+                    <td>{{row.empIdNo}}</td>
+                    <td *ngIf="loggedInDepartmentId==ITDeptId">{{row.username}}</td>
+                    <td>{{row.phoneNo}}</td>
+                    <td>{{row.email}}</td>
+                  </tr>
+                  </tbody>
+                  <tbody *ngIf="pagedItems?.length==0"  style="min-height: 450px">
+                  <tr>
+                    <td colspan="5" class="text-center">
+                      <div class="panel-body" style="text-align: center; margin: 20px">
+                        <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                          class="fa fa-exclamation-triangle"></i></div>
+                        <h2>Sorry</h2>
+                        <p>There is no record found</p>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+
+                </table>
+
+              </div>
+              <div class="wizard-action-pro">
+                <ul class="wizard-nav-ac">
+                  <li><a [ngClass]="{'disabled':pager.currentPage === 1} +' button-first a-prevent '" [routerLink]=""
+                         (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
+                  <li *ngFor="let page of pager.pages"><a
+                    [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
+                    [routerLink]="" (click)="setPage(page)"><i
+                    class="notika-icon">{{page}}</i></a></li>
+                  <li><a [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' a-prevent'" [routerLink]=""
+                         (click)="setPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
+
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

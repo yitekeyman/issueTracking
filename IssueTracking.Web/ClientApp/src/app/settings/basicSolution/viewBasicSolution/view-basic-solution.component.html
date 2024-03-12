@@ -17,9 +17,7 @@
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
               <div class="breadcomb-report">
-                <button data-placement="left" title="Add Solution" class="btn" data-toggle="modal"
-                        data-target="#editIssueTypeModal">Add Solution
-                </button>
+
               </div>
             </div>
           </div>
@@ -28,90 +26,11 @@
     </div>
   </div>
 </div>
-
-<div class="invoice-area">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-3 col-md-3">
-        <div class="panel">
-          <div class="panel-heading bg-au">
-            <label>Issue Type Details</label>
-          </div>
-          <div class="panel-body data-table-list">
-            <table class="table table-striped " id="data-table-basic" style="font-size: 12px">
-              <tr>
-                <td><label>Name: </label> {{basicSolution.issueType.name}}</td>
-              </tr>
-              <tr>
-                <td><label>System Raised: </label> {{basicSolution.issueType.raisedSystem.name}}
-                  <small>({{basicSolution.issueType.raisedSystem.description}})</small></td>
-              </tr>
-              <tr>
-                <td><label>Description: </label> {{basicSolution.issueType.description}}</td>
-              </tr>
-              <tr>
-                <td><label>Other Solution: </label> <span
-                  *ngIf="basicSolution.issueType.issueSolution?.length>1">have {{basicSolution.issueType.issueSolution.length}}
-                  other solution</span>
-                  <span *ngIf="basicSolution.issueType.issueSolution?.length<=1"> there is no other solution</span>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-9 col-md-9" style="min-height: 450px;">
-        <div class="panel">
-          <div class="panel-heading">
-            <label>Issue Type Details</label>
-          </div>
-          <div class="panel-body data-table-list">
-            <table class="table" style="font-size: 13px">
-              <tr>
-                <td>{{basicSolution.solutionDescription}}</td>
-              </tr>
-              <tr *ngIf="basicSolution.solutionQuery!=''">
-                <td>
-                  <div class="form-group ">
-                    <label class="nk-label"><small>Solution SQL Query</small></label>
-                    <div class="editor-container" fxLayout="column">
-
-                      <ngx-monaco-editor fxFlex [options]="editorOptions" (init)="editorInit($event)"
-                                         [(ngModel)]="basicSolution.solutionQuery">
-                      </ngx-monaco-editor>
-                    </div>
-
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="basicSolution.solutionResource?.length>0">
-                <td>
-                  <label class="nk-label"><small>Solution Resource</small></label>
-                  <div class="solution-dropzone">
-                    <div class="row">
-                      <div *ngFor="let image of basicSolution.solutionResource;index as i "
-                           [ngClass]="{'col-md-12 solution-dropzone-preview-1':i<1,'col-md-3 solution-dropzone-preview':i>0}">
-                        <a
-                          href="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
-                          target="_blank">
-                          <img
-                            src="{{url}}IssueTracking/GetResourceDoc?fileName={{image.fileName}}&mimeType={{image.mimeType}}&docRef={{image.docRef}}"
-                            alt=""/>
-                          <label>{{image.fileName}}</label>
-                        </a>
-                      </div>
-                    </div>
-
-                  </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div *ngIf="solutionId!=null || issueTypeId!=null">
+  <app-min-view-basic-soltion  [basicSolutionId]="solutionId" [issueTypeId]="issueTypeId"></app-min-view-basic-soltion>
 </div>
+
+
 <div class="modal fade" id="editIssueTypeModal" role="dialog">
   <app-edit-basic-solution></app-edit-basic-solution>
 </div>

@@ -55,7 +55,7 @@
                 <td><span title="{{row.createdBy.firstName}} {{row.createdBy.fatherName}}">{{row.createdBy.username}}</span></td>
                 <td><span title="{{issueTrackingServices.convertDate(row.createdDate)}}">{{issueTrackingServices.timeDifference(row.createdDate)}}</span></td>
                 <td class="text-right">
-                  <div class="btn-group">
+                  <div class="btn-group" *ngIf="loggedInDepartmentId==ITDeptId || loggedInEmployeeId==row.createdBy.id">
                     <button class="btn btn-sm " data-toggle="modal" data-target="#editMilestoneModal" type="button" title="Edit Milestone" (click)="editMilestone(row)"><i class="fa fa-edit"></i></button>
                     <button class="btn btn-sm "  type="button" title="view Details"><i class="fa fa-eye"></i></button>
                     <button class="btn btn-sm "  type="button" title="Delete Milestone"><i class="fa fa-trash"></i></button>

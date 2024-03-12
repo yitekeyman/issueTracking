@@ -57,7 +57,7 @@ export class IssuesComponent implements OnInit {
 
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router: Router, public activeRouting: ActivatedRoute) {
     this.queryParams = {
-      state: 1,
+      state: 3,
       query: '',
       branch: '',
       type: 0,
@@ -70,7 +70,7 @@ export class IssuesComponent implements OnInit {
     this.loggedInUserId=localStorage.getItem('userId');
     this.loggedUserName=localStorage.getItem('username');
     if (localStorage.getItem('departmentId') != 'f48cb514-8e36-4a87-a2e0-49042c096c99') {
-      this.queryParams.branch = localStorage.getItem('departmentId');
+      //this.queryParams.branch = localStorage.getItem('departmentId');
       this.issueTrackingService.GetAllEmployeeByBranchId(this.queryParams.branch).subscribe(res => {
         this.employeeList = res;
       })
@@ -88,7 +88,7 @@ export class IssuesComponent implements OnInit {
       this.priorityList=res;
     })
 
-    this.issueTrackingService.GetAllIssueType().subscribe(res=>{
+    this.issueTrackingService.GetAllIssueType(-1).subscribe(res=>{
       this.issueTypeList=res;
     })
     this.memberGroup = this.fb.group({

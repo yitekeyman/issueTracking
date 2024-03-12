@@ -248,11 +248,11 @@ namespace IssueTracking.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllIssueType()
+        public IActionResult GetAllIssueType([FromQuery] long systemRaisedId)
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetAllIssueType(GetSession()));
+                return Json(_iIssueTrackingFacade.GetAllIssueType(GetSession(),systemRaisedId));
             }
             catch (Exception e)
             {
@@ -843,6 +843,56 @@ namespace IssueTracking.Web.Controllers
             try
             {
                 _iIssueTrackingFacade.AddDueDate(GetSession(), issueId, dueDate);
+                return StatusCode(200, new { message = true });
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        [HttpPost]
+        public IActionResult GetPhoneBook([FromBody] PhoneBookSearchParam model)
+        {
+           
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetPhoneBook(GetSession(), model));
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        
+        [HttpGet]
+        public IActionResult GetHeadOfficeDept()
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetHeadOfficeDept(GetSession()));
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        
+        [HttpPost]
+        public IActionResult ForwardIssue([FromBody] IssueForwardModel model)
+        {
+           if (!ModelState.IsValid) return Json(false);
+            try
+            {
+                _iIssueTrackingFacade.ForwardIssue(GetSession(), model);
                 return StatusCode(200, new { message = true });
             }
             catch (Exception e)

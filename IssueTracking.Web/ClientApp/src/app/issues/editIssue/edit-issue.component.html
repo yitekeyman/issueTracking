@@ -32,17 +32,11 @@
             <option [value]="ir.id" *ngFor="let ir of priorityList"> {{ir.name}}</option>
           </select>
         </div>
-        <div class="form-group col-md-12" >
+        <div class="form-group col-md-4" >
           <label class="nk-label"><small>Issue Title *</small></label>
           <input type="text" name="Issue Title" class="form-control" placeholder="IssueTitle" formControlName="issueTitle" [(ngModel)]="issueModal.issueTitle" >
         </div>
-        <div class="form-group col-md-12">
-          <label class="nk-label"><small>Issue Details *</small></label>
-          <textarea rows="6" name="Issue Description" class="form-control" placeholder="Write Issue Detail Here"
-                    formControlName="issueDescription" [(ngModel)]="issueModal.issueDescription">
-          </textarea>
-        </div>
-        <div class="form-group col-md-12">
+        <div class="form-group col-md-4">
           <label class="nk-label"><small>Policy Number *</small></label>
           <input class="form-control" formControlName="policyNo" [(ngModel)]="issueModal.policyNo"
                  type="text" placeholder="Enter Policy Number">
@@ -53,6 +47,20 @@
             Duplicate policy numbers found.
           </small>
         </div>
+        <div class="form-group col-md-4" >
+          <label class="nk-label"><small>Forward To *</small></label>
+          <select class="form-control" name="Forward To" formControlName="forwardTo" [(ngModel)]="issueModal.forwardTo" >
+            <option value="">Choose One Department/Service</option>
+            <option [value]="d.id" *ngFor="let d of headOffice"> {{d.departmentName}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-12">
+          <label class="nk-label"><small>Issue Details *</small></label>
+          <textarea rows="5" name="Issue Description" class="form-control" placeholder="Write Issue Detail Here"
+                    formControlName="issueDescription" [(ngModel)]="issueModal.issueDescription">
+          </textarea>
+        </div>
+
         <div class="dropzone-area ">
           <div id="dropzone1" class="multi-uploader-cs">
             <label class="nk-label"><small>Do you have a supported resource?</small></label>

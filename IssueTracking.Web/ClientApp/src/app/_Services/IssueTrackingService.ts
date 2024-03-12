@@ -57,8 +57,8 @@ export class IssueTrackingService {
     return this.apiService.get(`IssueTracking/GetIssueTypeById?id=${model}`);
   }
 
-  public GetAllIssueType() {
-    return this.apiService.get(`IssueTracking/GetAllIssueType`);
+  public GetAllIssueType(id:any) {
+    return this.apiService.get(`IssueTracking/GetAllIssueType?systemRaisedId=${id}`);
   }
 
   public EditBasicIssueSolution(model: any) {
@@ -341,6 +341,17 @@ export class IssueTrackingService {
   }
   public AddDueDate(id: any, dueDate:any) {
     return this.apiService.post(`IssueTracking/AddDueDate?issueId=${id}&dueDate=${dueDate}`, null);
+  }
+
+  public GetPhoneBook(model: any) {
+    return this.apiService.post(`IssueTracking/GetPhoneBook`, model);
+  }
+
+  public GetHeadOfficeDept() {
+    return this.apiService.get(`IssueTracking/GetHeadOfficeDept`);
+  }
+  public ForwardIssue(model:any) {
+    return this.apiService.post(`IssueTracking/ForwardIssue`,model);
   }
   public logout() {
     return this.apiService.post('IssueTracking/Logout', null).subscribe(res => {

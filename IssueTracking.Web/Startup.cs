@@ -36,14 +36,14 @@ namespace IssueTracking.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-              services.AddCors(options =>
-        {
-            options.AddPolicy("AllowAllOrigins",
-                  builder =>
-                  {
-                      builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                  });
-        });
+        //       services.AddCors(options =>
+        // {
+        //     options.AddPolicy("AllowAllOrigins",
+        //           builder =>
+        //           {
+        //               builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        //           });
+        // });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // In production, the Angular files will be served from this directory
@@ -54,7 +54,7 @@ namespace IssueTracking.Web
 
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.IdleTimeout = TimeSpan.FromMinutes(60);
                 options.Cookie.Name = ".ASPNetCoreSession";
                 options.Cookie.Path = "/";
             });
@@ -65,10 +65,10 @@ namespace IssueTracking.Web
                 opts.Cookie.Path = "/";
             });
 
-            services.AddMvc().AddJsonOptions(opts =>
-            {
-                opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            });
+            // services.AddMvc().AddJsonOptions(opts =>
+            // {
+            //     opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            // });
 
             //services.AddHostedService<TimerScheduling>();
             services.AddApplicationInsightsTelemetry(Configuration);
@@ -102,8 +102,9 @@ namespace IssueTracking.Web
                 await next();
                 if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value))
                 {
-                    context.Request.Path = "/index.html";
-                  
+                    context.Request.Path = "index.html";
+                    await next();
+
                 }
             });
 
@@ -122,18 +123,18 @@ namespace IssueTracking.Web
                     template: "api/{controller}/{action=Index}/{id?}");
             });
             
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    app.UseDeveloperExceptionPage();
-                    //spa.Options.StartupTimeout = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 30);
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
-            });
-            /*
+            // app.UseSpa(spa =>
+            // {
+            //     spa.Options.SourcePath = "ClientApp";
+            //
+            //     if (env.IsDevelopment())
+            //     {
+            //         app.UseDeveloperExceptionPage();
+            //         //spa.Options.StartupTimeout = new TimeSpan(days: 0, hours: 0, minutes: 1, seconds: 30);
+            //         spa.UseAngularCliServer(npmScript: "start");
+            //     }
+            // });
+            
             app.UseSpa(spa =>
             {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
@@ -146,7 +147,7 @@ namespace IssueTracking.Web
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-            */
+            
         }
 
         private void InjectDependencies(IServiceCollection services)

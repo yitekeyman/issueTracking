@@ -1,0 +1,9 @@
+:host {
+  flex-direction: column;
+}
+
+.editor-container {
+  height: 200px;
+  border:1px solid #eee;
+  background-color: #eee;
+}

@@ -15,7 +15,7 @@ import {
   styleUrls:['./view-basic-solution.component.scss']
 })
 export class ViewBasicSolutionComponent implements OnInit{
-public basicSolution:any=null;
+public basicSolution:any=[];
 public solutionId:any=null;
 public issueTypeId:any=null;
 public url=configs.url;
@@ -47,22 +47,12 @@ constructor(public issueTrackingService:IssueTrackingService, public activeRouti
 
 }
   ngOnInit() {
-   this.loadSolutionPage();
+   //this.loadSolutionPage();
   }
 
   loadSolutionPage(){
     dialog.loading();
-    if(this.solutionId!=null){
-      this.issueTrackingService.GetBasicSolutionById(this.solutionId).subscribe(res=>{
-        this.basicSolution=res;
-        for(let i=0; i<this.basicSolution.solutionResource.length; i++){
-          let image=this.issueTrackingService.convertBase64ToFile(this.basicSolution.solutionResource[i]);
-          this.files.push(image);
-
-        }
-        dialog.close()
-      },dialog.error);
-    }else if(this.issueTypeId!=null){
+    if(this.issueTypeId!=null){
       this.issueTrackingService.GetBasicSolutionByIssueType(this.issueTypeId).subscribe(res=>{
         this.basicSolution=res;
         dialog.close()
