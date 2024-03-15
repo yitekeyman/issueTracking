@@ -60,8 +60,9 @@ namespace IssueTracking.Domain.IssueTracking
         IList<EmployeeModel> GetPhoneBook(UserSession session, PhoneBookSearchParam model);
         IList<DepartmentSchemaModel> GetHeadOfficeDept(UserSession session);
         void ForwardIssue(UserSession session, IssueForwardModel model);
-        IssueNotificationReturnModel GetNotification(UserSession session);
+        IssueNotificationReturnModel GetNotification(UserSession session, Boolean status);
         void MarkReadNotification(UserSession session,string notId);
+        int GetUnReadNotification(UserSession session);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -373,10 +374,10 @@ namespace IssueTracking.Domain.IssueTracking
             return _issueTrackingService.GetHeadOfficeDept();
         }
         
-        public IssueNotificationReturnModel GetNotification(UserSession session)
+        public IssueNotificationReturnModel GetNotification(UserSession session, Boolean status)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetNotification();
+            return _issueTrackingService.GetNotification(status);
         }
 
         public void MarkReadNotification(UserSession session, string notId)
@@ -389,6 +390,12 @@ namespace IssueTracking.Domain.IssueTracking
         {
             _issueTrackingService.SetSession(session);
             _issueTrackingService.ForwardIssue(model);
+        }
+
+        public int GetUnReadNotification(UserSession session)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.GetUnReadNotification();
         }
     }
 }

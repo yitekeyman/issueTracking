@@ -11,89 +11,23 @@
         <div class="header-top-menu">
           <ul class="nav navbar-nav notika-top-nav">
 
-            <!--
-             <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
-                                     class="nav-link dropdown-toggle"><span><i
+
+             <li class="nav-item" *ngIf="totalNotif>0"><a  data-toggle="dropdown" role="button" aria-expanded="false"
+                                                          class="nav-link dropdown-toggle" (click)="showNotification()"><span><i
                class="notika-icon notika-alarm"></i></span>
                <div class="spinner4 spinner-4"></div>
-               <div class="ntd-ctn"><span>3</span></div>
+               <div class="ntd-ctn"><span>{{totalNotif}}</span></div>
              </a>
-               <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
-                 <div class="hd-mg-tt">
-                   <h2>Notification</h2>
-                 </div>
-                 <div class="hd-message-info">
-                   <a href="#">
-                     <div class="hd-message-sn">
-                       <div class="hd-message-img">
-                         <img src="assets/img/post/1.jpg" alt=""/>
-                       </div>
-                       <div class="hd-mg-ctn">
-                         <h3>David Belle</h3>
-                         <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                       </div>
-                     </div>
-                   </a>
-                   <a href="#">
-                     <div class="hd-message-sn">
-                       <div class="hd-message-img">
-                         <img src="assets/img/post/2.jpg" alt=""/>
-                       </div>
-                       <div class="hd-mg-ctn">
-                         <h3>Jonathan Morris</h3>
-                         <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                       </div>
-                     </div>
-                   </a>
-                   <a href="#">
-                     <div class="hd-message-sn">
-                       <div class="hd-message-img">
-                         <img src="assets/img/post/4.jpg" alt=""/>
-                       </div>
-                       <div class="hd-mg-ctn">
-                         <h3>Fredric Mitchell</h3>
-                         <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                       </div>
-                     </div>
-                   </a>
-                   <a href="#">
-                     <div class="hd-message-sn">
-                       <div class="hd-message-img">
-                         <img src="assets/img/post/1.jpg" alt=""/>
-                       </div>
-                       <div class="hd-mg-ctn">
-                         <h3>David Belle</h3>
-                         <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                       </div>
-                     </div>
-                   </a>
-                   <a href="#">
-                     <div class="hd-message-sn">
-                       <div class="hd-message-img">
-                         <img src="assets/img/post/2.jpg" alt=""/>
-                       </div>
-                       <div class="hd-mg-ctn">
-                         <h3>Glenn Jecobs</h3>
-                         <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                       </div>
-                     </div>
-                   </a>
-                 </div>
-                 <div class="hd-mg-va">
-                   <a href="#">View All</a>
-                 </div>
-               </div>
-             </li> -->
+            </li>
             <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
-                                    class="nav-link dropdown-toggle"><span><i class="fa fa-user"></i></span></a>
+                                    class="nav-link dropdown-toggle"><span style="font-size: 11pt"><i class="fa fa-user"></i> Hello {{employee.firstName}}  <i class="fa fa-caret-down"></i></span></a>
               <div role="menu" class="dropdown-menu animated zoomIn">
-                <div class="hd-mg-tt text-center">
-                  <p>Logged in as "{{username}}"</p>
-                  <hr>
+                <div class=" text-center">
+                  <span style="white-space: nowrap; padding: 12px 5px">Logged in as "{{username}}"</span>
                 </div>
 
-                <div class="hd-message-info text-center">
-                  <a href="#" routerLink="" class="btn" (click)="logout()" style="font-size: 11pt">Log Out</a>
+                <div class="hd-message-info text-center" style="border-top: 1px dashed #eee;">
+                  <a href="#" routerLink="" class="btn btn-sm" (click)="logout()" style="font-size: 11pt; width: 100%">Log Out</a>
                 </div>
               </div>
             </li>
@@ -158,7 +92,7 @@
           </li>
           <li routerLinkActive="active" ><a data-toggle="tab" href="#Appviews" routerLink="/LIT/settings"><i class="notika-icon notika-app"></i> Settings</a>
           </li>
-          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification" (click)="setPages('Notification')">  <span class="notika-icon notika-alarm" aria-hidden="true"></span><span class="mini-click-non"> Notification </span><span class="badge badge-primary" *ngIf=" notifications.unreadNotification>0">{{notifications.unreadNotification}}</span> </a>
+          <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification"><i class="notika-icon notika-alarm"></i>  Notification </a>
           </li>
 
         </ul>
@@ -194,7 +128,7 @@
           </div>
           <div id="Notif" class="tab-pane notika-tab-menu-bg animated flipInX" routerLinkActive="active" >
             <ul class="notika-main-menu-dropdown">
-              <li routerLink="/LIT/notifications">
+              <li routerLink="/LIT/notification">
               </li>
             </ul>
           </div>

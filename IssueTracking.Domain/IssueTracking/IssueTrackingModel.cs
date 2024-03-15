@@ -390,9 +390,10 @@ namespace IssueTracking.Domain.IssueTracking
     public class NotificationModel
     {
         public string Id { get; set; }
+        public int TitleId { get; set; }
         public string NotificationTitle { get; set; }
         public string NotificationDetail { get; set; }
-        public string NotificationFrom { get; set; }
+        public EmployeeModel NotificationFrom = new EmployeeModel();
         public string NotificationTo { get; set; }
         public DateTime NotificationDate { get; set; }
         public bool Status { get; set; }
@@ -408,6 +409,7 @@ namespace IssueTracking.Domain.IssueTracking
     public class IssueNotificationReturnModel
     {
         public int UnreadNotification { get; set; }
+        public int ReadNotification { get; set; }
         public IList<NotificationModel> Notifications = new List<NotificationModel>();
     }
 

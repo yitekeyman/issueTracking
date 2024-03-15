@@ -855,11 +855,23 @@ namespace IssueTracking.Web.Controllers
         }
         
         [HttpGet]
-        public IActionResult GetNotification()
+        public IActionResult GetNotification([FromQuery] Boolean status)
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetNotification(GetSession()));
+                return Json(_iIssueTrackingFacade.GetNotification(GetSession(), status));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new {message = e.Message});
+            }
+        }
+        [HttpGet]
+        public IActionResult GetUnReadNotification()
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.GetUnReadNotification(GetSession()));
             }
             catch (Exception e)
             {

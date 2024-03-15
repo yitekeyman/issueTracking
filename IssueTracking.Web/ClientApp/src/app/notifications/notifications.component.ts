@@ -6,30 +6,37 @@ import swal from "sweetalert2";
 import {PagerService} from "../_Services/pager.service";
 
 @Component({
-  selector:'app-notification',
-  templateUrl:'./notifications.component.html'
+  selector: 'app-notification',
+  templateUrl: './notifications.component.html'
 })
 
-export class NotificationsComponent implements OnInit{
-  public notifications=[];
+export class NotificationsComponent implements OnInit {
+  public notifications = [];
+  public totalRead = 0;
+  public totalUnRead = 0;
   public pager: any = {};
   pagedItems: any[];
-  constructor(public router:Router, public issueTrackingService:IssueTrackingService, public pagerService:PagerService) {
-    this.pager=localStorage.getItem('routerLink');
-  }
-  ngOnInit() {
-    this.getNotifications();
+  public status = false;
+
+  constructor(public router: Router, public issueTrackingService: IssueTrackingService, public pagerService: PagerService) {
+    this.pager = localStorage.getItem('routerLink');
   }
 
-  public getNotifications(){
+  ngOnInit() {
+    this.getNotifications(this.status);
+  }
+
+  public getNotifications(status) {
     dialog.loading();
-    this.issueTrackingService.GetNotification().subscribe(res=>{
-      this.notifications=res.notifications;
-      if(this.notifications.length>0){
+    this.issueTrackingService.GetNotification(status).subscribe(res => {
+      this.totalUnRead = res.unreadNotification;
+      this.totalRead = res.readNotification;
+      this.notifications = res.notifications;
+      if (this.notifications.length > 0) {
         this.setPage(1);
       }
       dialog.close();
-    }, e=>{
+    }, e => {
       swal({
         type: 'error', title: 'Oops...', text: e.message
       });
@@ -48,10 +55,19 @@ export class NotificationsComponent implements OnInit{
 
   }
 
-  public showNotDetails(notId:string, issueId:any){
+  public showNotDetails(notId: string, issueId: any, status: boolean) {
     dialog.loading();
-    this.issueTrackingService.MarkReadNotification(notId);
-    this.router.navigate(['/LIT/issues/view-issue/', issueId]);
+    if (!status)
+      this.issueTrackingService.MarkReadNotification(notId).subscribe();
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['LIT/issues/view-issue/', issueId]);
+    });
+
+  }
+
+  public showPage(status: boolean) {
+    this.status = status;
+    this.getNotifications(this.status);
   }
 }
 

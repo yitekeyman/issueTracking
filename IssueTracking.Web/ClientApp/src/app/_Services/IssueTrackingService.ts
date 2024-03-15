@@ -343,8 +343,11 @@ export class IssueTrackingService {
     return this.apiService.post(`IssueTracking/AddDueDate?issueId=${id}&dueDate=${dueDate}`, null);
   }
 
-  public GetNotification(){
-    return this.apiService.get(`IssueTracking/GetNotification`);
+  public GetNotification(status:boolean){
+    return this.apiService.get(`IssueTracking/GetNotification?status=${status}`);
+  }
+  public GetUnReadNotification(){
+    return this.apiService.get(`IssueTracking/GetUnReadNotification`);
   }
   public MarkReadNotification(model:any){
     return this.apiService.post(`IssueTracking/MarkReadNotification?notId=${model}`,null);

@@ -1,113 +1,115 @@
-<div class="data-table-area mg-b-15" style="min-height: calc(99vh - 75px)">
-  <div class="container-fluid">
+
+<div class="breadcomb-area" >
+  <div class="container">
+    <div class="breadcomb-list">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="breadcomb-wp">
+            <div class="breadcomb-icon">
+              <i class="notika-icon notika-alarm"></i>
+            </div>
+            <div class="breadcomb-ctn">
+              <h2>Notifications</h2>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="invoice-area">
+  <div class="container">
     <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <ul class="nav navbar-nav">
+          <li class="nav-item">
+            <div class="btn-group">
+              <button [ngClass]="status==false?'btn btn-success':'btn btn-outline-success'"
+                      (click)="showPage(false)">&nbsp;<span *ngIf="notifications!=null">{{totalUnRead}}</span> Un-Read
+              </button>
+              <button [ngClass]="status==true?'btn btn-success ':'btn btn-outline-success'"
+                      (click)="showPage(true)">&nbsp;<span *ngIf="notifications!=null">{{totalRead}}</span> Read
+
+              </button>
+
+            </div>
+
+          </li>
+        </ul>
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 text-right">
+
+      </div>
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="sparkline13-list" >
-          <div class="sparkline13-hd">
-            <div class="main-sparkline13-hd">
+        <div class="data-table-list wizard-wrap-int" style="min-height: 450px;">
+            <div class="table-responsive" style="min-height: 400px;">
+              <table id="data-table-basic" class="table table-striped" >
+                <thead>
+                <tr>
+                  <th>
+                    <input type="checkbox" formControlName="checkUncheckAll">
+                  </th>
+                  <th></th>
+                  <th>Title</th>
+                  <th>Details</th>
+                  <th>Date</th>
+                  <th>From</th>
+                  <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody *ngIf="notifications?.length>0"   style="min-height: 300px">
+                <tr *ngFor="let row of pagedItems; index as i" (click)="showNotDetails(row.id, row.issueId, row.status)" style="cursor: pointer">
+                  <td ><input type="checkbox" ></td>
 
-              <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-10">
-                  <div class="breadcome-heading">
-                    <h3><span class="fa fa-bell"></span> Notification <span class="table-project-n">List</span></h3>
-                  </div>
-                </div>
-                <!--
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="breadcome-heading">
-                        <div class="text-center" *ngIf="notifications.length >0">
-                            <small> {{notifications.length}}  Record Found</small>
-                        </div>
+                  <td>
+
+                  </td>
+                  <td>{{row.notificationTitle}}</td>
+                  <td>{{row.notificationDetail}}</td>
+                  <td><span title="{{issueTrackingService.convertDate(row.notificationDate)}}">{{issueTrackingService.timeDifference(row.notificationDate)}}</span></td>
+                  <td>{{row.notificationFrom.username}}</td>
+
+                  <td class="text-right" style="min-width: 150px">
+                    <div class="btn-group">
+
+                      <button class="btn btn-sm " type="button" ><i
+                        class="fa fa-check-square"></i>
+
+                      </button>
                     </div>
-                </div> -->
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                  </td>
+                </tr>
 
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                  <div class="breadcome-heading">
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="sparkline13-graph" style="border-top: 2px solid #eee">
-            <div class="datatable-dashv1-list custom-datatable-overright">
-
-              <div class="bootstrap-table">
-
-                <div class="fixed-table-container" style="padding-bottom: 0px;height: calc(84vh - 98px);overflow-x: auto;">
-
-                  <div class="fixed-table-body">
-                    <div class="fixed-table-loading" *ngIf="notifications?.length==0" style="margin-top: 50px; text-align: center;">
-
-                      <h1 style="font-size: 54pt; opacity: 0.3"><span class="fa fa-exclamation-triangle"></span></h1>
-                      <p>There is no issue found</p>
+                </tbody>
+                <tbody *ngIf="notifications?.length==0">
+                <tr>
+                  <td colspan="10" class="text-center">
+                    <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+                      <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                        class="fa fa-exclamation-triangle"></i></div>
+                      <h2>Sorry</h2>
+                      <p>There is no record found</p>
                     </div>
+                  </td>
+                </tr>
+                </tbody>
 
-                    <table id="table" data-toggle="table"
-                           data-show-columns="true" data-show-pagination-switch="true" data-show-refresh="true"
-                           data-key-events="true" data-show-toggle="true" data-resizable="true" data-cookie="true"
-                           data-cookie-id-table="saveId" data-show-export="true" data-click-to-select="true"
-                           data-toolbar="#toolbar" class="table table-hover table-striped JColResizer"
-                           *ngIf="notifications?.length>0">
-                      <thead>
-                      <tr>
-                        <th data-field="id" tabindex="0">
-                          <div class="th-inner ">No</div>
-                          <div class="fht-cell"></div>
-                        </th>
-                        <th data-field="email" tabindex="0">
-                          <div class="th-inner ">Date</div>
-                          <div class="fht-cell"></div>
-                        </th>
-                        <th data-field="email" tabindex="0">
-                          <div class="th-inner ">From</div>
-                          <div class="fht-cell"></div>
-                        </th>
-                        <th data-field="phone" tabindex="0">
-                          <div class="th-inner ">Notifications</div>
+              </table>
 
-                          <div class="fht-cell"></div>
-                        </th>
-                      </tr>
-                      </thead>
-                      <tbody *ngFor="let item of pagedItems;index as i;" >
-                      <tr [ngStyle]= "item.status && {'font-weight':'bold'}" (click)="showNotDetails(item.id, item.issueId)" style="cursor: pointer">
-                        <td style="">{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
-                        <td style="">{{item.notificationDate| date}}</td>
-                        <td style="">{{item.notificationFrom}}</td>
-                        <td style="">{{item.notificationDetail}}</td>
-
-                      </tr>
-
-                      </tbody>
-                    </table>
-                  </div>
-
-
-                </div>
-              </div>
-              <div class="clearfix"></div>
             </div>
-          </div>
-          <div class="fixed-table-pagination" style="border-top: 2px solid #eee;">
 
-            <div class="">
-              <ul class="pagination" *ngIf="pager.pages && pager.pages.length" style="margin-bottom: 0; margin-top: 0.5rem">
-                <li [ngClass]="{disabled:pager.currentPage === 1} +' page-item'"><a [routerLink]="" class="page-link"
-                                                                                    (click)="setPage(pager.currentPage - 1)">‹</a>
-                </li>
-                <li  *ngFor="let page of pager.pages"
-                     [ngClass]="{active:pager.currentPage === page}+' page-item'"><a [routerLink]="" class="page-link"
-                                                                                     (click)="setPage(page)">{{page}}</a></li>
+          <div class="wizard-action-pro" *ngIf="notifications?.length>0">
+            <ul class="wizard-nav-ac">
+              <li><a [ngClass]="pager.currentPage === 1?' button-first btn-disabled':'a-prevent'" [routerLink]=" "
+                     (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
+              <li *ngFor="let page of pager.pages"><a [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
+                                                      [routerLink]="" (click)="setPage(page)"><i
+                class="notika-icon">{{page}}</i></a></li>
+              <li><a [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' a-prevent'" [routerLink]=""
+                     (click)="setPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
 
-                <li  [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' page-next'"><a
-                  [routerLink]="" class="page-link" (click)="setPage(pager.currentPage + 1)">›</a></li>
-              </ul>
-            </div>
+            </ul>
           </div>
         </div>
       </div>

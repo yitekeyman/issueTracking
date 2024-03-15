@@ -76,9 +76,10 @@ namespace IssueTracking.Domain.IssueTracking
         void DeleteIssueDueDate(string issueId);
         IList<EmployeeModel> GetPhoneBook(PhoneBookSearchParam model);
         IList<DepartmentSchemaModel> GetHeadOfficeDept();
-        IssueNotificationReturnModel GetNotification();
+        IssueNotificationReturnModel GetNotification(Boolean status);
         void MarkReadNotification(string notId);
         void ForwardIssue(IssueForwardModel model);
+        int GetUnReadNotification();
     }
 
     public class IssueTrackingService : IIssueTrackingService
@@ -512,6 +513,7 @@ namespace IssueTracking.Domain.IssueTracking
             _context.IssuesList.Add(issue);
             _context.SaveChanges();
             CreateActionTrackers(issue.Id.ToString(), "Created Issue", null, null);
+            SetNotification(issue.Id, "Created Issue", issue.ForwardTo, null, false);
             return issue.Id.ToString();
         }
 
@@ -585,6 +587,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.IssuesList.Update(oldIssue);
                 _context.SaveChanges();
                 CreateActionTrackers(model.Id, actionType, null, "Issue Edited");
+                SetNotification(Guid.Parse(model.Id), actionType, Guid.Parse(model.ForwardTo), null, true);
             }
             else
             {
@@ -726,6 +729,8 @@ namespace IssueTracking.Domain.IssueTracking
             foreach (var iss in issues)
             {
                 var department = GetDepartment(iss.BranchId).DepartmentName;
+                if (GetDepartment(iss.BranchId).BranchId != 10)
+                    department = GetDepartment(iss.BranchId).BranchName;
 
                 var issl = new IssueSearchModel()
                 {
@@ -889,6 +894,7 @@ namespace IssueTracking.Domain.IssueTracking
             _context.IssueComments.Add(comment);
             _context.SaveChanges();
             CreateActionTrackers(model.IssueId, "Commented on Issue", null, comment.Id.ToString());
+            SetNotification(Guid.Parse(model.IssueId), "Commented on Issue", null, null, true);
         }
 
         public void EditIssueComment(IssueCommentsModel model)
@@ -936,6 +942,7 @@ namespace IssueTracking.Domain.IssueTracking
 
                 _context.IssueComments.Update(existingComment);
                 _context.SaveChanges();
+                SetNotification(Guid.Parse(model.IssueId), actionType, null, null, true);
             }
             else
             {
@@ -1143,6 +1150,7 @@ namespace IssueTracking.Domain.IssueTracking
                     _context.SaveChanges();
 
                     CreateActionTrackers(model.IssueId, actionType, null, model.AssignedTo);
+                    SetNotification(Guid.Parse(model.IssueId), actionType, null, Guid.Parse(model.AssignedTo), true);
                 }
             }
         }
@@ -1179,6 +1187,7 @@ namespace IssueTracking.Domain.IssueTracking
                         CloseDueDate(issue.Id);
                         CloseActiveTask(issue.Id);
                         CreateActionTrackers(issueId, actionType, null, remark);
+                        SetNotification(Guid.Parse(issueId), actionType, null, null, true);
                     }
                     else
                     {
@@ -1210,6 +1219,7 @@ namespace IssueTracking.Domain.IssueTracking
                     _context.IssuesList.Update(issue);
                     _context.SaveChanges();
                     CreateActionTrackers(issueId, actionType, null, remark);
+                    SetNotification(Guid.Parse(issueId), actionType, issue.ForwardTo, null, true);
                 }
                 else
                 {
@@ -1257,6 +1267,7 @@ namespace IssueTracking.Domain.IssueTracking
                             CloseDueDate(issue.Id);
                             CloseActiveTask(issue.Id);
                             CreateActionTrackers(issues, actionType, null, model.Remark);
+                            SetNotification(issue.Id, actionType, issue.ForwardTo, null, true);
                             success++;
                         }
                         else
@@ -1297,6 +1308,7 @@ namespace IssueTracking.Domain.IssueTracking
                         _context.IssuesList.Update(issue);
                         _context.SaveChanges();
                         CreateActionTrackers(issues, actionType, null, model.Remark);
+                        SetNotification(issue.Id, actionType, issue.ForwardTo, null, true);
                         success++;
                     }
                     else
@@ -1653,6 +1665,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.IssueMilestones.Add(issueMileStone);
                 _context.SaveChanges();
                 CreateActionTrackers(issueId, "Added Milestone to Issue", null, milestoneId);
+                SetNotification(Guid.Parse(issueId), "Added Milestone to Issue", null, null, true);
             }
             else
             {
@@ -1669,6 +1682,7 @@ namespace IssueTracking.Domain.IssueTracking
                     issueMilestone.MilestoneId.ToString());
                 _context.IssueMilestones.Remove(issueMilestone);
                 _context.SaveChanges();
+                SetNotification(issueMilestone.IssueId, "Removed Milestone from issue", null, null, true);
             }
             else
             {
@@ -1683,6 +1697,7 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 CreateActionTrackers(issueAssign.IssueId.ToString(), "Removed Assigned User from Issue", null,
                     issueAssign.AssignedTo.ToString());
+                SetNotification(issueAssign.IssueId, "Removed Assigned User from Issue", null, null, true);
                 _context.IssueAssigned.Remove(issueAssign);
                 _context.SaveChanges();
             }
@@ -1730,6 +1745,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.IssueDependancies.Add(dep);
                 _context.SaveChanges();
                 CreateActionTrackers(issueId, "Added Dependencies for Issue", null, depeId);
+                SetNotification(Guid.Parse(issueId), "Added Dependencies for Issue", null, null, true);
             }
             else
             {
@@ -1746,6 +1762,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.SaveChanges();
                 CreateActionTrackers(oldDependency.MajorIssue.ToString(), "Removed Dependencies from Issue", null,
                     oldDependency.Dependancies.ToString());
+                SetNotification(oldDependency.MajorIssue, "Removed Dependencies from Issue", null, null, true);
             }
             else
             {
@@ -1821,6 +1838,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.IssueDueDate.Add(dueDateModel);
                 _context.SaveChanges();
                 CreateActionTrackers(issueId, "Set Due Date for Issue", null, dueDateModel.Id.ToString());
+                SetNotification(Guid.Parse(issueId), "Set Due Date for Issue", null, null, true);
             }
             else
             {
@@ -1839,6 +1857,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.SaveChanges();
                 CreateActionTrackers(issueId, "Update Due Date Of Issue", JsonConvert.SerializeObject(oldDueDate),
                     ava.Id.ToString());
+                SetNotification(Guid.Parse(issueId), "Update Due Date Of Issue", null, null, true);
             }
         }
 
@@ -1852,6 +1871,7 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.SaveChanges();
                 CreateActionTrackers(issueId, "Remove Due Date of Issue", JsonConvert.SerializeObject(oldDueDate),
                     (new DateTime(oldDueDate.DueDate ?? 0)).ToString());
+                SetNotification(Guid.Parse(issueId), "Remove Due Date of Issue", null, null, true);
             }
             else
             {
@@ -2001,7 +2021,17 @@ namespace IssueTracking.Domain.IssueTracking
                 }
             }
 
-            return ret;
+            var par2 = _context.ForwardTo.Where(i => i.IssueId == issueId).ToList();
+            foreach (var p in par2)
+            {
+                if (!commenter.Contains(p.ForwardFrom))
+                {
+                    commenter.Add(p.ForwardFrom);
+                    ret.Add(GetEmployee(p.ForwardFrom));
+                }
+            }
+
+            return ret.OrderBy(p => p.Username).ToList();
         }
 
         public IList<EmployeeModel> GetPhoneBook(PhoneBookSearchParam model)
@@ -2089,6 +2119,14 @@ namespace IssueTracking.Domain.IssueTracking
                 _context.ForwardTo.Add(forwardModel);
                 _context.SaveChanges();
                 CreateActionTrackers(issue.Id.ToString(), "Issue Forwarded To", null, forwardModel.Id.ToString());
+                if (forwardModel.ForwardToEmp != null)
+                {
+                    SetNotification(issue.Id, "Issue Forwarded To", null, forwardModel.ForwardToEmp, true);
+                }
+                else
+                {
+                    SetNotification(issue.Id, "Issue Forwarded To", forwardModel.ForwardToDept, null, true);
+                }
             }
             else
             {
@@ -2363,40 +2401,39 @@ namespace IssueTracking.Domain.IssueTracking
 
             return ret;
         }
-        
-        public IssueNotificationReturnModel GetNotification()
+
+        public IssueNotificationReturnModel GetNotification(Boolean status)
         {
             var ret = new IssueNotificationReturnModel();
-            var notifFrom = GetEmployeeId();
-            if (!string.IsNullOrEmpty(notifFrom))
-            {
-                var notfi = new List<NotificationModel>();
-                ret.UnreadNotification =
-                    _context.IssueNotification.Count(n => n.NotificationTo == Guid.Parse(notifFrom) && n.Status == false);
-                var notifications = _context.IssueNotification.Where(n => n.NotificationTo == Guid.Parse(notifFrom))
-                    .OrderByDescending(n => n.NotificationDate).ToList();
-                
-                foreach (var nt in notifications)
-                {
-                    var username=_context.Account.First(e => e.EmployeeId == nt.NotificationFrom).Username;
-                    var notification = new NotificationModel()
-                    {
-                        Id = nt.Id.ToString(),
-                        NotificationTitle = nt.NotificationTitle,
-                        NotificationDetail = $"You have been assigned to Issue : " + nt.NotificationTitle,
-                        NotificationFrom = username,
-                        NotificationTo = nt.NotificationTo.ToString(),
-                        IssueId = nt.IssueId.ToString(),
-                        NotificationDate = new DateTime(nt.NotificationDate ?? 0).Date,
-                        Status = false,
-                        
-                    };
-                   notfi.Add(notification);
-                }
+            var notfi = new List<NotificationModel>();
+            ret.UnreadNotification =
+                _context.IssueNotification.Count(
+                    n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == false);
+            ret.ReadNotification = _context.IssueNotification.Count(
+                n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == true);
+            var notifications = _context.IssueNotification
+                .Where(n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == status)
+                .OrderByDescending(n => n.NotificationDate).ToList();
 
-                ret.Notifications = notfi;
+            foreach (var nt in notifications)
+            {
+                var notification = new NotificationModel()
+                {
+                    Id = nt.Id.ToString(),
+                    NotificationTitle = nt.NotificationTitle,
+                    NotificationDetail = nt.NotificationDetail,
+                    NotificationFrom = GetEmployee(Guid.Parse(nt.NotificationFrom.ToString())),
+                    NotificationTo = nt.NotificationTo.ToString(),
+                    IssueId = nt.IssueId.ToString(),
+                    NotificationDate = new DateTime(nt.NotificationDate ?? 0),
+                    Status = nt.Status,
+                    TitleId = GetActionTypeId(nt.NotificationTitle)
+                };
+                notfi.Add(notification);
             }
-            
+
+            ret.Notifications = notfi;
+
             return ret;
         }
 
@@ -2407,15 +2444,16 @@ namespace IssueTracking.Domain.IssueTracking
             _context.IssueNotification.Update(notification);
             _context.SaveChanges();
         }
-        
+
         private string GetEmployeeId()
         {
             string employeeId = null;
             var users = _context.Account.FirstOrDefault(a => a.Username.Equals(_session.Username));
-            if (users != null && users.EmployeeId!=null)
+            if (users != null && users.EmployeeId != null)
             {
                 employeeId = users.EmployeeId.ToString();
             }
+
             return employeeId;
         }
 
@@ -2457,6 +2495,92 @@ namespace IssueTracking.Domain.IssueTracking
             {
                 ret.Add(GetForwardIssue(issueFor.Id.ToString()));
             }
+
+            return ret;
+        }
+
+        private void SetNotification(Guid issueId, string title, Guid? deptId, Guid? empId, Boolean forParticipant)
+        {
+            var issue = _context.IssuesList.First(e => e.Id == issueId);
+            var description = string.Format("#{0} : {1}", issue.Ticket, issue.IssueTitle);
+            var notificationList = new List<IssueNotification>();
+            var staffs = new List<Guid>();
+            if (forParticipant)
+            {
+                var participant = GetParticipant(issueId);
+                foreach (var pr in participant)
+                {
+                    if (!pr.Id.Equals(_session.UserId) && !staffs.Contains(Guid.Parse(pr.Id)))
+                    {
+                        var notif = new IssueNotification()
+                        {
+                            Id = Guid.NewGuid(),
+                            NotificationDate = DateTime.Now.Ticks,
+                            IssueId = issueId,
+                            NotificationFrom = Guid.Parse(_session.UserId),
+                            NotificationDetail = description,
+                            Status = false,
+                            NotificationTitle = title,
+                            NotificationTo = Guid.Parse(pr.Id)
+                        };
+                        staffs.Add(Guid.Parse(pr.Id));
+                        notificationList.Add(notif);
+                    }
+                }
+            }
+
+            if (empId != null)
+            {
+                if (!empId.ToString().Equals(_session.UserId) && !staffs.Contains(Guid.Parse(empId.ToString())))
+                {
+                    var notif = new IssueNotification()
+                    {
+                        Id = Guid.NewGuid(),
+                        NotificationDate = DateTime.Now.Ticks,
+                        IssueId = issueId,
+                        NotificationFrom = Guid.Parse(_session.UserId),
+                        NotificationDetail = description,
+                        Status = false,
+                        NotificationTitle = title,
+                        NotificationTo = empId
+                    };
+                    staffs.Add(Guid.Parse(empId.ToString()));
+                    notificationList.Add(notif);
+                }
+            }
+
+            if (deptId != null)
+            {
+                var employees = GetAllEmployeeByBranchId(deptId.ToString());
+                foreach (var pr in employees)
+                {
+                    if (!pr.Id.Equals(_session.UserId) && !staffs.Contains(Guid.Parse(pr.Id)))
+                    {
+                        var notif = new IssueNotification()
+                        {
+                            Id = Guid.NewGuid(),
+                            NotificationDate = DateTime.Now.Ticks,
+                            IssueId = issueId,
+                            NotificationFrom = Guid.Parse(_session.UserId),
+                            NotificationDetail = description,
+                            Status = false,
+                            NotificationTitle = title,
+                            NotificationTo = Guid.Parse(pr.Id)
+                        };
+                        staffs.Add(Guid.Parse(pr.Id));
+                        notificationList.Add(notif);
+                    }
+                }
+            }
+
+            _context.IssueNotification.AddRange(notificationList);
+            _context.SaveChanges();
+        }
+
+        public int GetUnReadNotification()
+        {
+            int ret = _context.IssueNotification.Count(e =>
+                e.NotificationTo == Guid.Parse(_session.UserId) && e.Status == false);
             return ret;
         }
     }

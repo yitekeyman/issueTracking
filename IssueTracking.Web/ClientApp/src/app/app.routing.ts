@@ -32,7 +32,7 @@ const routes: Routes =[
 
   {
     path: 'LIT',
-    component: NotificationsComponent,
+    redirectTo: 'LIT/notification',
     pathMatch: 'full'
   },
 
