@@ -11,15 +11,13 @@ import {PagerService} from "../_Services/pager.service";
 })
 
 export class NotificationsComponent implements OnInit {
-  public notifications = [];
-  public totalRead = 0;
-  public totalUnRead = 0;
+  public notifications = null;
   public pager: any = {};
   pagedItems: any[];
   public status = false;
 
   constructor(public router: Router, public issueTrackingService: IssueTrackingService, public pagerService: PagerService) {
-    this.pager = localStorage.getItem('routerLink');
+    //this.pager = localStorage.getItem('routerLink');
   }
 
   ngOnInit() {
@@ -29,10 +27,12 @@ export class NotificationsComponent implements OnInit {
   public getNotifications(status) {
     dialog.loading();
     this.issueTrackingService.GetNotification(status).subscribe(res => {
-      this.totalUnRead = res.unreadNotification;
-      this.totalRead = res.readNotification;
-      this.notifications = res.notifications;
-      if (this.notifications.length > 0) {
+      // this.totalUnRead = res.unreadNotification;
+      // this.totalRead = res.readNotification;
+      // this.notifications = res.notifications;
+      //this.notifications=null;
+      this.notifications = res;
+      if (this.notifications.notifications.length > 0) {
         this.setPage(1);
       }
       dialog.close();
@@ -48,10 +48,10 @@ export class NotificationsComponent implements OnInit {
       return;
     }
 
-    this.pager = this.pagerService.getPager(this.notifications.length, page);
+    this.pager = this.pagerService.getPager(this.notifications.notifications.length, page);
 
     //get the paged items
-    this.pagedItems = this.notifications.slice(this.pager.startIndex, this.pager.endIndex + 1);
+    this.pagedItems = this.notifications.notifications.slice(this.pager.startIndex, this.pager.endIndex + 1);
 
   }
 

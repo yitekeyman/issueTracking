@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
   public assignee = '';
   public notifications: any;
   public currentPage: any;
-  public employee: EmployeeModel;
+  public employee: EmployeeModel=null;
 
   public totalNotif:number=0;
   constructor(location: Location, private element: ElementRef, public router: Router, public activeRouting: ActivatedRoute, public issueTrackingService: IssueTrackingService) {

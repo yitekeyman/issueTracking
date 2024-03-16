@@ -20,7 +20,7 @@
              </a>
             </li>
             <li class="nav-item"><a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
-                                    class="nav-link dropdown-toggle"><span style="font-size: 11pt"><i class="fa fa-user"></i> Hello {{employee.firstName}}  <i class="fa fa-caret-down"></i></span></a>
+                                    class="nav-link dropdown-toggle"><span style="font-size: 11pt" *ngIf="employee!=null"><i class="fa fa-user"></i> Hello {{employee.firstName}}  <i class="fa fa-caret-down"></i></span></a>
               <div role="menu" class="dropdown-menu animated zoomIn">
                 <div class=" text-center">
                   <span style="white-space: nowrap; padding: 12px 5px">Logged in as "{{username}}"</span>

@@ -40,7 +40,7 @@ import {NotificationsComponent} from "./notifications/notifications.component";
     AppComponent,
     AdminLayoutComponent,
     TimeDifferencePipe,
-    NotificationsComponent
+    //NotificationsComponent
 
   ],
   providers: [
