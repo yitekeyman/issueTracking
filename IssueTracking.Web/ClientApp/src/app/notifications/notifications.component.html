@@ -18,7 +18,7 @@
     </div>
   </div>
 </div>
-<div class="invoice-area">
+<div class="invoice-area" *ngIf="notifications!=null">
   <div class="container">
     <div class="row">
       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
@@ -39,16 +39,21 @@
         </ul>
       </div>
       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 text-right">
-
+        <ul class="nav navbar-nav floatRight">
+          <li class="nav-item" >
+            <button class="btn btn-warning" *ngIf="!status && haveSelected" (click)="patchMarkRead()"><span>Mark as Read</span></button>
+          </li>
+        </ul>
       </div>
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" *ngIf="notifications!=null">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" >
         <div class="data-table-list wizard-wrap-int" style="min-height: 450px;">
+          <form [formGroup]="memberGroup">
             <div class="table-responsive" style="min-height: 400px;">
               <table id="data-table-basic" class="table table-striped" >
                 <thead>
                 <tr>
-                  <th>
-                    <input type="checkbox" >
+                  <th *ngIf="!status">
+                    <input type="checkbox" (change)="checkUncheckAll()" formControlName="checkUncheckAll" *ngIf="notifications.notifications?.length>0" [(ngModel)]="isMasterSel" />
                   </th>
                   <th></th>
                   <th>Title</th>
@@ -58,12 +63,19 @@
                   <th class="text-right">Action</th>
                 </tr>
                 </thead>
-                <tbody *ngIf="notifications.notifications?.length>0"   style="min-height: 300px">
-                <tr *ngFor="let row of pagedItems; index as i" (click)="showNotDetails(row.id, row.issueId, row.status)" style="cursor: pointer">
-                  <td ><input type="checkbox" ></td>
+                <tbody *ngIf="notifications.notifications?.length>0"  formArrayName="listOfMem"  style="min-height: 300px">
+                <tr *ngFor="let row of pagedItems; index as i"  >
+                  <td [formGroupName]="i" *ngIf="!status">
+                    <input type="checkbox" formControlName="memberId" (change)="isAllSelected()" id="mem_{{i}}"/>
+                  </td>
 
-                  <td>
-
+                  <td style="text-align: center; color: #00c292; font-size: 16pt">
+                    <span *ngIf="row.titleId==1 || row.titleId==3 || row.titleId==4"><i class="fa fa-exclamation-circle"></i> </span>
+                    <span *ngIf="row.titleId==2 || row.titleId==5 "><i class="fa fa-check-circle"></i> </span>
+                    <span *ngIf="row.titleId==6"><i class="fa fa-user-plus"></i> </span>
+                    <span *ngIf="row.titleId==7"><i class="fa fa-comments"></i> </span>
+                    <span *ngIf="row.titleId==8"><i class="fa fa-commenting"></i> </span>
+                    <span *ngIf="row.titleId==9"><i class="fa fa-pencil-square-o"></i> </span>
                   </td>
                   <td>{{row.notificationTitle}}</td>
                   <td>{{row.notificationDetail}}</td>
@@ -73,10 +85,11 @@
                   <td class="text-right" style="min-width: 150px">
                     <div class="btn-group">
 
-                      <button class="btn btn-sm " type="button" ><i
-                        class="fa fa-check-square"></i>
+                      <button class="btn btn-sm " type="button" title="Mark as Read" *ngIf="!row.status" (click)="mark_as_Read(row.id)"><i
+                        class="fa fa-check-square" ></i>
 
                       </button>
+                      <button class="btn btn-sm" type="button" title="See Detail" (click)="showNotDetails(row.id, row.issueId, row.status)"><i class="fa fa-eye"></i> </button>
                     </div>
                   </td>
                 </tr>
@@ -98,8 +111,9 @@
               </table>
 
             </div>
+          </form>
 
-          <div class="wizard-action-pro" *ngIf="notifications.notifications?.length>0">
+          <div class="wizard-action-pro" *ngIf="notifications.notifications?.length>0" >
             <ul class="wizard-nav-ac">
               <li><a [ngClass]="pager.currentPage === 1?' button-first btn-disabled':'a-prevent'" [routerLink]=" "
                      (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>

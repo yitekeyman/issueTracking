@@ -8,11 +8,15 @@
               <div class="breadcomb-icon">
                 <div class="btn-group">
                   <button type="button" class="btn btn-default "
-                          *ngIf="(issue.issueStatus.id==1 || issue.issueStatus.id==3) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          *ngIf="(issue.issueStatus.id==1) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
                           (click)="IssueClose()">Close
                   </button>
                   <button type="button" class="btn btn-default "
-                          *ngIf="(issue.issueStatus.id==2 || issue.issueStatus.id==4 ) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
+                          *ngIf="(issue.issueStatus.id==3)  && (issue.issueRequestedBy.id==loggedInEmployeeId || issue.forwardTo==loggedInDepartmentId)"
+                          (click)="IssueCancel()">Cancel
+                  </button>
+                  <button type="button" class="btn btn-default "
+                          *ngIf="(issue.issueStatus.id==2) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
                           (click)="Reopen()">Reopen
                   </button>
                   <button data-placement="left" title="Edit Issue" class="btn btn-default " data-toggle="modal"
@@ -20,11 +24,7 @@
                           *ngIf="issue.issueStatus.id==1 && issue.issueRequestedBy.id==loggedInEmployeeId"
                           (click)="editIssue(issueId)">Edit
                   </button>
-                  <button data-placement="left" title="Edit Issue" class="btn btn-default " data-toggle="modal"
-                          data-target="#editIssueModal"
-                          *ngIf="(issue.issueStatus.id==1 || issue.issueStatus.id==3)  && issue.issueRequestedBy.id==loggedInEmployeeId"
-                          (click)="editIssue(issueId)">Cancel
-                  </button>
+
                 </div>
               </div>
             </div>

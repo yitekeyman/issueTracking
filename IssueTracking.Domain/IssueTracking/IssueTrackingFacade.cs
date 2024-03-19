@@ -63,6 +63,8 @@ namespace IssueTracking.Domain.IssueTracking
         IssueNotificationReturnModel GetNotification(UserSession session, Boolean status);
         void MarkReadNotification(UserSession session,string notId);
         int GetUnReadNotification(UserSession session);
+        string PatchMakeReadNotification(UserSession session,PatchActionModel model);
+        void CancelIssue(UserSession session, string issueId, string remark);
     }
     public class IssueTrackingFacade:IIssueTrackingFacade
     {
@@ -396,6 +398,18 @@ namespace IssueTracking.Domain.IssueTracking
         {
             _issueTrackingService.SetSession(session);
             return _issueTrackingService.GetUnReadNotification();
+        }
+
+        public string PatchMakeReadNotification(UserSession session, PatchActionModel model)
+        {
+            _issueTrackingService.SetSession(session);
+            return _issueTrackingService.PatchMakeReadNotification(model);
+        }
+
+        public void CancelIssue(UserSession session, string issueId, string remark)
+        {
+            _issueTrackingService.SetSession(session);
+            _issueTrackingService.CancelIssue(issueId,remark);
         }
     }
 }

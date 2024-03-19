@@ -15,6 +15,7 @@ import {NotificationsComponent} from "../../notifications/notifications.componen
     CommonModule,
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
+    ReactiveFormsModule,
     SettingsModule,
     IssuesRoutingModule
 

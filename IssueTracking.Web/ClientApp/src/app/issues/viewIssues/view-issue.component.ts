@@ -302,6 +302,35 @@ export class ViewIssueComponent implements OnInit {
     })
   }
 
+  public IssueCancel(){
+    swal({
+      title: 'Are you sure?',
+      text: "You want to Cancel Selected Issue",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, Cancel!'
+    }).then((result) => {
+      if (result.value) {
+        dialog.loading();
+        this.issueTrackingService.CancelIssue(this.issueId, "Issue Cancelled").subscribe(res => {
+          swal("Success!", "You have successfully cancelled issue", "success").then(value => {
+            this.loadIssuePage();
+            dialog.close();
+          })
+
+        }, e => {
+          swal({
+            type: 'error',
+            title: 'Oops...',
+            text: e.message
+          });
+
+        });
+      }
+    })
+  }
   public Reopen(){
     swal({
       title: 'Are you sure?',

@@ -363,6 +363,13 @@ export class IssueTrackingService {
   public ForwardIssue(model:any) {
     return this.apiService.post(`IssueTracking/ForwardIssue`,model);
   }
+  public CancelIssue(issueId: string, remark: string) {
+    return this.apiService.post(`IssueTracking/CancelIssue?issueId=${issueId}&remark=${remark}`, null);
+  }
+
+  public PatchMakeReadNotification(model: any) {
+    return this.apiService.post('IssueTracking/PatchMakeReadNotification', model);
+  }
   public logout() {
     return this.apiService.post('IssueTracking/Logout', null).subscribe(res => {
       localStorage.removeItem('username');

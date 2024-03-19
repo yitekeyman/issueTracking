@@ -943,5 +943,36 @@ namespace IssueTracking.Web.Controllers
                 return StatusCode(stCode, new { message = e.Message });
             }
         }
+        [HttpPost]
+        public IActionResult PatchMakeReadNotification([FromBody] PatchActionModel model)
+        {
+            try
+            {
+                return Json(_iIssueTrackingFacade.PatchMakeReadNotification(GetSession(), model));
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        [HttpPost]
+        public IActionResult CancelIssue([FromQuery] string issueId, string remark)
+        {
+            try
+            {
+                _iIssueTrackingFacade.CancelIssue(GetSession(), issueId, remark);
+                return StatusCode(200, new { message = true });
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
     }
 }

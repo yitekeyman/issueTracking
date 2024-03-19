@@ -80,6 +80,8 @@ namespace IssueTracking.Domain.IssueTracking
         void MarkReadNotification(string notId);
         void ForwardIssue(IssueForwardModel model);
         int GetUnReadNotification();
+        string PatchMakeReadNotification(PatchActionModel model);
+        void CancelIssue(string issueId, string remark);
     }
 
     public class IssueTrackingService : IIssueTrackingService
@@ -1207,6 +1209,58 @@ namespace IssueTracking.Domain.IssueTracking
             }
         }
 
+        public void CancelIssue(string issueId, string remark)
+        {
+            var actionType = "Cancelled Issue";
+            var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issueId));
+            if (issue != null)
+            {
+                if (issue.IssueStatus == 1 || issue.IssueStatus==3)
+                {
+                    var hasDependencies = _context.IssueDependancies.Where(d => d.MajorIssue == Guid.Parse(issueId))
+                        .ToList();
+                    Boolean hasError = false;
+                    string errorMessage = "";
+                    foreach (var dep in hasDependencies)
+                    {
+                        if (_context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 1 || _context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 3)
+                        {
+                            hasError = true;
+                            errorMessage = string.Format("{0}, ",
+                                _context.IssuesList.First(e => e.Id == dep.Dependancies).Ticket);
+                        }
+                    }
+
+                    if (!hasError)
+                    {
+                        issue.IssueClosedBy = Guid.Parse(_session.UserId);
+                        issue.IssueClosedDate = DateTime.Now.Ticks;
+                        issue.IssueStatus = 4;
+                        _context.IssuesList.Update(issue);
+                        _context.SaveChanges();
+                        CloseDueDate(issue.Id);
+                        CloseActiveTask(issue.Id);
+                        CreateActionTrackers(issueId, actionType, null, remark);
+                        SetNotification(Guid.Parse(issueId), actionType, null, null, true);
+                    }
+                    else
+                    {
+                        errorMessage = string.Format("Dependency issues of {0} are not closed", errorMessage);
+
+                        throw new Exception(errorMessage);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Issue Already closed/cancelled");
+                }
+            }
+            else
+            {
+                throw new Exception("Issue Not Found");
+            }
+        }
+
         public void ReopenIssue(string issueId, string remark)
         {
             var actionType = "Re-Opened Issue";
@@ -1309,6 +1363,39 @@ namespace IssueTracking.Domain.IssueTracking
                         _context.SaveChanges();
                         CreateActionTrackers(issues, actionType, null, model.Remark);
                         SetNotification(issue.Id, actionType, issue.ForwardTo, null, true);
+                        success++;
+                    }
+                    else
+                    {
+                        failed++;
+                    }
+                }
+                else
+                {
+                    failed++;
+                }
+            }
+
+            ret = string.Format("Action Executed, with {1} success and {2} failed out off {0} total requested issues",
+                model.CaseList.Count(), success, failed);
+            return ret;
+        }
+        public string PatchMakeReadNotification(PatchActionModel model)
+        {
+            string ret = "";
+            int success = 0;
+            int failed = 0;
+            foreach (var notification in model.CaseList)
+            {
+                var notify = _context.IssueNotification.FirstOrDefault(i => i.Id == Guid.Parse(notification));
+                if (notify != null)
+                {
+                    if (!notify.Status)
+                    {
+                        notify.Status = true;
+                        _context.IssueNotification.Update(notify);
+                        _context.SaveChanges();
+                       
                         success++;
                     }
                     else
@@ -2244,6 +2331,8 @@ namespace IssueTracking.Domain.IssueTracking
                 ret = 19;
             else if (name.Equals("Issue Forwarded To"))
                 ret = 20;
+            else if (name.Equals("Cancelled Issue"))
+                ret = 21;
 
             return ret;
         }
