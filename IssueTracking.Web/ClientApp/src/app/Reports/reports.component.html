@@ -1,0 +1,89 @@
+<style>
+    .menu-item {
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 14px;
+        color: black;
+        transition: background-color 0.3s;
+    }
+
+    .menu-item:hover {
+        background-color: lightgrey; 
+    }
+</style>
+
+
+<div class="breadcomb-area" >
+    <div class="container">
+        <div class="breadcomb-list">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="breadcomb-wp">
+                        <div class="breadcomb-icon">
+                            <i class="fa fa-file-text-o sub-icon-mg"></i>
+                        </div>
+                        <div class="breadcomb-ctn">
+                            <h2>Reports</h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="breadcomb-area" >
+    <div class="container">
+        <div class="breadcomb-list">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="breadcomb-wp">
+                        <div class="card">
+                            <div class="card-body" style="min-height: 600px; padding: 0.75em 0em">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <div class="col-md-2 col-sm-3" style="min-height: 585px; border-right: 4px solid #eee">
+                                            <ul class="nav navbar-nav">
+                                            <li class="menu-title" style="border-bottom: 1px solid #eee;"> <h3 class="fa fa-list-alt" style="color: #00c292" > Statistical Report</h3>  </li>
+                                            <li class="menu-item">
+                                                <a [routerLink]="" (click)="openReport(1)" style="border-bottom: 1px solid #0c0c0c; padding: 10px; color: black !important; ">Issue Priority with Issue Status</a>
+                                            </li>
+                                            <li class="menu-item">
+                                                <a [routerLink]="" (click)="openReport(2)" style="border-bottom: 1px solid #0c0c0c; padding: 10px; color: black !important;">Branch with Issue Priority, Issue Status</a>
+                                            </li>
+                                            <li class="menu-item">
+                                                <a [routerLink]="" (click)="openReport(3)" style="border-bottom: 1px solid #0c0c0c; padding: 10px; color: black !important;">Issues Raised with Issue Status</a>
+                                            </li>
+                                            <li class="menu-title" style="border-bottom: 1px solid #eee;"> <h3 class="fa fa-list-alt" style="color: #00c292" > Cancelled Issues Report </h3>  </li>
+                                            <li class="menu-item">
+                                                <a [routerLink]="" (click)="openReport(4)" style="border-bottom: 1px solid #0c0c0c; padding: 10px; color: black !important;">Cancelled Issues List</a>
+                                            </li>    
+                                                
+                                            <br />
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-9" style="padding: 0;">
+                                        <div class="col-md-12" *ngIf="stat_one">
+                                            <app-issue-priority-status-stat></app-issue-priority-status-stat>
+                                        </div>
+                                        <div class="col-md-12" *ngIf="stat_two">
+                                            <app-issue-priority-branch-stat></app-issue-priority-branch-stat>
+                                        </div>
+                                        <div class="col-md-12" *ngIf="stat_three">
+                                            <app-issue-raised-status-stat></app-issue-raised-status-stat>
+                                        </div>
+                                        <div class="col-md-12" *ngIf="stat_four">
+                                            <app-cancelled-issues-stat></app-cancelled-issues-stat>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

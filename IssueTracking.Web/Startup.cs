@@ -3,6 +3,7 @@ using System.IO;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 using IssueTracking.Domain.IssueTracking;
+using IssueTracking.Domain.Reports;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -155,6 +156,8 @@ namespace IssueTracking.Web
             services.AddTransient<IUserActionService, UserActionService>();
             services.AddTransient<IIssueTrackingService, IssueTrackingService>();
             services.AddTransient<IIssueTrackingFacade, IssueTrackingFacade>();
+            services.AddTransient<IReportService, ReportService>();
+            services.AddTransient<IReportFacade, ReportFacade>();
         }
     }
 }

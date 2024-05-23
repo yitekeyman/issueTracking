@@ -1,124 +1,204 @@
-<div class="breadcomb-area">
-  <div class="container">
-    <div class="breadcomb-list">
-      <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <div class="breadcomb-wp">
-            <div class="breadcomb-icon">
-              <i class="notika-icon  notika-bar-chart"></i>
-            </div>
-            <div class="breadcomb-ctn">
-              <h2>Dashboard</h2>
-              <p *ngIf="dashboard!=null"> Total Issues: <span class="bread-ntd">{{dashboard.total}}</span>, &nbsp;&nbsp;Open
-                Issues: <span class="bread-ntd">{{dashboard.open}}</span>, &nbsp;&nbsp;Closed Issues: <span
-                  class="bread-ntd">{{dashboard.closed}}</span></p>
-            </div>
-          </div>
-        </div>
-        <!--        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">-->
-        <!--          <div class="breadcomb-report">-->
+<style>
+    .card-counter {
+        box-shadow: 2px 2px 10px #DADADA;
+        margin: 5px;
+        padding: 20px 20px;
+        background-color: #fff;
+        height: 90px;
+        border-radius: 5px;
+        transition: .3s linear all;
+    }
 
-        <!--          </div>-->
-        <!--        </div>-->
-      </div>
+    .card-counter:hover {
+        box-shadow: 4px 4px 20px #DADADA;
+        transition: .3s linear all;
+    }
+
+    .card-counter.primary {
+        background-color: #FFF;
+        color:  #007bff;
+    }
+
+    .card-counter.danger {
+        background-color: #FFF;
+        color: #ef5350;
+    }
+
+    .card-counter.success {
+        background-color: #FFF;
+        color: #66bb6a;
+    }
+
+    .card-counter i {
+        font-size: 55px;
+        width: 60px;
+        height: 60px;
+        top: 10px;
+        border-radius: 50%;
+        margin-right: 15px;
+        display: block;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card-counter .count-numbers {
+        position: absolute;
+        right: 35px;
+        top: 20px;
+        font-size: 32px;
+        display: block;
+    }
+
+    .card-counter .count-name {
+        position: absolute;
+        right: 35px;
+        top: 65px;
+        font-style: normal;
+        text-transform: capitalize;
+        display: block;
+        font-size: 18px;
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
+<div class="breadcomb-area">
+    <div class="container">
+        <div class="breadcomb-list">
+            <div class="breadcomb-wp">
+                <div class="breadcomb-icon">
+                    <i class="notika-icon notika-edit"></i>
+                </div>
+                <div class="breadcomb-ctn">
+                    <h2>Dashboard</h2>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-md-3">
+                    <div class="card-counter primary" *ngIf="dashboard!=null">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span class="count-numbers">{{dashboard.total}}</span>
+                        <span class="count-name">Total Issues</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-counter danger">
+                        <i class="fa fa-ticket"></i>
+                        <span class="count-numbers">{{dashboard.open}}</span>
+                        <span class="count-name">Open Issues</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-counter success">
+                        <i class="fa fa-check-circle"></i>
+                        <span class="count-numbers">{{dashboard.closed}}</span>
+                        <span class="count-name">Closed Issues</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
 </div>
 
+
+
 <div class="invoice-area">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-        <div class="invoice-wrap" style="min-height: 450px;">
-          <table class="table" *ngIf="dashboard!=null">
-            <tbody *ngIf="dashboard.actions?.length>0">
-            <tr *ngFor="let row of dashboard.actions">
-              <td style="border-top: 1px dashed #00c292">
-                <table style="width: 100%">
-                  <tr>
-                    <td style="vertical-align: top; width:10%;">
-                      <div class="conversation-list">
-                        <div class="chat-avatar">
-                          <img src="assets/img/post/1.jpg" alt="male" class="mCS_img_loaded">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                <div class="invoice-wrap" style="min-height: 450px;">
+                    <table class="table" *ngIf="dashboard!=null">
+                        <tbody *ngIf="dashboard.actions?.length>0">
+                        <tr *ngFor="let row of dashboard.actions">
+                            <td style="border-top: 1px dashed #00c292">
+                                <table style="width: 100%">
+                                    <tr>
+                                        <td style="vertical-align: top; width:10%;">
+                                            <div class="conversation-list">
+                                                <div class="chat-avatar">
+                                                    <img src="assets/img/post/1.jpg" alt="male" class="mCS_img_loaded">
+                                                </div>
+
+                                            </div>
+                                        </td>
+                                        <td style="vertical-align: top">
+                                            <h4>{{row.userId.firstName}} {{row.actionType}} <a href=""
+                                                                                               routerLink="" (click)="seeIssueDetails(row.issue.id)">{{row.issue.issueType}}#{{row.issue.ticketNo}}</a></h4>
+                                            <p>{{row.issue.issueTitle}}  {{row.issue.policyNo}}<br/>
+                                                <small>{{row.remark}}</small><br/>
+                                                <small title="{{issueTrackingService.convertDate(row.actionDate)}}" data-toggle="tooltip" data-placement="bottom" data-original-title="{{convertDate(row.actionDate)}}" aria-describedby="tooltip891370">{{issueTrackingService.timeDifference(row.actionDate)}} </small></p>
+                                        </td>
+                                        <td style="vertical-align: top; text-align: right; color: #00c292; font-size: 18pt">
+                                            <span *ngIf="row.actionTypeId==1 || row.actionTypeId==3 || row.actionTypeId==4"><i class="fa fa-exclamation-circle"></i> </span>
+                                            <span *ngIf="row.actionTypeId==2 || row.actionTypeId==5 "><i class="fa fa-check-circle"></i> </span>
+                                            <span *ngIf="row.actionTypeId==6"><i class="fa fa-user-plus"></i> </span>
+                                            <span *ngIf="row.actionTypeId==7"><i class="fa fa-comments"></i> </span>
+                                            <span *ngIf="row.actionTypeId==8"><i class="fa fa-commenting"></i> </span>
+                                            <span *ngIf="row.actionTypeId==9"><i class="fa fa-pencil-square-o"></i> </span>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tbody *ngIf="dashboard.actions?.length==0">
+                        <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+                            <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                                    class="fa fa-exclamation-triangle"></i></div>
+                            <h2>Sorry</h2>
+                            <p>There is no action performed yet</p>
                         </div>
-
-                      </div>
-                    </td>
-                    <td style="vertical-align: top">
-                      <h4>{{row.userId.firstName}} {{row.actionType}} <a href=""
-                                                                        routerLink="" (click)="seeIssueDetails(row.issue.id)">{{row.issue.issueType}}#{{row.issue.ticketNo}}</a></h4>
-                        <p>{{row.issue.issueTitle}}  {{row.issue.policyNo}}<br/>
-                        <small>{{row.remark}}</small><br/>
-                        <small title="{{issueTrackingService.convertDate(row.actionDate)}}" data-toggle="tooltip" data-placement="bottom" data-original-title="{{convertDate(row.actionDate)}}" aria-describedby="tooltip891370">{{issueTrackingService.timeDifference(row.actionDate)}} </small></p>
-                    </td>
-                    <td style="vertical-align: top; text-align: right; color: #00c292; font-size: 18pt">
-                      <span *ngIf="row.actionTypeId==1 || row.actionTypeId==3 || row.actionTypeId==4"><i class="fa fa-exclamation-circle"></i> </span>
-                      <span *ngIf="row.actionTypeId==2 || row.actionTypeId==5 "><i class="fa fa-check-circle"></i> </span>
-                      <span *ngIf="row.actionTypeId==6"><i class="fa fa-user-plus"></i> </span>
-                      <span *ngIf="row.actionTypeId==7"><i class="fa fa-comments"></i> </span>
-                      <span *ngIf="row.actionTypeId==8"><i class="fa fa-commenting"></i> </span>
-                      <span *ngIf="row.actionTypeId==9"><i class="fa fa-pencil-square-o"></i> </span>
-                    </td>
-                  </tr>
-                </table>
-
-              </td>
-            </tr>
-            </tbody>
-            <tbody *ngIf="dashboard.actions?.length==0">
-            <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
-              <div style="text-align: center; font-size: 50px; color:#00c292"><i
-                class="fa fa-exclamation-triangle"></i></div>
-              <h2>Sorry</h2>
-              <p>There is no action performed yet</p>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-        <div class="invoice-wrap" style="min-height: 450px;">
-          <div class="form-group">
-            <select class="form-control" [(ngModel)]="selectedDepartment" (change)="selectBranch()" [disabled]="!(ITDeptId==loggedInDepartmentId)">
-              <option value="">All Branchs/Dept</option>
-              <option *ngFor="let dept of departmentList" [value]="dept.id">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="invoice-wrap" style="min-height: 450px;">
+                    <div class="form-group">
+                        <select class="form-control" [(ngModel)]="selectedDepartment" (change)="selectBranch()" [disabled]="!(ITDeptId==loggedInDepartmentId)">
+                            <option value="">All Branchs/Dept</option>
+                            <option *ngFor="let dept of departmentList" [value]="dept.id">
                 <span
-                  *ngIf="dept.branchId==10">{{dept.departmentName}}</span> <span
-                *ngIf="dept.branchId!=10">{{dept.branchName}}</span>
-              </option>
-            </select>
-          </div>
-          <div class="accordion-stn" *ngIf="dashboard!=null">
-            <div class="panel-group" data-collapse-color="nk-green" id="accordionGreen" role="tablist"
-                 aria-multiselectable="true">
-              <div class="panel panel-collapse notika-accrodion-cus" *ngFor="let sideBar of dashboard.raisedSystems">
-                <div class="panel-heading" role="tab">
-                  <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordionGreen" href="#sys_{{sideBar.system.id}}"
-                       aria-expanded="false" class="collapsed">
-                      <table style="width: 100%; font-size: 12pt">
-                        <tr><td style="font-size: 12pt">{{sideBar.system.name}}</td><td style="text-align: right; font-size: 12pt">{{sideBar.system.total}}</td></tr>
-                      </table>
-                    </a>
-                  </h4>
-                </div>
-                <div id="sys_{{sideBar.system.id}}" class="collapse" role="tabpanel" aria-expanded="false"
-                     style="height: 0px;">
-                  <div class="panel-body">
-                    <table class="table table-striped" style="font-size: 11pt">
-                      <tr><td><b><i class="fa fa-exclamation-circle" style="color: #FF9800"></i> Open: {{sideBar.system.open}}</b></td><td style="text-align: right;padding: 5px 0;"><b><i class="fa fa-check-circle" style="color: #4CAF50"></i> Closed: {{sideBar.system.closed}}</b></td></tr>
-                    </table>
-                    <table style="width: 100%;font-size: 10pt">
-                      <tr *ngFor="let row of sideBar.issueType"><td style="padding: 5px 0; border-bottom: 1px solid #00c292"><b>{{row.name}}</b></td><td style="text-align: right; font-size: 9pt;border-bottom: 1px solid #00c292; width:30%">{{row.open}} <i class="fa fa-exclamation-circle" style="color: #FF9800"></i> | {{row.closed}} <i class="fa fa-check-circle" style="color: #4CAF50"></i> </td></tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
+                        *ngIf="dept.branchId==10">{{dept.departmentName}}</span> <span
+                                    *ngIf="dept.branchId!=10">{{dept.branchName}}</span>
+                            </option>
+                        </select>
+                    </div>
+                    <div class="accordion-stn" *ngIf="dashboard!=null">
+                        <div class="panel-group" data-collapse-color="nk-green" id="accordionGreen" role="tablist"
+                             aria-multiselectable="true">
+                            <div class="panel panel-collapse notika-accrodion-cus" *ngFor="let sideBar of dashboard.raisedSystems">
+                                <div class="panel-heading" role="tab">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordionGreen" href="#sys_{{sideBar.system.id}}"
+                                           aria-expanded="false" class="collapsed">
+                                            <table style="width: 100%; font-size: 12pt">
+                                                <tr><td style="font-size: 12pt">{{sideBar.system.name}}</td><td style="text-align: right; font-size: 12pt">{{sideBar.system.total}}</td></tr>
+                                            </table>
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="sys_{{sideBar.system.id}}" class="collapse" role="tabpanel" aria-expanded="false"
+                                     style="height: 0px;">
+                                    <div class="panel-body">
+                                        <table class="table table-striped" style="font-size: 11pt">
+                                            <tr><td><b><i class="fa fa-exclamation-circle" style="color: #FF9800"></i> Open: {{sideBar.system.open}}</b></td><td style="text-align: right;padding: 5px 0;"><b><i class="fa fa-check-circle" style="color: #4CAF50"></i> Closed: {{sideBar.system.closed}}</b></td></tr>
+                                        </table>
+                                        <table style="width: 100%;font-size: 10pt">
+                                            <tr *ngFor="let row of sideBar.issueType"><td style="padding: 5px 0; border-bottom: 1px solid #00c292"><b>{{row.name}}</b></td><td style="text-align: right; font-size: 9pt;border-bottom: 1px solid #00c292; width:30%">{{row.open}} <i class="fa fa-exclamation-circle" style="color: #FF9800"></i> | {{row.closed}} <i class="fa fa-check-circle" style="color: #4CAF50"></i> </td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>

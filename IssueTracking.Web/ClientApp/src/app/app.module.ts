@@ -22,6 +22,7 @@ import {DialogModule} from "./_shared/dialog/dialog.module";
 import {DialogService} from "./_shared/dialog/dialog.service";
 import {NotificationService} from "./_Services/notification.service";
 import {NotificationsComponent} from "./notifications/notifications.component";
+import {ReportService} from "./_Services/report.service";
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import {NotificationsComponent} from "./notifications/notifications.component";
     AppRoutingModule,
     NgxDropzoneModule,
     DialogModule,
+    
 
   ],
   declarations: [
@@ -48,7 +50,8 @@ import {NotificationsComponent} from "./notifications/notifications.component";
     IssueTrackingService,
     PagerService,
     DialogService,
-    NotificationService
+    NotificationService,
+    ReportService
   ],
   bootstrap: [AppComponent]
 })

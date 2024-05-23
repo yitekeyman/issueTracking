@@ -1,0 +1,116 @@
+<style>
+
+    .align-center {
+        text-align: center;
+    }
+
+    .align-right {
+        text-align: right;
+    }
+
+
+    table {
+        font-size: 12px;
+        width: 100%;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        color: black;
+
+    }
+
+    table th, table td {
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: top;
+        border: 1px solid #ddd;
+        color: black;
+    }
+</style>
+<div class="col-md-12">
+    <div class="report-tab">
+        <div class="page-header float-left">
+            <div class="page-title" style="color: black">
+                <h4 class="box-title">Cancelled Issues List Report</h4>
+            </div>
+        </div>
+        <div class="page-header float-right">
+            <div class="page-title">
+                <table class="table">
+                    <tr>
+                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                            <label>Issue Date From</label>
+                            <input type="date" class="form-control" [(ngModel)]="dateFrom">
+                        </td>
+                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                            <label>Issue Date To</label>
+                            <input type="date" class="form-control" [(ngModel)]="dateTo">
+                        </td>
+                        <td style="width: 33%; border:none; padding-top: 36px">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success" (click)="generateReport()">Generate</button>
+                                <button type="button" class="btn btn-outline-info" [useExistingCss]="true"
+                                        printSectionId="print-section-all"
+                                        ngxPrint *ngIf="reportResult!=null">Print
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="border-bottom: 4px solid #eee; width: 100%; float: left" ></div>
+    <div class="printExp_body" id="print-section-all" style="width: 100%; float: left; max-height: 500px; overflow-y: auto"
+         *ngIf="reportResult!=null">
+        <table style="font-size:12pt">
+            <tr>
+                <td><label style="font-size: 14px; font-weight: bold; color: black">Report Title: </label> {{reportResult.reportHeader.reportTitle}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 14px; font-weight: bold; color: black">Issue Date From: </label> {{convertDate(reportResult.reportHeader.dateFrom)}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 14px; font-weight: bold; color: black">Issue Date To: </label> {{convertDate(reportResult.reportHeader.dateTo)}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 14px; font-weight: bold; color: black">Issue Generated On: </label> {{convertDate(reportResult.reportHeader.reportGeneratedOn)}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 14px; font-weight: bold; color: black">Total Record: </label> {{reportResult.reportList.length}}</td>
+            </tr>
+        </table>
+        <table style="font-size:10pt">
+            <thead>
+
+            <tr>
+                <th>#</th>
+                <th>Branch</th>
+                <th class="align-center">Employee Name</th>
+                <th class="align-center">Ticket</th>
+                <th class="align-center">Issue Title</th>
+                <th class="align-center">Issue Raised</th>
+                <th class="align-center">Issue Type</th>
+                <th class="align-center">Issue Date</th>
+                <th class="align-center">Remark</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rep of reportResult.reportList; index as i">
+                <td>{{i+1}}</td>
+                <td>{{rep.branch}}</td>
+                <td style="white-space: nowrap">{{rep.employeeName}}</td>
+                <td style="white-space: nowrap">{{rep.ticket}}</td>
+                <td style="white-space: nowrap">{{rep.issueTitle}}</td>
+                <td style="white-space: nowrap">{{rep.issueRaised}}</td>
+                <td style="white-space: nowrap">{{rep.issueType}}</td>
+                <td style="white-space: nowrap">{{convertDate(rep.issueDate)}}</td>
+                <td class="align-center"></td>
+            </tr>
+
+            </tbody>
+
+        </table>
+    </div>
+</div>

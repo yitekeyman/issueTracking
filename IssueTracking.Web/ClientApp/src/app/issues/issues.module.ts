@@ -11,6 +11,7 @@ import {IssuesComponent} from "./issues.component";
 import {SettingsRouting} from "../settings/settings.routing";
 import {HttpClientModule} from "@angular/common/http";
 import {ForwardIssueComponent} from "./forwardIssue/forward-issue.component";
+import {ReportsModule} from "../Reports/reports.module";
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {ForwardIssueComponent} from "./forwardIssue/forward-issue.component";
     NgxDropzoneModule,
     MonacoEditorModule,
     HttpClientModule,
-    IssuesRoutingModule
+    IssuesRoutingModule,
+    ReportsModule
   ],
 
   exports: [

@@ -10,7 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "noEmitHelpers": false,
+    "noEmitHelpers": true,
     "isolatedModules": false,
     "target": "ES2022",
     "useDefineForClassFields": false,

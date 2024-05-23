@@ -1,0 +1,122 @@
+<style>
+
+    .align-center {
+        text-align: center;
+    }
+
+    .align-right {
+        text-align: right;
+    }
+
+
+    table {
+        font-size: 12px;
+        width: 100%;
+        margin-bottom: 1rem;
+        max-width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        color: black;
+
+    }
+
+    table th, table td {
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: top;
+        border: 1px solid #ddd;
+        color: black;
+    }
+</style>
+<div class="col-md-12">
+    <div class="report-tab">
+        <div class="page-header float-left">
+            <div class="page-title" style="color: black">
+                <h4 class="box-title">Issues Raised With Issue Status Statistical Report</h4>
+            </div>
+        </div>
+        <div class="page-header float-right">
+            <div class="page-title">
+                <table class="table">
+                    <tr>
+                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                            <label>Issue Date From</label>
+                            <input type="date" class="form-control" [(ngModel)]="dateFrom">
+                        </td>
+                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                            <label>Issue Date To</label>
+                            <input type="date" class="form-control" [(ngModel)]="dateTo">
+                        </td>
+                        <td style="width: 33%; border:none; padding-top: 36px">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success" (click)="generateReport()">Generate</button>
+                                <button type="button" class="btn btn-outline-info" [useExistingCss]="true"
+                                        printSectionId="print-section-all"
+                                        ngxPrint *ngIf="reportResult!=null">Print
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="border-bottom: 4px solid #eee; width: 100%; float: left" ></div>
+    <div class="printExp_body" id="print-section-all" style="width: 100%; float: left; max-height: 850px; overflow-y: auto"
+         *ngIf="reportResult!=null">
+        <table style="font-size:12pt">
+            <tr>
+                <td><label style="font-size: 16px; font-weight: bold; color: black">Report Title: </label> {{reportResult.reportHeader.reportTitle}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 16px; font-weight: bold; color: black">Issue Date From: </label> {{convertDate(reportResult.reportHeader.dateFrom)}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 16px; font-weight: bold; color: black">Issue Date To: </label> {{convertDate(reportResult.reportHeader.dateTo)}}</td>
+            </tr>
+            <tr>
+                <td><label style="font-size: 16px; font-weight: bold; color: black">Report Generated On: </label> {{convertDate(reportResult.reportHeader.reportGeneratedOn)}}</td>
+            </tr>
+        </table>
+        <table style="font-size:12pt">
+            <thead>
+            <tr>
+                <th rowspan="2" class="align-center">#</th>
+                <th rowspan="2" class="align-center">Issue Raised System</th>
+                <th colspan="3" class="align-center">Issue Status</th>
+                <th rowspan="2" class="align-center">Total</th>
+                <th rowspan="2" class="align-center">Remark</th>
+            </tr>
+            <tr>
+
+                <th class="align-center">Pending Issues</th>
+                <th class="align-center">Open Issues </th>
+                <th class="align-center">Closed Issues</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rep of reportResult.reportList; index as i">
+                <td><span *ngIf="rep.title!='Total'">{{i+1}}</span></td>
+                <td>{{rep.title}}</td>
+                <td class="align-center">{{rep.pendingIssues}}</td>
+                <td class="align-center">{{rep.openIssues}}</td>
+                <td class="align-center">{{rep.closedIssues}}</td>
+                <td class="align-center">{{rep.total}}</td>
+                <td class="align-center"></td>
+            </tr>
+            <tr *ngFor="let rep of reportResult.reportList; index as i">
+                <td  *ngIf="rep.title=='Total'"><span *ngIf="rep.title!='Total'">{{i+1}}</span></td>
+                <td *ngIf="rep.title=='Total'">Percent</td>
+                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.pendingIssues*100/rep.total)|currency :" "}}%</span></td>
+                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.openIssues*100/rep.total)|currency :" "}}%</span></td>
+                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.closedIssues*100/rep.total)|currency :" "}}%</span></td>
+                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.total*100/rep.total)|currency :" "}}%</span></td>
+                <td *ngIf="rep.title=='Total'" class="align-center"></td>
+            </tr>
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+

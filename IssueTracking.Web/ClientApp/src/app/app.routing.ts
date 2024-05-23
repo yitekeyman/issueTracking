@@ -38,6 +38,12 @@ const routes: Routes =[
 
   {
     path: 'LIT',
+    redirectTo: 'LIT/report',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'LIT',
     component: AdminLayoutComponent,
     children: [
       {
