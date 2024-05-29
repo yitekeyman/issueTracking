@@ -1156,7 +1156,7 @@ namespace IssueTracking.Domain.IssueTracking
                 }
             }
         }
-
+   
         public void CloseIssue(string issueId, string remark)
         {
             var actionType = "Closed Issue";
@@ -1260,6 +1260,7 @@ namespace IssueTracking.Domain.IssueTracking
                 throw new Exception("Issue Not Found");
             }
         }
+
 
         public void ReopenIssue(string issueId, string remark)
         {

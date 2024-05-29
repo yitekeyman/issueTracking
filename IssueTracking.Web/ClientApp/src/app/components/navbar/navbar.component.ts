@@ -17,7 +17,8 @@ export class NavbarComponent implements OnInit {
   public departmentName: string = "";
   public userRole: string = "";
   public userId: string = "";
-
+  public ITDept = 'f48cb514-8e36-4a87-a2e0-49042c096c99';
+  public ITStaff = [];
   public routerLink = "/LIT/issues"
   public q = '';
   public state = 1;
@@ -36,6 +37,9 @@ export class NavbarComponent implements OnInit {
     this.username = localStorage.getItem("username");
     this.userRole = localStorage.getItem("role");
     this.departmentId = localStorage.getItem("departmentId");
+    this.issueTrackingService.GetAllEmployeeByBranchId(this.ITDept).subscribe(res => {
+      this.ITStaff = res;
+    });
     this.userId = localStorage.getItem("userId");
     this.issueTrackingService.GetUnReadNotification().subscribe(res2=>{
       this.totalNotif=res2;

@@ -94,7 +94,7 @@
           </li>
           <li routerLinkActive="active"><a data-toggle="tab" href="#Notif" routerLink="/LIT/notification"><i class="notika-icon notika-alarm"></i>  Notification </a>
           </li>
-          <li routerLinkActive="active"><a data-toggle="tab" href="#Rep" routerLink="/LIT/reports"><i class="fa fa-file-text-o sub-icon-mg"></i>  Report </a>
+          <li routerLinkActive="active" *ngIf="departmentId==ITDept"><a data-toggle="tab" href="#Rep" routerLink="/LIT/reports"><i class="fa fa-file-text-o sub-icon-mg"></i>  Report </a>
           </li>
 
         </ul>
