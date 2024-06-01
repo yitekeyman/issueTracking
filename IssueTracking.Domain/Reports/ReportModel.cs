@@ -58,6 +58,7 @@ namespace IssueTracking.Domain.Reports
             public string IssueTitle { get; set; }
             public string IssueRaised { get; set; }
             public string IssueType { get; set; }
+            public string CancelReason { get; set; }
             public string Branch { get; set; }
             public string EmployeeName { get; set; }
             public DateTime IssueDate { get; set; }

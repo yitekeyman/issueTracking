@@ -24,11 +24,11 @@
         padding: 8px;
         line-height: 1.42857143;
         vertical-align: top;
-        border: 1px solid #ddd;
+        border: 2px solid #ddd;
         color: black;
     }
 </style>
-<div class="col-md-12">
+<div class="col-md-9">
     <div class="report-tab">
         <div class="page-header float-left">
             <div class="page-title" style="color: black">
@@ -92,6 +92,7 @@
                 <th class="align-center">Issue Title</th>
                 <th class="align-center">Issue Raised</th>
                 <th class="align-center">Issue Type</th>
+                <th class="align-center">Cancel Reason</th>
                 <th class="align-center">Issue Date</th>
                 <th class="align-center">Remark</th>
             </tr>
@@ -105,6 +106,7 @@
                 <td style="white-space: nowrap">{{rep.issueTitle}}</td>
                 <td style="white-space: nowrap">{{rep.issueRaised}}</td>
                 <td style="white-space: nowrap">{{rep.issueType}}</td>
+                <td style="white-space: nowrap">{{rep.cancelReason}}</td>
                 <td style="white-space: nowrap">{{convertDate(rep.issueDate)}}</td>
                 <td class="align-center"></td>
             </tr>

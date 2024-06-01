@@ -7,11 +7,12 @@
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
               <div class="breadcomb-icon">
                 <div class="btn-group">
-                  <button type="button" class="btn btn-default "
+                  <button type="button" class="btn btn-default" (click)="goBack()"> Back </button>
+                  <button type="button" class="btn btn-default"
                           *ngIf="(issue.issueStatus.id==1) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
                           (click)="IssueClose()">Close
                   </button>
-                  <button type="button" class="btn btn-default "
+                  <button type="button" class="btn btn-default"
                           *ngIf="(issue.issueStatus.id==3)  && (issue.issueRequestedBy.id==loggedInEmployeeId || issue.forwardTo==loggedInDepartmentId)"
                           (click)="IssueCancel()">Cancel
                   </button>
@@ -19,7 +20,7 @@
                           *ngIf="(issue.issueStatus.id==2) && (loggedInDepartmentId==ITDept || issue.issueRequestedBy.id==loggedInEmployeeId)"
                           (click)="Reopen()">Reopen
                   </button>
-                  <button data-placement="left" title="Edit Issue" class="btn btn-default " data-toggle="modal"
+                  <button data-placement="left" title="Edit Issue" class="btn btn-default" data-toggle="modal"
                           data-target="#editIssueModal"
                           *ngIf="issue.issueStatus.id==1 && issue.issueRequestedBy.id==loggedInEmployeeId"
                           (click)="editIssue(issueId)">Edit

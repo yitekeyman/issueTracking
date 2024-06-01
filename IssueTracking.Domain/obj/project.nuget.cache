@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7FzIAtoaa396zkVL360ZKjzh9w4BoMXAizonp2fNW1gEhk84ZIard6RFQl1l9GHc5ZORsnUplqhkRFoRw8f0/w==",
+  "dgSpecHash": "QX6/sKejSx0kyc9GqdplhnF1zrR5Eu8dIhbDLwVJ8/fXNmPLRucwdyeJA5RohdIjai/wc7HodhYHAaiFXfqaqw==",
   "success": true,
-  "projectFilePath": "E:\\code\\issueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
+  "projectFilePath": "C:\\Users\\user\\Pictures\\issueTracking\\IssueTracking.Domain\\IssueTracking.Domain.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\documentformat.openxml\\2.9.1\\documentformat.openxml.2.9.1.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\libuv\\1.10.0\\libuv.1.10.0.nupkg.sha512",
