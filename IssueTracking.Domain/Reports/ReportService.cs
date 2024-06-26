@@ -937,7 +937,8 @@ namespace IssueTracking.Domain.Reports
             var delIss = _context.IssuesList
                 .Where(d => d.IssueStatus == 4 &&
                             d.IssueClosedDate >= reportHeader.DateFrom.Ticks &&
-                            d.IssueClosedDate <= reportHeader.DateTo.Ticks).ToList();
+                            d.IssueClosedDate <= reportHeader.DateTo.Ticks).ToList()
+                .OrderBy(d => d.IssueRequestedDate);
             foreach (var dl in delIss)
             {
                 var department = GetDepartment(dl.BranchId).DepartmentName;
@@ -947,7 +948,12 @@ namespace IssueTracking.Domain.Reports
                
                 var issueRaisedSystem = _context.IssueRaisedSystem.FirstOrDefault(i => i.Id == dl.IssueType.RaisedSystemId);
                 var issueRaised = issueRaisedSystem != null ? issueRaisedSystem.Name : "N/A";
-
+                
+                var cancelReason = _context.IssueComments
+                    .Where(ic => ic.IssueId == (Guid?)dl.Id)
+                    .OrderByDescending(ic => ic.CommentDate)
+                    .Select(ic => ic.IssueComment)
+                    .FirstOrDefault();
                 var report = new CancelledIssuesList()
                 {
                     EmployeeId = dl.Id.ToString(),
@@ -957,7 +963,8 @@ namespace IssueTracking.Domain.Reports
                     Ticket = dl.Ticket,
                     EmployeeName = GetEmployee(dl.IssueRequestedBy).FirstName + " " + GetEmployee(dl.IssueRequestedBy).FatherName,
                     Branch = department,
-                    IssueDate = new DateTime(dl.IssueRequestedDate ?? 0)
+                    IssueDate = new DateTime(dl.IssueRequestedDate ?? 0),
+                    CancelReason = cancelReason
                 };
 
                 reportList.ReportList.Add(report);
