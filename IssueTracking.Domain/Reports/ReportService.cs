@@ -37,25 +37,24 @@ namespace IssueTracking.Domain.Reports
         private ReportHeaderModel ReportHeader(DateTime dateFrom, DateTime dateTo)
         {
             var reportHeader = new ReportHeaderModel();
+
             if (dateFrom == new DateTime(0001, 1, 1))
             {
                 dateFrom = new DateTime(1970, 1, 1);
-                reportHeader.DateFrom = dateFrom;
             }
-            else
-            {
-                reportHeader.DateFrom = dateFrom;
-            }
+
+            reportHeader.DateFrom = dateFrom;
 
             if (dateTo == new DateTime(0001, 1, 1))
             {
                 dateTo = DateTime.Now;
-                reportHeader.DateTo = dateTo;
             }
             else
             {
-                reportHeader.DateTo = dateTo;
+                dateTo = dateTo.Date.AddDays(1).AddSeconds(-1);
             }
+
+            reportHeader.DateTo = dateTo;
 
             reportHeader.ReportGeneratedOn = DateTime.Now;
             return reportHeader;
@@ -75,20 +74,20 @@ namespace IssueTracking.Domain.Reports
                 PendingIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 3 && i.IssuePriority == 2 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 OpenIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 1 && i.IssuePriority == 2 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(), 
                 ClosedIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 2 && i.IssuePriority == 2 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 Total = _context.IssuesList.Where(i =>
                     i.IssuePriority == 2 &&
                     (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
             reportList.ReportList.Add(high);
 
@@ -99,20 +98,20 @@ namespace IssueTracking.Domain.Reports
                 PendingIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 3 && i.IssuePriority == 3 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 OpenIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 1 && i.IssuePriority == 3 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 ClosedIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 2 && i.IssuePriority == 3 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 Total = _context.IssuesList.Where(i =>
                     i.IssuePriority == 3 &&
                     (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
             reportList.ReportList.Add(medium);
 
@@ -123,20 +122,20 @@ namespace IssueTracking.Domain.Reports
                 PendingIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 3 && i.IssuePriority == 4 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 OpenIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 1 && i.IssuePriority == 4 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 ClosedIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 2 && i.IssuePriority == 4 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 Total = _context.IssuesList.Where(i =>
                     i.IssuePriority == 4 &&
                     (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
             reportList.ReportList.Add(low);
 
@@ -147,20 +146,20 @@ namespace IssueTracking.Domain.Reports
                 PendingIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 3 && i.IssuePriority == 1 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 OpenIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 1 && i.IssuePriority == 1 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 ClosedIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 2 && i.IssuePriority == 1 &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 Total = _context.IssuesList.Where(i =>
                     i.IssuePriority == 1 &&
                     (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
             reportList.ReportList.Add(normal);
 
@@ -171,21 +170,21 @@ namespace IssueTracking.Domain.Reports
                 PendingIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 3 && (i.IssuePriority >= 1 && i.IssuePriority <= 4) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 OpenIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 1 && (i.IssuePriority >= 1 && i.IssuePriority <= 4) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 ClosedIssues = _context.IssuesList.Where(i =>
                     i.IssueStatus == 2 && (i.IssuePriority >= 1 && i.IssuePriority <= 4) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
                 Total = _context.IssuesList.Where(i =>
                     (i.IssuePriority >= 1 && i.IssuePriority <= 4) &&
                     (i.IssueStatus == 1 || i.IssueStatus == 2 ||
                        i.IssueStatus == 3) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
-                    i.IssueClosedDate <= reportHeader.DateTo.Ticks).Count(),
+                    i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
             reportList.ReportList.Add(total);
             return reportList;
@@ -269,7 +268,8 @@ namespace IssueTracking.Domain.Reports
 
                     total += _context.IssuesList.Where(i =>
                         (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
-                        (i.IssuePriority >= 1 && i.IssuePriority <= 4) && i.BranchId == ds.Id &&
+                        (i.IssuePriority == 1 || i.IssuePriority == 2 ||
+                         i.IssuePriority == 3 || i.IssuePriority == 4) && i.BranchId == ds.Id &&
                         i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
                         i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count();
                 }
@@ -373,7 +373,7 @@ namespace IssueTracking.Domain.Reports
                 },
                 Total = _context.IssuesList.Where(i =>
                     (i.IssueStatus == 1 || i.IssueStatus == 2 || i.IssueStatus == 3) &&
-                    (i.IssuePriority >= 1 || i.IssuePriority <= 4) &&
+                    (i.IssuePriority >= 1 && i.IssuePriority <= 4) &&
                     i.IssueRequestedDate >= reportHeader.DateFrom.Ticks &&
                     i.IssueRequestedDate <= reportHeader.DateTo.Ticks).Count(),
             };
@@ -938,13 +938,13 @@ namespace IssueTracking.Domain.Reports
                 .Where(d => d.IssueStatus == 4 &&
                             d.IssueClosedDate >= reportHeader.DateFrom.Ticks &&
                             d.IssueClosedDate <= reportHeader.DateTo.Ticks).ToList()
-                .OrderBy(d => d.IssueRequestedDate);
+                .OrderBy(d => d.IssueClosedDate);
             foreach (var dl in delIss)
             {
                 var department = GetDepartment(dl.BranchId).DepartmentName;
                 if (GetDepartment(dl.BranchId).BranchId != 10)
                     department = GetDepartment(dl.BranchId).BranchName;
-                var issueType = GetIssueType(dl.IssueTypeId); // Call the GetIssueType method to retrieve the IssueType object
+                var issueType = GetIssueType(dl.IssueTypeId);
                
                 var issueRaisedSystem = _context.IssueRaisedSystem.FirstOrDefault(i => i.Id == dl.IssueType.RaisedSystemId);
                 var issueRaised = issueRaisedSystem != null ? issueRaisedSystem.Name : "N/A";
@@ -963,7 +963,7 @@ namespace IssueTracking.Domain.Reports
                     Ticket = dl.Ticket,
                     EmployeeName = GetEmployee(dl.IssueRequestedBy).FirstName + " " + GetEmployee(dl.IssueRequestedBy).FatherName,
                     Branch = department,
-                    IssueDate = new DateTime(dl.IssueRequestedDate ?? 0),
+                    IssueDate = new DateTime(dl.IssueClosedDate ?? 0),
                     CancelReason = cancelReason
                 };
 
@@ -972,6 +972,7 @@ namespace IssueTracking.Domain.Reports
 
             return reportList;
         }
+        
         
         private DepartmentSchemaModel GetDepartment(Guid id)
         {
