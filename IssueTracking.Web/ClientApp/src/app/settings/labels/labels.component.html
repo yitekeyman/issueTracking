@@ -1,3 +1,43 @@
+<style>
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .pagination {
+    margin-bottom: 0;
+    margin-top: 0.5rem;
+  }
+  .page-link {
+    color: white;
+    background-color: #00c292;
+    outline: none;
+  }
+  .page-link:hover {
+    background-color: #00a86b;
+    color: white;
+  }
+  .page-link:hover .page-number {
+    color: white;
+  }
+  .page-item.active .page-link {
+    outline: 1px solid black;
+    background-color: #00c292;
+  }
+  .page-item .page-link i {
+    color: white;
+  }
+  .page-item.disabled .page-link {
+    color: grey;
+  }
+  .page-item.disabled .page-link i {
+    color: grey;
+  }
+  .page-link .page-number {
+    display: inline-block;
+  }
+</style>
+
 <div class="breadcomb-area">
   <div class="container">
     <div class="row">
@@ -74,17 +114,32 @@
             </table>
 
           </div>
-          <div class="wizard-action-pro">
-            <ul class="wizard-nav-ac">
-              <li><a [ngClass]="{'disabled':pager.currentPage === 1} +' button-first a-prevent '" [routerLink]=""
-                     (click)="setPage(pager.currentPage - 1)"><i class="notika-icon notika-back"></i></a></li>
-              <li *ngFor="let page of pager.pages"><a [ngClass]="{disabled:pager.currentPage === page}+' a-prevent' "
-                                                      [routerLink]="" (click)="setPage(page)"><i
-                class="notika-icon">{{page}}</i></a></li>
-              <li><a [ngClass]="{disabled:pager.currentPage === pager.totalPages} +' a-prevent'" [routerLink]=""
-                     (click)="setPage(pager.currentPage + 1)"><i class="notika-icon notika-next-pro"></i></a></li>
-
-            </ul>
+          <div class="fixed-table-pagination" style="border-top: 2px solid #eee;">
+            <div class="pagination-container">
+              <ul class="pagination" *ngIf="pager.pages && pager.pages.length">
+                <li [ngClass]="{disabled: pager.currentPage === 1}" class="page-item">
+                  <a [routerLink]="" class="page-link" (click)="setPage(1)" [attr.disabled]="pager.currentPage === 1 ? true : null"><i class="fa fa-arrows-v"></i><i
+                          class="fa fa-chevron-left"></i></a>
+                </li>
+                <li [ngClass]="{disabled: pager.currentPage === 1}" class="page-item">
+                  <a [routerLink]="" class="page-link" (click)="setPage(pager.currentPage - 1)" [attr.disabled]="pager.currentPage === 1 ? true : null"><i
+                          class="fa fa-chevron-left"></i></a>
+                </li>
+                <li *ngFor="let page of pager.pages" [ngClass]="{'active': pager.currentPage === page}" class="page-item">
+                  <a [routerLink]="" class="page-link" (click)="setPage(page)">
+                    <span class="page-number">{{page}}</span>
+                  </a>
+                </li>
+                <li [ngClass]="{disabled: pager.currentPage === pager.totalPages}" class="page-item">
+                  <a [routerLink]="" class="page-link" (click)="setPage(pager.currentPage + 1)" [attr.disabled]="pager.currentPage === pager.totalPages ? true : null"><i
+                          class="fa fa-chevron-right"></i></a>
+                </li>
+                <li [ngClass]="{disabled: pager.currentPage === pager.totalPages}" class="page-item">
+                  <a [routerLink]="" class="page-link" (click)="setPage(pager.totalPages)" [attr.disabled]="pager.currentPage === pager.totalPages ? true : null"><i
+                          class="fa fa-chevron-right"></i><i class="fa fa-arrows-v"></i></a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

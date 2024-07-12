@@ -139,7 +139,7 @@ export interface MilestoneModel {
   id: string;
   dueDate: any;
   name: string;
-  description;
+  description: string;
 }
 export interface PhoneBookSearchParam{
   empIdNo:string;

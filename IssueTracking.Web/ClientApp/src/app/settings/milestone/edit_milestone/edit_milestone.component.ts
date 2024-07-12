@@ -11,7 +11,8 @@ import {DatePipe} from "@angular/common";
   templateUrl:'./edit_milestone.component.html'
 })
 export class EditMilestoneComponent implements OnInit{
-  @Input() public selectedMilestone=null;
+  @Input() public editedMileStoneId = null;
+  @Input() public isDirectSave:boolean;
   @Output() public loadPage = new EventEmitter();
   @Output() public closeModal = new EventEmitter();
 
@@ -33,12 +34,12 @@ export class EditMilestoneComponent implements OnInit{
       dueDate:null
     }
     let dateTimePipe = new DatePipe("en-US");
-    if(this.selectedMilestone!=null){
+    if(this.editedMileStoneId!=null){
       this.milestoneModel={
-        id:this.selectedMilestone.id,
-        name:this.selectedMilestone.name,
-        description:this.selectedMilestone.description,
-        dueDate:this.selectedMilestone.dueDate
+        id:this.editedMileStoneId.id,
+        name:this.editedMileStoneId.name,
+        description:this.editedMileStoneId.description,
+        dueDate:this.editedMileStoneId.dueDate
       }
 
       if(this.milestoneModel.dueDate!='0001-01-01T00:00:00')

@@ -1076,8 +1076,10 @@ namespace IssueTracking.Domain.IssueTracking
         public IList<DepartmentSchemaModel> GetAllBranch()
         {
             var ret = new List<DepartmentSchemaModel>();
-            var branch = _context.DepartmentSchema.Where(d => d.Status == true).OrderBy(d => d.BranchId)
-                .ThenBy(d => d.DepartmentId).ToList();
+           var branch = _context.DepartmentSchema.
+                           Where(d => d.Status == true).OrderBy(d => d.Department.Name)
+                           .ThenBy(d => d.Branch.BaranchType)
+                           .ThenBy(d => d.Branch.BraName).ToList();
             foreach (var br in branch)
             {
                 ret.Add(GetDepartment(br.Id));

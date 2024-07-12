@@ -1,0 +1,35 @@
+<div class="modal-dialog modal-large">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" id="close" data-dismiss="modal" (click)="close()">&times;</button>
+        </div>
+        <div class="modal-body form-element-area mg-b-15">
+            <h2>View Milestone</h2>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="nk-label"><small>Name</small></label>
+                        <input type="text" class="form-control" readonly [value]="milestoneModel.name">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="nk-label"><small>Due Date</small></label>
+                        <input type="text" class="form-control" readOnly [value]="milestoneModel.dueDate">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="nk-label"><small>Description</small></label>
+                        <textarea rows="6" class="form-control" readOnly [value]="milestoneModel.description"></textarea>
+                    </div>
+                </div>
+            </div> 
+            <hr>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-icon-notika waves-effect" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>

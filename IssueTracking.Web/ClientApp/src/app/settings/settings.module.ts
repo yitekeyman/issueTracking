@@ -20,6 +20,7 @@ import {PhoneBookComponent} from "./phoneBook/phoneBook.component";
 import {
   MinViewBasicSolutionComponent
 } from "./basicSolution/viewBasicSolution/min-view-basic-solution/min-view-basic-solution.component";
+import {ViewMilestoneComponent} from "./milestone/view_milestone/view_milestone.component";
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import {
     ViewBasicSolutionComponent,
     MilestonesComponent,
     EditMilestoneComponent,
+    ViewMilestoneComponent,
     PhoneBookComponent,
     MinViewBasicSolutionComponent
   ]

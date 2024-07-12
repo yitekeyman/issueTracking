@@ -27,6 +27,23 @@
         border: 2px solid #ddd;
         color: black;
     }
+    .button-group-horizontal {
+        display: inline-flex;
+    }
+
+    .button-group-horizontal button {
+        margin-left: 5px;
+    }
+    .button-icon {
+        width: 25px;
+        height: 25px;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+
+    .button-text {
+        vertical-align: middle;
+    }
 </style>
 <div class="col-md-12">
     <div class="report-tab">
@@ -39,21 +56,28 @@
             <div class="page-title">
                 <table class="table">
                     <tr>
-                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                        <td style="width: 23%; border:none; font-size:16px; font-weight: bold; color: black">
                             <label>Issue Date From</label>
                             <input type="date" class="form-control" [(ngModel)]="dateFrom">
                         </td>
-                        <td style="width: 33%; border:none; font-size:16px; font-weight: bold; color: black">
+                        <td style="width: 23%; border:none; font-size:16px; font-weight: bold; color: black">
                             <label>Issue Date To</label>
                             <input type="date" class="form-control" [(ngModel)]="dateTo">
                         </td>
                         <td style="width: 33%; border:none; padding-top: 36px">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success" (click)="generateReport()">Generate</button>
-                                <button type="button" class="btn btn-outline-info" [useExistingCss]="true"
-                                        printSectionId="print-section-all"
-                                        ngxPrint *ngIf="reportResult!=null">Print
-                                </button>
+                                <div class="button-group-horizontal">
+                                    <button type="button" class="btn btn-success" (click)="generateReport()">Generate</button>
+                                    <button type="button" class="btn btn-secondary" [useExistingCss]="true"
+                                            printSectionId="print-section-all" ngxPrint *ngIf="reportResult!=null">
+                                        <img src="assets/img/icons8-print-48.png" alt="Print Icon" class="button-icon">
+                                        <span class="button-text">Print</span>
+                                    </button>
+                                    <button type="button" class="btn btn-primary" *ngIf="reportResult!=null" (click)="exportToExcel()">
+                                        <img src="assets/img/icons8-microsoft-excel-48.png" alt="Excel Icon" class="button-icon">
+                                        <span class="button-text">Export to Excel</span>
+                                    </button>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -104,14 +128,18 @@
                 <td class="align-center">{{rep.total}}</td>
                 <td class="align-center"></td>
             </tr>
-            <tr *ngFor="let rep of reportResult.reportList; index as i">
-                <td  *ngIf="rep.title=='Total'"><span *ngIf="rep.title!='Total'">{{i+1}}</span></td>
-                <td *ngIf="rep.title=='Total'">Percent</td>
-                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.pendingIssues*100/rep.total)|currency :" "}}%</span></td>
-                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.openIssues*100/rep.total)|currency :" "}}%</span></td>
-                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.closedIssues*100/rep.total)|currency :" "}}%</span></td>
-                <td *ngIf="rep.title=='Total'" class="align-center"><span *ngIf="rep.title=='Total'">{{(rep.total*100/rep.total)|currency :" "}}%</span></td>
-                <td *ngIf="rep.title=='Total'" class="align-center"></td>
+            <tr *ngIf="hasTotalTitle()">
+                <td></td>
+                <td>Percent (%)</td>
+                <ng-container *ngFor="let rep of reportResult.reportList">
+                    <ng-container *ngIf="rep.title == 'Total'">
+                        <td class="align-center">{{(rep.pendingIssues * 100 / rep.total) | number: '1.0-2'}}%</td>
+                        <td class="align-center">{{(rep.openIssues * 100 / rep.total) | number: '1.0-2'}}%</td>
+                        <td class="align-center">{{(rep.closedIssues * 100 / rep.total) | number: '1.0-2'}}%</td>
+                        <td class="align-center">{{100}}%</td>
+                        <td class="align-center"></td>
+                    </ng-container>
+                </ng-container>
             </tr>
 
             </tbody>

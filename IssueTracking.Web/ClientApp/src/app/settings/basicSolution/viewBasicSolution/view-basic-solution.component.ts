@@ -1,6 +1,6 @@
 ﻿import {Component, OnInit, ViewChild} from "@angular/core";
 import {IssueTrackingService} from "../../../_Services/IssueTrackingService";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import dialog from "../../../components/dialog";
 import {configs} from "../../../app-config";
 import {
@@ -15,10 +15,10 @@ import {
   styleUrls:['./view-basic-solution.component.scss']
 })
 export class ViewBasicSolutionComponent implements OnInit{
-public basicSolution:any=[];
-public solutionId:any=null;
-public issueTypeId:any=null;
-public url=configs.url;
+  public basicSolution:any=[];
+  public solutionId:any=null;
+  public issueTypeId:any=null;
+  public url=configs.url;
   public files: File[] = [];
   public editorOptions: MonacoEditorConstructionOptions = {
     theme: 'vs',
@@ -37,17 +37,17 @@ public url=configs.url;
       endLineNumber: 3
     });
   }
-constructor(public issueTrackingService:IssueTrackingService, public activeRouting:ActivatedRoute,private monacoLoaderService: MonacoEditorLoaderService) {
-  if(this.activeRouting.snapshot.params['solution-id']){
-    this.solutionId=this.activeRouting.snapshot.params['solution-id'];
-  }else if(this.activeRouting.snapshot.params['issue-type-id']){
-    this.issueTypeId=this.activeRouting.snapshot.params['issue-type-id'];
+  constructor(public issueTrackingService:IssueTrackingService, public activeRouting:ActivatedRoute,private monacoLoaderService: MonacoEditorLoaderService, public router:Router) {
+    if(this.activeRouting.snapshot.params['solution-id']){
+      this.solutionId=this.activeRouting.snapshot.params['solution-id'];
+    }else if(this.activeRouting.snapshot.params['issue-type-id']){
+      this.issueTypeId=this.activeRouting.snapshot.params['issue-type-id'];
+    }
+
+
   }
-
-
-}
   ngOnInit() {
-   //this.loadSolutionPage();
+    //this.loadSolutionPage();
   }
 
   loadSolutionPage(){
@@ -58,5 +58,9 @@ constructor(public issueTrackingService:IssueTrackingService, public activeRouti
         dialog.close()
       },dialog.error);
     }
+  }
+
+  public goBack() {
+    this.router.navigate(['LIT/settings/basic-solution']);
   }
 }

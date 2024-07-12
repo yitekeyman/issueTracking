@@ -196,7 +196,11 @@ namespace IssueTracking.Domain.Reports
             var reportHeader = ReportHeader(dateFrom, dateTo);
             reportHeader.ReportTitle = "Branch with Issue Priority, Issue Status Statistics";
             reportList.ReportHeader = reportHeader;
-            var branches = _context.Branches.OrderBy(b => b.BaranchType).ToList();
+            var branches = _context.Branches
+                            .OrderBy(b => b.BaranchType)
+                            .ThenByDescending(b => b.Pobox == "26281/1000")
+                            .ThenBy(b => b.BraName)
+                            .ToList();
             foreach (var br in branches)
             {
                 long highOpen = 0;
