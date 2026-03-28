@@ -56,7 +56,7 @@
           <div class="form-group ic-cmp-int form-elet-mg">
             <div class="">
               <input type="text" class="form-control" placeholder="Search Issues ..."
-                     [(ngModel)]="queryParams.query"/>
+                     [(ngModel)]="queryParams.query" (keyup.enter)="queryIssues('query',queryParams.query)"/>
             </div>
             <div class="form-ic-cmp">
               <button class="btn btn-success"
@@ -79,35 +79,34 @@
 </div>
 
 <div class="invoice-area" *ngIf="issuesList!=null">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+  <div class="container" >
+    <div class="row" >
+      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12" style="zoom: 90%">
         <ul class="nav navbar-nav">
           <li class="nav-item">
-            <div class="btn-group">
-              <button [ngClass]="queryParams.state==3?'btn btn-success':'btn btn-outline-success'"
-                      (click)="queryIssues('state',3)">&nbsp;<span *ngIf="issuesList!=null">{{issuesList.pendingIssue}}</span> Pending
-              </button>
-              <button [ngClass]="queryParams.state==1?'btn btn-success ':'btn btn-outline-success'"
+            <div class="btn-group" >
+              <button [ngClass]="queryParams.state==1?'btn btn-success ':'btn btn-default'"
                       (click)="queryIssues('state',1)">&nbsp;<span *ngIf="issuesList!=null">{{issuesList.openedIssue}}</span> Open
 
               </button>
-              <button [ngClass]="queryParams.state==2?'btn btn-success':'btn btn-outline-success'"
+              <button [ngClass]="queryParams.state==3?'btn btn-success':'btn btn-default'"
+                      (click)="queryIssues('state',3)">&nbsp;<span *ngIf="issuesList!=null">{{issuesList.pendingIssue}}</span> Pending
+              </button>
+
+              <button [ngClass]="queryParams.state==2?'btn btn-success':'btn btn-default'"
                       (click)="queryIssues('state',2)">&nbsp;<span *ngIf="issuesList!=null">{{issuesList.closedIssue}}</span> Closed
               </button>
 
-              <button [ngClass]="queryParams.state==4?'btn btn-success':'btn btn-outline-success'"
+              <button [ngClass]="queryParams.state==4?'btn btn-success':'btn btn-default'"
                       (click)="queryIssues('state',4)">&nbsp;<span *ngIf="issuesList!=null">{{issuesList.cancelledIssue}}</span> Cancelled
               </button>
             </div>
 
           </li>
-          <li class="nav-item">
 
-          </li>
         </ul>
       </div>
-      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 text-right">
+      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 text-right" style="zoom: 90%">
         <ul class="nav navbar-nav floatRight">
           <li class="nav-item" >
             <button class="btn btn-warning" *ngIf="queryParams.state==1 && haveSelected && loggedIdDept==ITDeptId" (click)="patchClose()"><span>Close</span></button>

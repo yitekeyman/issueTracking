@@ -1,6 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {ReportService} from "../../../_Services/report.service";
-import dialog from "../../../_Shared/dialog";
+import dialog from "../../../_shared/dialog";
 import swal from "sweetalert2";
 import {DatePipe} from "@angular/common";
 import * as XLSX from 'xlsx';
@@ -27,7 +27,7 @@ export class IssuePriorityWithBranchComponent implements OnInit{
     hasTotalTitle(): boolean {
         return this.reportResult?.reportList?.some((rep: any) => rep.title === 'Total');
     }
-    
+
     public generateReport() {
         dialog.loading();
         this.reportService.BranchIssuePriorityStatistics(this.dateFrom, this.dateTo).subscribe(res => {

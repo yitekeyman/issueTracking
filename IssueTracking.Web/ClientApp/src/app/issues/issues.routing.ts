@@ -9,7 +9,7 @@ import {DashboardComponent} from "../dashboard/dashboard.component";
 export const routes:Routes=[
   {
     //path: 'issues?state=:state&q=:query&branch=:branch&type=:type&sort=:sort&labels=:labels&milestones=:milestones&assignee=:assignee',
-    path:'issues',
+    path:'issues/:state',
     component: IssuesComponent,
     children: [
       {

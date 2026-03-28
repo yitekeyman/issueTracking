@@ -313,7 +313,10 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "2.2.0"
         },
         "runtime": {
-          "IssueTracking.Datas.dll": {}
+          "IssueTracking.Datas.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

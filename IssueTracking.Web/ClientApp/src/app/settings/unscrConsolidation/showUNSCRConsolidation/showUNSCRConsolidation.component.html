@@ -1,0 +1,96 @@
+<div class="modal-dialog modal-large">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" id="close" data-dismiss="modal" (click)="close()">&times;</button>
+    </div>
+
+    <div class="modal-body mg-b-1">
+      <h2>UNSCR Consolidation Details</h2>
+      <hr style="margin:1em 0 0; border-top: 2px solid #ccc;">
+      <div *ngIf="results!=null" class="" style="height: calc(73vh); overflow-y: auto">
+        <table  class="table table-striped">
+          <tbody>
+          <tr>
+            <td class="text-right"><b>Type:</b></td>
+            <td>{{ results.type }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Code:</b></td>
+            <td>{{ results.code }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Name:</b></td>
+            <td>{{ results.name }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Title:</b></td>
+            <td>{{ results.title }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Designation:</b></td>
+            <td>{{ results.designation }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Good Quality:</b></td>
+            <td>{{ results.goodQuality }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Low Quality:</b></td>
+            <td>{{ results.lowQuality }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>DOB:</b></td>
+            <td>{{ results.dob }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>POB:</b></td>
+            <td>{{ results.pob }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Nationality:</b></td>
+            <td>{{ results.nationality }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Passport No:</b></td>
+            <td>{{ results.passportNo }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>National Id:</b></td>
+            <td>{{ results.nationalId }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Address:</b></td>
+            <td>{{ results.address }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Other Info:</b></td>
+            <td>{{ results.otherInfo }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Listed On:</b></td>
+            <td>{{ results.listedOn }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>status:</b></td>
+            <td>{{ results.status }}</td>
+          </tr>
+          <tr>
+            <td class="text-right"><b>Last Modified:</b></td>
+            <td>{{ results.lastModifiedDate }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="results==null" class="text-center">
+        <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+          <div style="text-align: center; font-size: 50px; color:#00c292"><i
+            class="fa fa-exclamation-triangle"></i></div>
+          <h2>Sorry</h2>
+          <p>There is no record found</p>
+        </div>
+      </div>
+      <hr style="margin:0 0 1em; border-top: 2px solid #ccc;">
+    </div>
+
+  </div>
+</div>

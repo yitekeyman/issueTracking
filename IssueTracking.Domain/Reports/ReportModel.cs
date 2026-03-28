@@ -23,8 +23,8 @@ namespace IssueTracking.Domain.Reports
     
     public class IssueByStatusStatisticsModel
     {
-        public ReportHeaderModel ReportHeader = new ReportHeaderModel();
-        public IList<IssueByStatusStatistics> ReportList = new List<IssueByStatusStatistics>();
+        public ReportHeaderModel ReportHeader { get; set; } = new ReportHeaderModel();
+        public IList<IssueByStatusStatistics> ReportList  { get; set; }= new List<IssueByStatusStatistics>();
     }
 
     public class IssueStatusModel
@@ -38,17 +38,17 @@ namespace IssueTracking.Domain.Reports
     public class BranchIssueStatusStatistics
         {
             public string Title { get; set; }
-            public IssueStatusModel FirstCol = new IssueStatusModel();
-            public IssueStatusModel SecondCol = new IssueStatusModel();
-            public IssueStatusModel ThirdCol = new IssueStatusModel();
-            public IssueStatusModel FourthCol = new IssueStatusModel();
+            public IssueStatusModel FirstCol { get; set; }= new IssueStatusModel();
+            public IssueStatusModel SecondCol { get; set; }= new IssueStatusModel();
+            public IssueStatusModel ThirdCol { get; set; }= new IssueStatusModel();
+            public IssueStatusModel FourthCol { get; set; }= new IssueStatusModel();
             public long Total { get; set; }
         }
 
         public class BranchIssueStatusStatisticsModel
         {
-            public ReportHeaderModel ReportHeader = new ReportHeaderModel();
-            public IList<BranchIssueStatusStatistics> ReportList = new List<BranchIssueStatusStatistics>();
+            public ReportHeaderModel ReportHeader { get; set; }= new ReportHeaderModel();
+            public IList<BranchIssueStatusStatistics> ReportList { get; set; }= new List<BranchIssueStatusStatistics>();
         }
 
         public class CancelledIssuesList
@@ -66,8 +66,8 @@ namespace IssueTracking.Domain.Reports
 
         public class CancelledIssuesListModel
         {
-            public ReportHeaderModel ReportHeader = new ReportHeaderModel();
-            public IList<CancelledIssuesList> ReportList = new List<CancelledIssuesList>();
+            public ReportHeaderModel ReportHeader { get; set; }= new ReportHeaderModel();
+            public IList<CancelledIssuesList> ReportList { get; set; }= new List<CancelledIssuesList>();
         }
 
         public class DepartmentSchemaModel

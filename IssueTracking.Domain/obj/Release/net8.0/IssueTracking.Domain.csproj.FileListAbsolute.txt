@@ -1,0 +1,16 @@
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Release\net8.0\IssueTracking.Domain.deps.json
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Release\net8.0\IssueTracking.Domain.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Release\net8.0\IssueTracking.Domain.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Release\net8.0\IssueTracking.Datas.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\bin\Release\net8.0\IssueTracking.Datas.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.csproj.AssemblyReference.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.AssemblyInfoInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.AssemblyInfo.cs
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.csproj.CoreCompileInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.sourcelink.json
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTra.6330FB02.Up2Date
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\refint\IssueTracking.Domain.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\IssueTracking.Domain.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Domain\obj\Release\net8.0\ref\IssueTracking.Domain.dll

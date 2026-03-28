@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using IssueTracking.Domain.Infrastructure;
 using IssueTracking.Domain.Reports;
 

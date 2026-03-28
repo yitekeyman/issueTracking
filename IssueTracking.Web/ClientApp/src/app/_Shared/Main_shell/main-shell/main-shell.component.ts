@@ -2,9 +2,8 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {IMainShellRoute} from '../interfaces';
-import swal from "sweetalert2";
-import * as $ from "jquery";
-import {AdminServices} from "../../../_services/admin.services";
+
+import {IssueTrackingService} from "../../../_Services/IssueTrackingService";
 
 @Component({
     selector: 'app-main-shell',
@@ -12,7 +11,7 @@ import {AdminServices} from "../../../_services/admin.services";
 })
 export class MainShellComponent implements OnInit {
 
-    @Input('routes')
+  @Input('routes')
     public routes: IMainShellRoute[] = [];
 
     public menuShowed = false;
@@ -23,10 +22,10 @@ export class MainShellComponent implements OnInit {
     public routerLink:string|null;
 
 
-    constructor (private adminService: AdminServices, public router: Router) {
+    constructor (private adminService: IssueTrackingService, public router: Router) {
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
 
         this.username = localStorage.getItem('username');
         this.routerLink=localStorage.getItem('routerLink');
@@ -38,7 +37,7 @@ export class MainShellComponent implements OnInit {
     logout() {
         // window.location.reload();
         this.adminService.logout();
-        this.router.navigate(['login']);
+        this.router.navigate(['login']).then(r => true);
     }
 
 }

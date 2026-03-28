@@ -6,6 +6,7 @@ import {IssueTypeListComponent} from "./issueType/issue-type-list.component";
 import {ViewBasicSolutionComponent} from "./basicSolution/viewBasicSolution/view-basic-solution.component";
 import {MilestonesComponent} from "./milestone/milestones.component";
 import {PhoneBookComponent} from "./phoneBook/phoneBook.component";
+import {UnscrConsolidationComponent} from "./unscrConsolidation/unscrConsolidation.component";
 
 export const SettingsRouting: Routes = [
   {path: 'basic-solution', component: BasicSolutionComponent},
@@ -16,6 +17,7 @@ export const SettingsRouting: Routes = [
   {path: 'basic-solution-issue-type/:issue-type-id', component: ViewBasicSolutionComponent},
   {path: 'milestones', component:MilestonesComponent},
   {path: 'phoneBook', component: PhoneBookComponent},
+  {path: 'UNSCR-consolidation', component: UnscrConsolidationComponent},
 ]
 
 

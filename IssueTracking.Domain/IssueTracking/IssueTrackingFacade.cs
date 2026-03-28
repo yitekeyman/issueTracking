@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 
@@ -30,7 +31,7 @@ namespace IssueTracking.Domain.IssueTracking
         void EditIssueComment(UserSession session, IssueCommentsModel model);
         IList<IssueCommentReturnModel> GetAllIssueComments(UserSession session, string issueId);
         void DeleteIssueComment(UserSession session, string commentId);
-        SearchIssueResult GetAllIssues(UserSession session, QueryParams model);
+        Task<SearchIssueResult> GetAllIssues(UserSession session, QueryParams model);
        //IList<IssuesListModel> GetsAllIssues(UserSession session);
         IssueListReturn GetIssueById(UserSession session, Guid id);
         
@@ -222,10 +223,10 @@ namespace IssueTracking.Domain.IssueTracking
             _issueTrackingService.EditIssue(model);
         }
 
-        public SearchIssueResult GetAllIssues(UserSession session, QueryParams model)
+        public async Task<SearchIssueResult> GetAllIssues(UserSession session, QueryParams model)
         {
             _issueTrackingService.SetSession(session);
-            return _issueTrackingService.GetAllIssues(model);
+            return await _issueTrackingService.GetAllIssues(model);
         } 
         /*
         public IList<IssuesListModel> GetsAllIssues(UserSession session)

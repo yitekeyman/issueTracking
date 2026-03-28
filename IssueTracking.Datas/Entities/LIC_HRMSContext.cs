@@ -111,6 +111,7 @@ namespace IssueTracking.Datas.Entities
         public virtual DbSet<TrainingCost> TrainingCost { get; set; }
         public virtual DbSet<Trainings> Trainings { get; set; }
         public virtual DbSet<Transfer> Transfer { get; set; }
+        public virtual DbSet<UnscrConsolidatedList> UnscrConsolidatedList { get; set; }
         public virtual DbSet<UserAction> UserAction { get; set; }
         public virtual DbSet<UserRole> UserRole { get; set; }
         public virtual DbSet<Workflow> Workflow { get; set; }
@@ -3247,6 +3248,55 @@ namespace IssueTracking.Datas.Entities
                 entity.Property(e => e.TransferTo).HasColumnName("transfer_to");
             });
 
+            modelBuilder.Entity<UnscrConsolidatedList>(entity =>
+            {
+                entity.ToTable("unscr_consolidated_list", "issue_tracking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasDefaultValueSql("nextval(('issue_tracking.\"money_laundary_seq\"'::text)::regclass)");
+
+                entity.Property(e => e.Address).HasColumnName("address");
+
+                entity.Property(e => e.Code)
+                    .HasColumnName("code")
+                    .HasMaxLength(128);
+
+                entity.Property(e => e.Designation).HasColumnName("designation");
+
+                entity.Property(e => e.Dob).HasColumnName("dob");
+
+                entity.Property(e => e.GoodQuality).HasColumnName("good_quality");
+
+                entity.Property(e => e.LastModifiedDate)
+                    .HasColumnName("last_modified_date")
+                    .HasColumnType("date");
+
+                entity.Property(e => e.ListedOn).HasColumnName("listed_on");
+
+                entity.Property(e => e.LowQuality).HasColumnName("low_quality");
+
+                entity.Property(e => e.Name).HasColumnName("name");
+
+                entity.Property(e => e.NationalId).HasColumnName("national_id");
+
+                entity.Property(e => e.Nationality).HasColumnName("nationality");
+
+                entity.Property(e => e.OtherInfo).HasColumnName("other_info");
+
+                entity.Property(e => e.PassportNo).HasColumnName("passport_no");
+
+                entity.Property(e => e.Pob).HasColumnName("pob");
+
+                entity.Property(e => e.Status).HasColumnName("status");
+
+                entity.Property(e => e.Title).HasColumnName("title");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasMaxLength(15);
+            });
+
             modelBuilder.Entity<UserAction>(entity =>
             {
                 entity.ToTable("user_action", "administrator");
@@ -3507,6 +3557,7 @@ namespace IssueTracking.Datas.Entities
             modelBuilder.HasSequence("issue_status_type_seq");
 
             modelBuilder.HasSequence("issue_type_list_seq");
+            modelBuilder.HasSequence("money_laundary_seq");
 
             modelBuilder.HasSequence("loan_type_seq");
 
@@ -3553,7 +3604,7 @@ namespace IssueTracking.Datas.Entities
 
                 var auditEntry = new AuditEntry(entry)
                 {
-                    TableName = entry.Metadata.Relational().TableName,
+                    TableName = entry.Metadata.GetTableName(),
                     UserName = username,
                     UserAction = actionId
                 };

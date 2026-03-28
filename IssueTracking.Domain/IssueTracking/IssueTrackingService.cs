@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
@@ -15,6 +16,17 @@ using RestSharp.Extensions;
 
 namespace IssueTracking.Domain.IssueTracking
 {
+    public static class DictionaryExtensions
+    {
+        public static void Merge<TKey, TValue>(this Dictionary<TKey, TValue> target, Dictionary<TKey, TValue> source)
+        {
+            foreach (var kvp in source)
+            {
+                target[kvp.Key] = kvp.Value;
+            }
+        }
+    }
+
     public interface IIssueTrackingService
     {
         void SetSession(UserSession session);
@@ -38,7 +50,7 @@ namespace IssueTracking.Domain.IssueTracking
         string GetResourceDoc(string fileName, string mimeType);
         string AddIssue(IssuesListModel model);
         void EditIssue(IssuesListModel model);
-        SearchIssueResult GetAllIssues(QueryParams model);
+        Task<SearchIssueResult> GetAllIssues(QueryParams model);
 
         //IList<IssuesListModel> GetsAllIssues();
         IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status);
@@ -679,62 +691,61 @@ namespace IssueTracking.Domain.IssueTracking
             return issueList;
         }
 
-        public SearchIssueResult GetAllIssues(QueryParams model)
+        public async Task<SearchIssueResult> GetAllIssues(QueryParams model)
         {
-            var ret = new SearchIssueResult();
-            var issuesModel = new List<IssueSearchModel>();
-            IList<IssuesList> issues = new List<IssuesList>();
-            // var q =
-            //     "SELECT * FROM issue_tracking.issues_list il inner join issue_tracking.labels l ON il.id==l.issue_id inner join issue_tracking.issue_assigned ia on ia.issue_id==il.id inner join issue_tracking.milestones ml on ml.issue_id==il.id WHERE il.issue_status=1 AND (il.issue_description LIKE '%%' OR il.issue_title LIKE '%%' OR il.ticket LIKE '%%' OR il.policy_no LIKE '%%') AND ia.assigned_to='' AND il.issue_requested_by='' AND l.id='' AND il.branch_id='' AND ml.id='' Order by il.ticket asc";
-
-            var query = "SELECT il.* FROM issue_tracking.issues_list il ";
-
-            if (!string.IsNullOrEmpty(model.Assignee) || model.Type == 1)
-                query = string.Format("{0} inner join issue_tracking.issue_assigned ia on ia.issue_id=il.id", query);
-            query = string.Format("{0} WHERE il.issue_status={1}", query, model.State);
-
+            var query = _context.IssuesList.Where(i => i.IssueStatus == model.State);
             if (!string.IsNullOrEmpty(model.Query))
-                query = string.Format(
-                    "{0}  AND (il.issue_description LIKE '%{1}%' OR il.issue_title LIKE '%{1}%' OR il.ticket LIKE '%{1}%' OR il.policy_no LIKE '%{1}%')",
-                    query, model.Query);
+            {
+                query = query.Where(i =>
+                    i.IssueDescription.Contains(model.Query) || i.IssueTitle.Contains(model.Query) ||
+                    i.Ticket.Contains(model.Query) || i.PolicyNo.Contains(model.Query));
+            }
+
             if (model.IssueType > -1)
-                query = string.Format("{0} AND il.issue_type_id={1}", query, model.IssueType);
-
+                query = query.Where(i => i.IssueTypeId == model.IssueType);
             if (model.Priority > 0)
-                query = string.Format("{0} AND il.issue_priority={1}", query, model.Priority);
-
+                query = query.Where(i => i.IssuePriority == model.Priority);
             if (model.Type == 1)
             {
-                query = String.Format("{0} AND ia.assigned_to='{1}'", query, _session.UserId);
+                query = query
+                    .Join(_context.IssueAssigned, issue => issue.Id, assigned => assigned.IssueId,
+                        (issue, assigned) => new { issue, assigned })
+                    .Where(x => x.assigned.AssignedTo == Guid.Parse(_session.UserId)).Select(x => x.issue);
             }
             else if (model.Type == 2)
             {
-                query = String.Format("{0} AND il.issue_requested_by='{1}'", query, _session.UserId);
+                query = query.Where(i => i.IssueRequestedBy == Guid.Parse(_session.UserId));
             }
             else if (!string.IsNullOrEmpty(model.Assignee))
             {
-                query = string.Format("{0} AND ia.assigned_to='{1}'", query, model.Assignee);
+                query = query
+                    .Join(_context.IssueAssigned, issue => issue.Id, assigned => assigned.IssueId,
+                        (issue, assigned) => new { issue, assigned })
+                    .Where(x => x.assigned.AssignedTo == Guid.Parse(model.Assignee)).Select(x => x.issue);
             }
 
-            if (!string.IsNullOrEmpty(model.Branch))
-                query = String.Format("{0} AND il.branch_id='{1}'", query, model.Branch);
-            if (model.Sort == 1)
+            if (!string.IsNullOrEmpty(model.Branch) && Guid.TryParse(model.Branch, out var branchId))
             {
-                query = String.Format("{0} Order by il.ticket DESC", query);
-            }
-            else
-            {
-                query = String.Format("{0} Order by il.ticket ASC", query);
+                query = query.Where(i => i.BranchId == branchId);
             }
 
-            issues = _context.IssuesList.FromSql(query).ToList();
-            foreach (var iss in issues)
-            {
-                var department = GetDepartment(iss.BranchId).DepartmentName;
-                if (GetDepartment(iss.BranchId).BranchId != 10)
-                    department = GetDepartment(iss.BranchId).BranchName;
+            query = model.Sort == 1 ? query.OrderByDescending(i => i.Ticket) : query.OrderBy(i => i.Ticket);
+            var issues = await query.ToListAsync();
+            var branchIds = issues.Select(i => i.BranchId).Distinct();
+            var userIds = issues.Select(i => i.IssueRequestedBy).Distinct();
+            var departments = await _context.DepartmentSchema
+                .Where(d => branchIds.Contains(d.Id))
+                .ToDictionaryAsync(d => d.Id);
 
-                var issl = new IssueSearchModel()
+            var employees = await _context.Employee
+                .Where(e => userIds.Contains(e.Id))
+                .ToDictionaryAsync(e => e.Id);
+            var issuesModel = issues.Select(iss =>
+            {
+                departments.TryGetValue(iss.BranchId, out var dept);
+                employees.TryGetValue(iss.IssueRequestedBy, out var emp);
+
+                return new IssueSearchModel
                 {
                     Id = iss.Id.ToString(),
                     TicketNo = iss.Ticket,
@@ -746,119 +757,73 @@ namespace IssueTracking.Domain.IssueTracking
                     IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
                     OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
                     OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
-                    Branch = department,
+                    Branch = GetDepartmentDisplayName(dept),
                     Status = iss.IssueStatus ?? 1,
-                    //IssueResource = JsonConvert.DeserializeObject<List<ResourceModel>>(iss.IssueResource),
                 };
-                issuesModel.Add(issl);
-            }
+            }).ToList();
+            var isStaff = IsItStaffLoggedIn();
+            var departmentId = isStaff ? null : _session.DepartmentId;
 
-            ret.IssueList = issuesModel;
-            if (IsItStaffLoggedIn())
+            return new SearchIssueResult
             {
-                ret.OpenedIssue = _context.IssuesList.Count(i => i.IssueStatus == 1);
-                ret.ClosedIssue = _context.IssuesList.Count(i => i.IssueStatus == 2);
-                ret.PendingIssue = _context.IssuesList.Count(i => i.IssueStatus == 3);
-                ret.CancelledIssue = _context.IssuesList.Count(i => i.IssueStatus == 4);
-            }
-            else
-            {
-                ret.OpenedIssue = _context.IssuesList.Count(i =>
-                    i.IssueStatus == 1 && i.BranchId == Guid.Parse(_session.DepartmentId));
-                ret.ClosedIssue = _context.IssuesList.Count(i =>
-                    i.IssueStatus == 2 && i.BranchId == Guid.Parse(_session.DepartmentId));
-                ret.PendingIssue = _context.IssuesList.Count(i =>
-                    i.IssueStatus == 3 && (i.BranchId == Guid.Parse(_session.DepartmentId) ||
-                                           i.ForwardTo == Guid.Parse(_session.DepartmentId)));
-                ret.CancelledIssue = _context.IssuesList.Count(i =>
-                    i.IssueStatus == 4 && i.BranchId == Guid.Parse(_session.DepartmentId));
-            }
-
-            return ret;
+                IssueList = issuesModel,
+                OpenedIssue = await CountIssuesByStatus(1, isStaff, departmentId),
+                ClosedIssue = await CountIssuesByStatus(2, isStaff, departmentId),
+                PendingIssue = await CountIssuesByStatus(3, isStaff, departmentId),
+                CancelledIssue = await CountIssuesByStatus(4, isStaff, departmentId)
+            };
         }
 
         public IList<IssueListReturn> GetIssueByStatus(IssueFilterParameter parameter, long status)
         {
-            var ret = new List<IssueListReturn>();
-            var issues = new List<IssuesList>();
-            var queryableIssue = _context.IssuesList.Where(e =>
-                e.IssueStatus == status &&
-                (string.IsNullOrEmpty(parameter.UserId) || Guid.Parse(parameter.UserId) == e.IssueRequestedBy) &&
-                (parameter.Priority == 0 || parameter.Priority == e.IssuePriority) &&
-                (string.IsNullOrEmpty(parameter.Branch) || Guid.Parse(parameter.Branch) == e.BranchId));
+            var query = _context.IssuesList.Where(i => i.IssueStatus == status);
 
-            if (parameter.RaisedSystem == 0)
+            if (!string.IsNullOrEmpty(parameter.UserId) && Guid.TryParse(parameter.UserId, out var userId))
             {
-                if (parameter.Sort == 1)
-                {
-                    issues = queryableIssue.OrderByDescending(e => e.IssueRequestedDate).ToList();
-                }
-                else if (parameter.Sort == 2)
-                {
-                    issues = queryableIssue.OrderBy(e => e.IssueRequestedDate).ToList();
-                }
-                else if (parameter.Sort == 3)
-                {
-                    issues = queryableIssue.OrderByDescending(e => e.IssueClosedDate).ToList();
-                }
-                else if (parameter.Sort == 4)
-                {
-                    issues = queryableIssue.OrderBy(e => e.IssueClosedDate).ToList();
-                }
-            }
-            else
-            {
-                string sort = "";
-                string query = "";
-
-                var issueTypes = _context.IssueTypeList.Where(e => e.RaisedSystemId == parameter.RaisedSystem)
-                    .ToList();
-                if (issueTypes.Count > 0)
-                {
-                    query = " WHERE ";
-                    var index = 0;
-                    foreach (var it in issueTypes)
-                    {
-                        if (index == 0)
-                        {
-                            query += $"IssueTypeId={it.Id}";
-                        }
-                        else
-                        {
-                            query += $" or IssueTypeId={it.Id}";
-                        }
-
-                        index++;
-                    }
-                }
-
-                if (parameter.Sort == 1)
-                {
-                    sort = $" Order By IssueRequestedDate desc";
-                }
-                else if (parameter.Sort == 2)
-                {
-                    sort = $" Order By IssueRequestedDate asc";
-                }
-                else if (parameter.Sort == 3)
-                {
-                    sort = $" Order By IssueClosedDate desc";
-                }
-                else if (parameter.Sort == 4)
-                {
-                    sort = $" Order By IssueClosedDate asc";
-                }
-
-                issues = queryableIssue.FromSql($"Select * From queryableIssue {query}{sort}").ToList();
+                query = query.Where(e => e.IssueRequestedBy == userId);
             }
 
-            foreach (var issue in issues)
+            if (parameter.Priority > 0)
             {
-                var iss = GetIssueById(issue.Id);
-                ret.Add(iss);
+                query = query.Where(i => i.IssuePriority == parameter.Priority);
             }
 
-            return ret;
+            if (!string.IsNullOrEmpty(parameter.Branch) && Guid.TryParse(parameter.Branch, out var branchId))
+            {
+                query = query.Where(i => i.BranchId == branchId);
+            }
+
+            if (parameter.RaisedSystem != 0)
+            {
+                var issueTypeIds = _context.IssueTypeList
+                    .Where(it => it.RaisedSystemId == parameter.RaisedSystem)
+                    .Select(it => it.Id);
+
+                query = query.Where(i => issueTypeIds.Contains(i.IssueTypeId ?? 0));
+            }
+
+            query = parameter.Sort switch
+            {
+                1 => query.OrderByDescending(e => e.IssueRequestedDate),
+                2 => query.OrderBy(e => e.IssueRequestedDate),
+                3 => query.OrderByDescending(e => e.IssueClosedDate),
+                4 => query.OrderBy(e => e.IssueClosedDate),
+                _ => query // Default no sorting
+            };
+            var issues = query.ToList();
+            var issueIds = issues.Select(i => i.Id).ToList();
+
+            var allDetails = new Dictionary<Guid, IssueListReturn>();
+            foreach (var id in issueIds)
+            {
+                allDetails[id] = GetIssueById(id);
+            }
+
+            return issues.Select(issue =>
+                allDetails.TryGetValue(issue.Id, out var details)
+                    ? details
+                    : new IssueListReturn()
+            ).ToList();
         }
 
         public void AddIssueComment(IssueCommentsModel model)
@@ -1076,10 +1041,9 @@ namespace IssueTracking.Domain.IssueTracking
         public IList<DepartmentSchemaModel> GetAllBranch()
         {
             var ret = new List<DepartmentSchemaModel>();
-           var branch = _context.DepartmentSchema.
-                           Where(d => d.Status == true).OrderBy(d => d.Department.Name)
-                           .ThenBy(d => d.Branch.BaranchType)
-                           .ThenBy(d => d.Branch.BraName).ToList();
+            var branch = _context.DepartmentSchema.Where(d => d.Status == true).OrderBy(d => d.Department.Name)
+                .ThenBy(d => d.Branch.BaranchType)
+                .ThenBy(d => d.Branch.BraName).ToList();
             foreach (var br in branch)
             {
                 ret.Add(GetDepartment(br.Id));
@@ -1158,7 +1122,7 @@ namespace IssueTracking.Domain.IssueTracking
                 }
             }
         }
-   
+
         public void CloseIssue(string issueId, string remark)
         {
             var actionType = "Closed Issue";
@@ -1217,7 +1181,7 @@ namespace IssueTracking.Domain.IssueTracking
             var issue = _context.IssuesList.FirstOrDefault(i => i.Id == Guid.Parse(issueId));
             if (issue != null)
             {
-                if (issue.IssueStatus == 1 || issue.IssueStatus==3)
+                if (issue.IssueStatus == 1 || issue.IssueStatus == 3)
                 {
                     var hasDependencies = _context.IssueDependancies.Where(d => d.MajorIssue == Guid.Parse(issueId))
                         .ToList();
@@ -1225,7 +1189,8 @@ namespace IssueTracking.Domain.IssueTracking
                     string errorMessage = "";
                     foreach (var dep in hasDependencies)
                     {
-                        if (_context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 1 || _context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 3)
+                        if (_context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 1 ||
+                            _context.IssuesList.First(e => e.Id == dep.Dependancies).IssueStatus == 3)
                         {
                             hasError = true;
                             errorMessage = string.Format("{0}, ",
@@ -1383,6 +1348,7 @@ namespace IssueTracking.Domain.IssueTracking
                 model.CaseList.Count(), success, failed);
             return ret;
         }
+
         public string PatchMakeReadNotification(PatchActionModel model)
         {
             string ret = "";
@@ -1398,7 +1364,7 @@ namespace IssueTracking.Domain.IssueTracking
                         notify.Status = true;
                         _context.IssueNotification.Update(notify);
                         _context.SaveChanges();
-                       
+
                         success++;
                     }
                     else
@@ -1421,232 +1387,81 @@ namespace IssueTracking.Domain.IssueTracking
         {
             var ret = new DashboardModel();
 
-            if (!string.IsNullOrEmpty(deptId))
+            Guid? departmentId = !string.IsNullOrEmpty(deptId) ? Guid.Parse(deptId) : null;
+            IQueryable<IssuesList> baseQuery = departmentId.HasValue
+                ? _context.IssuesList.Where(i => i.BranchId == departmentId.Value)
+                : _context.IssuesList;
+            ret.Total = baseQuery.Count();
+            ret.Closed = baseQuery.Count(i => i.IssueStatus == 2 || i.IssueStatus == 4);
+            ret.Open = baseQuery.Count(i => i.IssueStatus == 1 || i.IssueStatus == 3);
+
+            var systems = _context.IssueRaisedSystem
+                .Select(s => new
+                {
+                    System = s,
+                    IssueTypes = _context.IssueTypeList
+                        .Where(it => it.RaisedSystemId == s.Id || it.Id == 0)
+                        .OrderBy(it => it.Name)
+                        .ToList()
+                })
+                .ToList();
+            var allIssueTypeIds = systems.SelectMany(s => s.IssueTypes.Select(it => it.Id)).ToList();
+            var issueTypeCounts = GetIssueTypeCounts(baseQuery, allIssueTypeIds);
+            foreach (var systemData in systems)
             {
-                ret.Total = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId));
-                ret.Closed = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId) && i.IssueStatus == 2);
-                ret.Open = _context.IssuesList.Count(i => i.BranchId == Guid.Parse(deptId) && i.IssueStatus == 1);
-
-                var systemRaised = _context.IssueRaisedSystem.ToList();
-                var systems = new List<RaisedSystem>();
-                foreach (var sy in systemRaised)
+                var sys = new RaisedSystem
                 {
-                    var sys = new RaisedSystem();
-                    sys.System.Id = sy.Id;
-                    sys.System.Name = sy.Name;
-                    sys.System.Total = 0;
-                    sys.System.Closed = 0;
-                    sys.System.Open = 0;
-                    var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
-                        .OrderBy(e => e.Name)
-                        .ToList();
-                    foreach (var it in systemIssueTypes)
+                    System = new DashboardStat
                     {
-                        var issueType = new DashboardStat()
-                        {
-                            Id = it.Id,
-                            Name = it.Name,
-                            Total = _context.IssuesList.Count(i =>
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueTypeId > 0) ||
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 &&
-                                 i.OtherIssue == sy.Id.ToString())),
-                            Closed = _context.IssuesList.Count(i =>
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueStatus == 2 &&
-                                 i.IssueTypeId > 0) ||
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 && i.IssueStatus == 2 &&
-                                 i.OtherIssue == sy.Id.ToString())),
-                            Open = _context.IssuesList.Count(i =>
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == it.Id && i.IssueStatus == 1 &&
-                                 i.IssueTypeId > 0) ||
-                                (i.BranchId == Guid.Parse(deptId) && i.IssueTypeId == 0 && i.IssueStatus == 1 &&
-                                 i.OtherIssue == sy.Id.ToString()))
-                        };
-
-                        sys.System.Total += issueType.Total;
-                        sys.System.Closed += issueType.Closed;
-                        sys.System.Open += issueType.Open;
-                        sys.IssueType.Add(issueType);
-                    }
-
-                    ret.RaisedSystems.Add(sys);
-                }
-
-                var sql = string.Format(
-                    "SELECT ac.* FROM issue_tracking.action_tracker ac inner join issue_tracking.issues_list il on il.id=ac.issue_id where il.branch_id='{0}' order by ac.action_date desc limit(15);",
-                    deptId);
-                var actions = _context.ActionTracker.FromSql(sql).ToList();
-                foreach (var ac in actions)
+                        Id = systemData.System.Id,
+                        Name = systemData.System.Name
+                    },
+                    IssueType = new List<DashboardStat>()
+                };
+                foreach (var issueType in systemData.IssueTypes)
                 {
-                    var iss = _context.IssuesList.First(a => a.Id == ac.IssueId);
-                    var issl = new IssueSearchModel()
+                    var counts = issueTypeCounts.ContainsKey(issueType.Id)
+                        ? issueTypeCounts[issueType.Id]
+                        : new IssueTypeCounts(0, 0, 0);
+
+                    var stat = new DashboardStat
                     {
-                        Id = iss.Id.ToString(),
-                        TicketNo = iss.Ticket,
-                        IssueTitle = iss.IssueTitle,
-                        IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
-                        OtherIssue = iss.OtherIssue,
-                        PolicyNo = iss.PolicyNo,
-                        IssueDescription = iss.IssueDescription,
-                        IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
-                        OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
-                        OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
-                        Branch = GetDepartment(iss.BranchId).DepartmentName,
-                        Status = iss.IssueStatus ?? 1,
+                        Id = issueType.Id,
+                        Name = issueType.Name,
+                        Total = counts.Total,
+                        Closed = counts.Closed,
+                        Open = counts.Open
                     };
 
-                    var act = new ActionTrackerModel()
-                    {
-                        Id = ac.Id.ToString(),
-                        IssueId = ac.IssueId.ToString(),
-                        ActionDate = new DateTime(ac.ActionDate),
-                        ActionType = ac.ActionType,
-                        Issue = issl,
-                        UserId = GetEmployee(ac.UserId),
-                        Remark = ac.Remark,
-                        ActionDetails = ac.ActionDetails,
-                        ActionTypeId = GetActionTypeId(ac.ActionType)
-                    };
-
-                    if (ac.ActionType.Equals("Assigned User to Issue"))
-                    {
-                        act.Remark = string.Format("Assigned To {0}",
-                            GetEmployee(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).FirstName);
-                    }
-
-                    if (ac.ActionType.Equals("Removed Assigned User from Issue"))
-                        act.Remark = string.Format("{0} Removed from Assign",
-                            GetEmployee(Guid.Parse(ac.Remark)).FirstName);
-
-                    if (ac.ActionType.Equals("Added Milestone to Issue"))
-                        act.Remark = string.Format("Added Milestone is {0}",
-                            GetMilestoneById(ac.Remark).Name);
-
-                    if (ac.ActionType.Equals("Removed Milestone from issue"))
-                        act.Remark = string.Format("Removed Milestone is {0}",
-                            GetMilestoneById(ac.Remark).Name);
-
-                    if (ac.ActionType.Equals("Added Dependencies for Issue"))
-                        act.Remark = string.Format("Dependent Issue is {0}",
-                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
-
-                    if (ac.ActionType.Equals("Removed Dependencies from Issue"))
-                        act.Remark = string.Format("Dependent Issue is {0}",
-                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
-                    if (ac.ActionType.Equals("Issue Forwarded To"))
-                        act.Remark = string.Format("Forwarded to {0}",
-                            GetForwardIssue(ac.Remark).ForwardToDept.DepartmentName);
-                    ret.Actions.Add(act);
+                    sys.System.Total += stat.Total;
+                    sys.System.Closed += stat.Closed;
+                    sys.System.Open += stat.Open;
+                    sys.IssueType.Add(stat);
                 }
+
+                ret.RaisedSystems.Add(sys);
             }
-            else
+
+            var actionsQuery = _context.ActionTracker
+                .Join(_context.IssuesList,
+                    action => action.IssueId,
+                    issue => issue.Id,
+                    (action, issue) => new { Action = action, Issue = issue })
+                .OrderByDescending(x => x.Action.ActionDate)
+                .Take(15);
+
+            if (departmentId.HasValue)
             {
-                ret.Total = _context.IssuesList.Count();
-                ret.Closed = _context.IssuesList.Count(i => i.IssueStatus == 2);
-                ret.Open = _context.IssuesList.Count(i => i.IssueStatus == 1);
-
-                var systemRaised = _context.IssueRaisedSystem.ToList();
-                var systems = new List<RaisedSystem>();
-                foreach (var sy in systemRaised)
-                {
-                    var sys = new RaisedSystem();
-                    sys.System.Id = sy.Id;
-                    sys.System.Name = sy.Name;
-                    sys.System.Total = 0;
-                    sys.System.Closed = 0;
-                    sys.System.Open = 0;
-                    var systemIssueTypes = _context.IssueTypeList.Where(i => i.RaisedSystemId == sy.Id || i.Id == 0)
-                        .OrderBy(i => i.Name)
-                        .ToList();
-                    foreach (var it in systemIssueTypes)
-                    {
-                        var issueType = new DashboardStat()
-                        {
-                            Id = it.Id,
-                            Name = it.Name,
-                            Total = _context.IssuesList.Count(i =>
-                                (i.IssueTypeId == it.Id && i.IssueTypeId > 0) ||
-                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()))),
-                            Closed = _context.IssuesList.Count(i =>
-                                (i.IssueTypeId == it.Id && i.IssueStatus == 2 && i.IssueTypeId > 0) ||
-                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()) && i.IssueStatus == 2)),
-                            Open = _context.IssuesList.Count(i =>
-                                (i.IssueTypeId == it.Id && i.IssueStatus == 1 && i.IssueTypeId > 0) ||
-                                (i.IssueTypeId == 0 && i.OtherIssue.Equals(sy.Id.ToString()) && i.IssueStatus == 1))
-                        };
-
-                        sys.System.Total += issueType.Total;
-                        sys.System.Closed += issueType.Closed;
-                        sys.System.Open += issueType.Open;
-                        sys.IssueType.Add(issueType);
-                    }
-
-                    ret.RaisedSystems.Add(sys);
-                }
-
-                var sql =
-                    "SELECT ac.* FROM issue_tracking.action_tracker ac inner join issue_tracking.issues_list il on il.id=ac.issue_id order by ac.action_date desc limit(15);";
-                var actions = _context.ActionTracker.FromSql(sql).ToList();
-                foreach (var ac in actions)
-                {
-                    var iss = _context.IssuesList.First(a => a.Id == ac.IssueId);
-                    var issl = new IssueSearchModel()
-                    {
-                        Id = iss.Id.ToString(),
-                        TicketNo = iss.Ticket,
-                        IssueTitle = iss.IssueTitle,
-                        IssueType = _context.IssueTypeList.First(e => e.Id == iss.IssueTypeId).Name,
-                        OtherIssue = iss.OtherIssue,
-                        PolicyNo = iss.PolicyNo,
-                        IssueDescription = iss.IssueDescription,
-                        IssuePriority = _context.IssuePriorityType.First(e => e.Id == iss.IssuePriority).Name,
-                        OpenedBy = GetEmployee(iss.IssueRequestedBy).Username,
-                        OpeningDate = new DateTime(iss.IssueRequestedDate ?? 0),
-                        Branch = GetDepartment(iss.BranchId).DepartmentName,
-                        Status = iss.IssueStatus ?? 1,
-                    };
-
-                    var act = new ActionTrackerModel()
-                    {
-                        Id = ac.Id.ToString(),
-                        IssueId = ac.IssueId.ToString(),
-                        ActionDate = new DateTime(ac.ActionDate),
-                        ActionType = ac.ActionType,
-                        Issue = issl,
-                        UserId = GetEmployee(ac.UserId),
-                        Remark = ac.Remark,
-                        ActionDetails = ac.ActionDetails,
-                        ActionTypeId = GetActionTypeId(ac.ActionType)
-                    };
-
-                    if (ac.ActionType.Equals("Assigned User to Issue"))
-                    {
-                        act.Remark = string.Format("Assigned To {0}",
-                            GetEmployee(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).FirstName);
-                    }
-
-                    if (ac.ActionType.Equals("Removed Assigned User from Issue"))
-                        act.Remark = string.Format("{0} Removed from Assign",
-                            GetEmployee(Guid.Parse(ac.Remark)).FirstName);
-
-                    if (ac.ActionType.Equals("Added Milestone to Issue"))
-                        act.Remark = string.Format("Added Milestone is {0}",
-                            GetMilestoneById(ac.Remark).Name);
-
-                    if (ac.ActionType.Equals("Removed Milestone from issue"))
-                        act.Remark = string.Format("Removed Milestone is {0}",
-                            GetMilestoneById(ac.Remark).Name);
-
-                    if (ac.ActionType.Equals("Added Dependencies for Issue"))
-                        act.Remark = string.Format("Dependent Issue is {0}",
-                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
-
-                    if (ac.ActionType.Equals("Removed Dependencies from Issue"))
-                        act.Remark = string.Format("Dependent Issue is {0}",
-                            GetIssueById(Guid.Parse((ReadOnlySpan<char>)ac.Remark)).Ticket);
-
-                    ret.Actions.Add(act);
-                }
+                actionsQuery = actionsQuery.Where(x => x.Issue.BranchId == departmentId.Value);
             }
+
+            var actionResults = actionsQuery
+                .Select(x => new { x.Action, x.Issue })
+                .AsEnumerable()
+                .Select(x => (Action: x.Action, Issue: x.Issue))
+                .ToList();
+
+            ProcessActions(ret, actionResults);
 
 
             return ret;
@@ -2499,10 +2314,11 @@ namespace IssueTracking.Domain.IssueTracking
             var ret = new IssueNotificationReturnModel();
             var notfi = new List<NotificationModel>();
             ret.UnreadNotification =
-                _context.IssueNotification.Count(
-                    n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == false);
-            ret.ReadNotification = _context.IssueNotification.Count(
-                n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == true);
+                _context.IssueNotification.Count(n =>
+                    n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == false);
+            ret.ReadNotification =
+                _context.IssueNotification.Count(n =>
+                    n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == true);
             var notifications = _context.IssueNotification
                 .Where(n => n.NotificationTo == Guid.Parse(_session.UserId) && n.Status == status)
                 .OrderByDescending(n => n.NotificationDate).ToList();
@@ -2675,5 +2491,207 @@ namespace IssueTracking.Domain.IssueTracking
                 e.NotificationTo == Guid.Parse(_session.UserId) && e.Status == false);
             return ret;
         }
+
+        private string GetDepartmentDisplayName(DepartmentSchema dept)
+        {
+            if (dept == null) return string.Empty;
+            var d = GetDepartment(dept.Id);
+            return dept.BranchId != 10 ? d.BranchName : d.DepartmentName;
+        }
+
+
+        private async Task<int> CountIssuesByStatus(int status, bool isStaff, string departmentId)
+        {
+            var query = _context.IssuesList.Where(i => i.IssueStatus == status);
+
+            if (!isStaff && !string.IsNullOrEmpty(departmentId))
+            {
+                query = status == 3
+                    ? query.Where(i =>
+                        i.BranchId == Guid.Parse(departmentId) || i.ForwardTo == Guid.Parse(departmentId))
+                    : query.Where(i => i.BranchId == Guid.Parse(departmentId));
+            }
+
+            return await query.CountAsync();
+        }
+
+        // Put this in a separate file or at the top of your current file
+
+
+// Your existing method remains the same
+        private Dictionary<long, IssueTypeCounts> GetIssueTypeCounts(
+            IQueryable<IssuesList> baseQuery,
+            List<long> issueTypeIds)
+        {
+            var counts = new Dictionary<long, IssueTypeCounts>();
+
+            // 1. First handle non-zero issue types (no parsing needed)
+            var nonZeroIds = issueTypeIds.Where(id => id > 0).ToList();
+            if (nonZeroIds.Any())
+            {
+                var nonZeroCounts = baseQuery
+                    .Where(i => nonZeroIds.Contains(i.IssueTypeId.Value))
+                    .GroupBy(i => i.IssueTypeId.Value)
+                    .Select(g => new
+                    {
+                        IssueTypeId = g.Key,
+                        Total = g.Count(),
+                        Closed = g.Count(i => i.IssueStatus == 2),
+                        Open = g.Count(i => i.IssueStatus == 1)
+                    })
+                    .ToDictionary(x => x.IssueTypeId, x => new IssueTypeCounts(x.Total, x.Closed, x.Open));
+
+                counts.Merge(nonZeroCounts);
+            }
+
+            // 2. Handle zero issue types with client-side evaluation
+            if (issueTypeIds.Contains(0))
+            {
+                // First get all potential zero-type issues
+                var zeroTypeIssues = baseQuery
+                    .Where(i => i.IssueTypeId == 0)
+                    .AsEnumerable() // Switch to client evaluation
+                    .ToList();
+
+                // Group by system ID on client side
+                var zeroCounts = zeroTypeIssues
+                    .Where(i => long.TryParse(i.OtherIssue, out _))
+                    .GroupBy(i => long.Parse(i.OtherIssue))
+                    .Select(g => new
+                    {
+                        SystemId = g.Key,
+                        Total = g.Count(),
+                        Closed = g.Count(i => i.IssueStatus == 2),
+                        Open = g.Count(i => i.IssueStatus == 1)
+                    })
+                    .ToDictionary(x => -x.SystemId, x => new IssueTypeCounts(x.Total, x.Closed, x.Open));
+
+                counts.Merge(zeroCounts);
+            }
+
+            return counts;
+        }
+
+        private void ProcessActions(DashboardModel model, List<(ActionTracker Action, IssuesList Issue)> actionResults)
+        {
+            if (!actionResults.Any()) return;
+
+
+            var actions = actionResults.Select(a => a.Action).ToList();
+            var issues = actionResults.Select(a => a.Issue).ToList();
+            var issueIds = actionResults.Select(a => a.Issue.Id).Distinct().ToList();
+            var userIds = actionResults
+                .Select(a => a.Action.UserId)
+                .Concat(actionResults.Select(a => a.Issue.IssueRequestedBy))
+                .Distinct()
+                .ToList();
+
+            var remarkIds = actions
+                .Where(a => new[]
+                {
+                    "Assigned User to Issue",
+                    "Removed Assigned User from Issue",
+                    "Added Dependencies for Issue",
+                    "Removed Dependencies from Issue"
+                }.Contains(a.ActionType))
+                .Select(a => Guid.TryParse(a.Remark, out Guid id) ? id : (Guid?)null)
+                .Where(id => id.HasValue)
+                .Distinct()
+                .ToList();
+
+            var employees = _context.Employee
+                .Where(e => userIds.Contains(e.Id) || remarkIds.Contains(e.Id))
+                .ToDictionary(e => e.Id);
+
+            var departmentIds = issues.Select(i => i.BranchId).Distinct().ToList();
+            var departments = _context.DepartmentSchema
+                .Where(d => departmentIds.Contains(d.Id))
+                .ToDictionary(d => d.Id);
+
+            var issueTypeIds = issues.Select(i => i.IssueTypeId).Distinct().ToList();
+            var issueTypes = _context.IssueTypeList
+                .Where(it => issueTypeIds.Contains(it.Id))
+                .ToDictionary(it => it.Id);
+
+            var priorityIds = issues.Select(i => i.IssuePriority).Distinct().ToList();
+            var priorities = _context.IssuePriorityType
+                .Where(p => priorityIds.Contains(p.Id))
+                .ToDictionary(p => p.Id);
+
+            var remarkIssues = _context.IssuesList
+                .Where(i => remarkIds.Contains(i.Id))
+                .ToDictionary(i => i.Id);
+
+            for (int i = 0; i < actions.Count; i++)
+            {
+                var action = actions[i];
+                var issue = issues[i];
+
+                var issueModel = new IssueSearchModel
+                {
+                    Id = issue.Id.ToString(),
+                    TicketNo = issue.Ticket,
+                    IssueTitle = issue.IssueTitle,
+                    IssueType = issueTypes.TryGetValue(issue.IssueTypeId.Value, out var it) ? it.Name : "Unknown",
+                    OtherIssue = issue.OtherIssue,
+                    PolicyNo = issue.PolicyNo,
+                    IssueDescription = issue.IssueDescription,
+                    IssuePriority = priorities.TryGetValue(issue.IssuePriority.Value, out IssuePriorityType p)
+                        ? p.Name
+                        : "Unknown",
+                    OpenedBy = employees.TryGetValue(issue.IssueRequestedBy, out Employee emp)
+                        ? emp.FatherName
+                        : "Unknown",
+                    OpeningDate = new DateTime(issue.IssueRequestedDate??0),
+                    Branch = GetDepartmentDisplayName(_context.DepartmentSchema.First(e => e.Id == issue.BranchId)),
+                    Status = issue.IssueStatus ?? 1
+                };
+
+                var actionModel = new ActionTrackerModel
+                {
+                    Id = action.Id.ToString(),
+                    IssueId = action.IssueId.ToString(),
+                    ActionDate = new DateTime(action.ActionDate),
+                    ActionType = action.ActionType,
+                    Issue = issueModel,
+                    UserId = GetEmployee(action.UserId),
+                    Remark = action.Remark,
+                    ActionDetails = action.ActionDetails
+                };
+
+                // Process special remark cases
+                if (Guid.TryParse(action.Remark, out Guid remarkId))
+                {
+                    actionModel.Remark = action.ActionType switch
+                    {
+                        "Assigned User to Issue" when employees.TryGetValue(remarkId, out var user)
+                            => $"Assigned To {user.FirstName}",
+                        "Removed Assigned User from Issue" when employees.TryGetValue(remarkId, out var user)
+                            => $"{user.FirstName} Removed from Assign",
+                        "Added Dependencies for Issue" when remarkIssues.TryGetValue(remarkId, out var depIssue)
+                            => $"Dependent Issue is {depIssue.Ticket}",
+                        "Removed Dependencies from Issue" when remarkIssues.TryGetValue(remarkId, out var depIssue)
+                            => $"Dependent Issue is {depIssue.Ticket}",
+                        _ => actionModel.Remark
+                    };
+                }
+                else
+                {
+                    actionModel.Remark = action.ActionType switch
+                    {
+                        "Added Milestone to Issue" or "Removed Milestone from issue"
+                            => $"{action.ActionType.Split(' ')[0]} Milestone is {action.Remark}",
+                        "Issue Forwarded To" =>
+                            $"Forwarded to {GetForwardIssue(action.Remark).ForwardToDept.DepartmentName}",
+                        _ => actionModel.Remark
+                    };
+                }
+
+                model.Actions.Add(actionModel);
+            }
+        }
+
+
+        private record IssueTypeCounts(int Total, int Closed, int Open);
     }
 }

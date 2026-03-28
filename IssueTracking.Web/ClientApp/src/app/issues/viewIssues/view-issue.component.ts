@@ -597,6 +597,7 @@ export class ViewIssueComponent implements OnInit {
       this.router.navigate(['/LIT/settings/view-basic-solution', id]);
   }
   public goBack() {
-    this.router.navigate(['LIT/issues']);
+    //this.router.navigate(['LIT/issues']);
+    window.history.back();
   }
 }

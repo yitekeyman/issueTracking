@@ -1,3 +1,5 @@
 is_global = true
 build_property.RootNamespace = IssueTracking.Domain
-build_property.ProjectDir = C:\Users\user\Documents\issueTracking\IssueTracking.Domain\
+build_property.ProjectDir = C:\Code\Personal\IssueTracking\IssueTracking.Domain\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

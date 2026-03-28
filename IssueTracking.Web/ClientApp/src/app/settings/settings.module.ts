@@ -21,6 +21,9 @@ import {
   MinViewBasicSolutionComponent
 } from "./basicSolution/viewBasicSolution/min-view-basic-solution/min-view-basic-solution.component";
 import {ViewMilestoneComponent} from "./milestone/view_milestone/view_milestone.component";
+import {UnscrConsolidationComponent} from "./unscrConsolidation/unscrConsolidation.component";
+import {ShowUNSCRConsolidationComponent} from "./unscrConsolidation/showUNSCRConsolidation/showUNSCRConsolidation.component";
+import {AppModule} from "../app.module";
 
 
 @NgModule({
@@ -45,7 +48,9 @@ import {ViewMilestoneComponent} from "./milestone/view_milestone/view_milestone.
     EditMilestoneComponent,
     ViewMilestoneComponent,
     PhoneBookComponent,
-    MinViewBasicSolutionComponent
+    MinViewBasicSolutionComponent,
+    UnscrConsolidationComponent,
+    ShowUNSCRConsolidationComponent,
   ]
 })
 export class SettingsModule{

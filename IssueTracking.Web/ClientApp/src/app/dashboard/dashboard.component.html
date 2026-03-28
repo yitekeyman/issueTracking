@@ -74,7 +74,7 @@
             </div>
             <div class="row">
 
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card-counter primary" *ngIf="dashboard!=null">
                         <i class="fa fa-exclamation-circle"></i>
                         <span class="count-numbers">{{dashboard.total}}</span>
@@ -82,19 +82,19 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="card-counter danger">
+                <div class="col-md-4">
+                    <div class="card-counter danger" *ngIf="dashboard!=null">
                         <i class="fa fa-ticket"></i>
                         <span class="count-numbers">{{dashboard.open}}</span>
-                        <span class="count-name">Open Issues</span>
+                        <span class="count-name">Open & Pending Issues</span>
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="card-counter success">
+                <div class="col-md-4">
+                    <div class="card-counter success" *ngIf="dashboard!=null">
                         <i class="fa fa-check-circle"></i>
                         <span class="count-numbers">{{dashboard.closed}}</span>
-                        <span class="count-name">Closed Issues</span>
+                        <span class="count-name">Closed & Cancelled Issues</span>
                     </div>
                 </div>
             </div>

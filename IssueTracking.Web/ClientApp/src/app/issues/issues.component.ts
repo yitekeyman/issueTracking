@@ -1,4 +1,4 @@
-﻿import {Component, OnInit,} from "@angular/core";
+﻿import {Component, OnDestroy, OnInit,} from "@angular/core";
 import {
   IssueFilterParameter,
   IssueListReturnModel,
@@ -13,13 +13,14 @@ import dialog from "../components/dialog";
 import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {EditIssueComponent} from "./editIssue/edit-issue.component";
 import swal from "sweetalert2";
+import {Subject, takeUntil} from "rxjs";
 
 
 @Component({
   selector: 'app-issues',
   templateUrl: './issues.component.html'
 })
-export class IssuesComponent implements OnInit {
+export class IssuesComponent implements OnInit, OnDestroy {
 
   public filterParameter: IssueFilterParameter;
 
@@ -54,8 +55,10 @@ export class IssuesComponent implements OnInit {
 
   public loggedInUserId='';
   public loggedUserName='';
-
+  private destroy$ = new Subject<void>();
   constructor(public fb: FormBuilder, public issueTrackingService: IssueTrackingService, public pagerService: PagerService, public router: Router, public activeRouting: ActivatedRoute) {
+
+
     this.queryParams = {
       state: 3,
       query: '',
@@ -65,6 +68,9 @@ export class IssuesComponent implements OnInit {
       priority: 0,
       assignee: '',
       sort: 1
+    }
+    if (this.activeRouting.snapshot.params['state']) {
+      this.queryParams.state = this.activeRouting.snapshot.params['state'];
     }
     this.loggedIdDept = localStorage.getItem('departmentId');
     this.loggedInUserId=localStorage.getItem('userId');
@@ -109,30 +115,44 @@ export class IssuesComponent implements OnInit {
   ngOnInit() {
     this.getAllIssues();
   }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public getAllIssues() {
+    // Reset state
     this.isEdit = false;
     this.isAdd = false;
-    this.isMasterSel=false;
-    this.haveSelected=false;
+    this.isMasterSel = false;
+    this.haveSelected = false;
     this.selectedIssue = null;
-    this.selectedIssueLists.caseList=[];
-    this.memberArray.controls=[];
+    this.selectedIssueLists.caseList = [];
+    this.memberArray.clear(); // ✅ Proper FormArray reset
+
     dialog.loading();
-    this.issueTrackingService.GetAllIssues(this.queryParams).subscribe(res => {
-      this.issuesList = res;
-      for (const z of this.issuesList.issueList) {
-        this.memberForm = this.fb.group({memberId: ['']});
-        this.memberArray.push(this.memberForm);
-      }
-      if (this.issuesList.issueList?.length > 0)
-        this.setPage(1);
-      dialog.close();
-    }, e => {
-      swal({
-        type: 'error', title: 'Oops...', text: e.message
+
+    this.issueTrackingService.GetAllIssues(this.queryParams)
+      .pipe(takeUntil(this.destroy$)) // ✅ Unsubscribe
+      .subscribe({
+        next: (res) => {
+          this.issuesList=null;
+          this.issuesList = res;
+          // Create new FormGroup for each item
+          this.issuesList.issueList?.forEach(() => {
+            const memberForm = this.fb.group({ memberId: [''] }); // ✅ New instance
+            this.memberArray.push(memberForm);
+          });
+          if (this.issuesList.issueList?.length > 0) this.setPage(1);
+          dialog.close();
+        },
+        error: (e) => {
+          dialog.close(); // Ensure dialog closes
+          swal({
+            type: 'error', title: 'Oops...', text: e.message
+          });
+        }
       });
-    })
   }
 
   public setPage(page: number) {
@@ -191,7 +211,7 @@ export class IssuesComponent implements OnInit {
     }else if (type == "branch") {
       this.queryParams.branch = id;
     }
-
+    this.router.navigate(['LIT/issues', this.queryParams.state]);
     this.getAllIssues();
   }
 

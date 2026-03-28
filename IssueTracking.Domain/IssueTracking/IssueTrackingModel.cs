@@ -24,8 +24,8 @@ namespace IssueTracking.Domain.IssueTracking
         public long Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public LookupModel RaisedSystem = new LookupModel();
-        public IList<BasicSolutionReturn> IssueSolution = new List<BasicSolutionReturn>();
+        public LookupModel RaisedSystem { get; set; } = new LookupModel();
+        public IList<BasicSolutionReturn> IssueSolution { get; set; } = new List<BasicSolutionReturn>();
     }
 
     
@@ -35,8 +35,8 @@ namespace IssueTracking.Domain.IssueTracking
         public long IssueTypeId { get; set; }
         public string SolutionQuery { get; set; }
         public string SolutionDescription { get; set; }
-        public IList<ResourceModel> SolutionResource = new List<ResourceModel>();
-        public IssueTypeReturn IssueType = new IssueTypeReturn();
+        public IList<ResourceModel> SolutionResource { get; set; } = new List<ResourceModel>();
+        public IssueTypeReturn IssueType { get; set; } = new IssueTypeReturn();
     }
 
     public class BasicSolutionModel
@@ -45,7 +45,7 @@ namespace IssueTracking.Domain.IssueTracking
         public long IssueTypeId { get; set; }
         public string SolutionQuery { get; set; }
         public string SolutionDescription { get; set; }
-        public IList<ResourceModel> SolutionResource = new List<ResourceModel>();
+        public IList<ResourceModel> SolutionResource { get; set; } = new List<ResourceModel>();
     }
 
     public class ResourceModel
@@ -62,7 +62,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string Name { get; set; }
         public string Description { get; set; }
         
-        public IList<IssueTypeList> IssueType = new List<IssueTypeList>();
+        public IList<IssueTypeList> IssueType { get; set; } = new List<IssueTypeList>();
     }
     
 
@@ -82,7 +82,7 @@ namespace IssueTracking.Domain.IssueTracking
         public long? IssuePriority { get; set; }
         public string ForwardTo { get; set; }
         
-        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
+        public IList<ResourceModel> IssueResource { get; set; }= new List<ResourceModel>();
     }
 
     public class IssueListReturn
@@ -94,31 +94,31 @@ namespace IssueTracking.Domain.IssueTracking
         public string OtherIssue { get; set; }
         public string PolicyNo { get; set; }
         public string BranchId { get; set; }
-        public DepartmentSchemaModel ForwardTo = new DepartmentSchemaModel();
+        public DepartmentSchemaModel ForwardTo { get; set; }= new DepartmentSchemaModel();
         public string IssueDescription { get; set; }
 
-        public EmployeeModel IssueRequestedBy = new EmployeeModel();
+        public EmployeeModel IssueRequestedBy { get; set; }= new EmployeeModel();
         public DateTime IssueRequestedDate { get; set; }
-        public EmployeeModel IssueRespondBy= new EmployeeModel();
+        public EmployeeModel IssueRespondBy { get; set; }= new EmployeeModel();
         public DateTime IssueRespondDate { get; set; }
-        public EmployeeModel IssueClosedBy = new EmployeeModel();
+        public EmployeeModel IssueClosedBy { get; set; }= new EmployeeModel();
         public DateTime IssueClosedDate { get; set; }
-        public LookupModel IssuePriority = new LookupModel();
-        public LookupModel IssueStatus = new LookupModel();
-        public IList<AssignIssueReturnModel> Assigns = new List<AssignIssueReturnModel>();
-        public IList<LabelList> Labels = new List<LabelList>();
-        public IList<IssueMilestonesReturn> Milestones = new List<IssueMilestonesReturn>();
-        public IList<IssueDependenciesReturn> Dependencies = new List<IssueDependenciesReturn>();
-        public TimeTrackerReturn TimeTracker = new TimeTrackerReturn();
-        public DueDateReturn DueDate = new DueDateReturn();
+        public LookupModel IssuePriority { get; set; }= new LookupModel();
+        public LookupModel IssueStatus { get; set; }= new LookupModel();
+        public IList<AssignIssueReturnModel> Assigns { get; set; }= new List<AssignIssueReturnModel>();
+        public IList<LabelList> Labels { get; set; }= new List<LabelList>();
+        public IList<IssueMilestonesReturn> Milestones { get; set; }= new List<IssueMilestonesReturn>();
+        public IList<IssueDependenciesReturn> Dependencies { get; set; }= new List<IssueDependenciesReturn>();
+        public TimeTrackerReturn TimeTracker { get; set; }= new TimeTrackerReturn();
+        public DueDateReturn DueDate { get; set; }= new DueDateReturn();
         public string Ticket { get; set; }
-        public IList<EmployeeModel> Participant = new List<EmployeeModel>();
-        public IList<IssueCommentReturnModel> Comments = new List<IssueCommentReturnModel>();
-        public IList<ActionTrackerReturnModel> ActionTrackers = new List<ActionTrackerReturnModel>();
+        public IList<EmployeeModel> Participant { get; set; }= new List<EmployeeModel>();
+        public IList<IssueCommentReturnModel> Comments { get; set; }= new List<IssueCommentReturnModel>();
+        public IList<ActionTrackerReturnModel> ActionTrackers { get; set; }= new List<ActionTrackerReturnModel>();
         public int NoOfEdit { get; set; }
-        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
-        public IssueTypeReturn IssueType = new IssueTypeReturn();
-        public IList<IssueForwardModelReturn> Forwards = new List<IssueForwardModelReturn>();
+        public IList<ResourceModel> IssueResource { get; set; }= new List<ResourceModel>();
+        public IssueTypeReturn IssueType { get; set; }= new IssueTypeReturn();
+        public IList<IssueForwardModelReturn> Forwards { get; set; }= new List<IssueForwardModelReturn>();
 
 
     }
@@ -133,8 +133,8 @@ namespace IssueTracking.Domain.IssueTracking
     {
         public string Id { get; set; }
         public string IssueId { get; set; }
-        public EmployeeModel AssignedTo = new EmployeeModel();
-        public EmployeeModel AssignedBy = new EmployeeModel();
+        public EmployeeModel AssignedTo { get; set; }= new EmployeeModel();
+        public EmployeeModel AssignedBy { get; set; }= new EmployeeModel();
         public DateTime AssignDate { get; set; }
     }
     public class LookupModel
@@ -168,14 +168,14 @@ namespace IssueTracking.Domain.IssueTracking
         public int PendingIssue { get; set; }
         public int CancelledIssue { get; set; }
 
-        public IList<IssueSearchModel> IssueList = new List<IssueSearchModel>();
+        public IList<IssueSearchModel> IssueList { get; set; }= new List<IssueSearchModel>();
     }
     public class IssueListReturnModel
     {
-        public IList<IssueListReturn> Opened = new List<IssueListReturn>();
-        public IList<IssueListReturn> Closed = new List<IssueListReturn>();
-        public IList<SideBarStat> UpperSideBarStats = new List<SideBarStat>();
-        public IList<SideBarStat> LowerSideBarStats = new List<SideBarStat>();
+        public IList<IssueListReturn> Opened { get; set; }= new List<IssueListReturn>();
+        public IList<IssueListReturn> Closed { get; set; }= new List<IssueListReturn>();
+        public IList<SideBarStat> UpperSideBarStats { get; set; }= new List<SideBarStat>();
+        public IList<SideBarStat> LowerSideBarStats { get; set; }= new List<SideBarStat>();
     }
 
     public class DepartmentSchemaModel
@@ -214,11 +214,11 @@ namespace IssueTracking.Domain.IssueTracking
         
         public string IssueComment { get; set; }
 
-        public EmployeeModel CommentedBy = new EmployeeModel();
+        public EmployeeModel CommentedBy { get; set; }= new EmployeeModel();
         
         public DateTime IssueCommentDate { get; set; }
         
-        public IList<ResourceModel> CommentResource = new List<ResourceModel>();
+        public IList<ResourceModel> CommentResource { get; set; }= new List<ResourceModel>();
         
     }
 
@@ -236,8 +236,8 @@ namespace IssueTracking.Domain.IssueTracking
 
     public class IssueCommentReturnModel
     {
-        public IssueCommentsModel Comment = new IssueCommentsModel();
-        public IList<ActionTrackerReturnModel> Actions = new List<ActionTrackerReturnModel>();
+        public IssueCommentsModel Comment { get; set; }= new IssueCommentsModel();
+        public IList<ActionTrackerReturnModel> Actions { get; set; }= new List<ActionTrackerReturnModel>();
     }
     
 
@@ -272,7 +272,7 @@ namespace IssueTracking.Domain.IssueTracking
 
     public class PatchActionModel
     {
-        public IList<string> CaseList = new List<string>();
+        public IList<string> CaseList { get; set; }= new List<string>();
         public string Remark { get; set; }
     }
 
@@ -280,7 +280,7 @@ namespace IssueTracking.Domain.IssueTracking
     {
         public string Id { get; set; }
         public string IssueId { get; set; }
-        public IssueSearchModel Issue = new IssueSearchModel();
+        public IssueSearchModel Issue { get; set; }= new IssueSearchModel();
         public DateTime ActionDate { get; set; }
         public EmployeeModel UserId { get; set; }
         public string ActionType { get; set; }
@@ -300,13 +300,13 @@ namespace IssueTracking.Domain.IssueTracking
 
     public class RaisedSystem
     {
-        public DashboardStat System = new DashboardStat();
-        public IList<DashboardStat> IssueType = new List<DashboardStat>();
+        public DashboardStat System { get; set; }= new DashboardStat();
+        public IList<DashboardStat> IssueType { get; set; }= new List<DashboardStat>();
     }
     public class DashboardModel
     {
-        public IList<ActionTrackerModel> Actions = new List<ActionTrackerModel>();
-        public IList<RaisedSystem> RaisedSystems = new List<RaisedSystem>();
+        public IList<ActionTrackerModel> Actions { get; set; } = new List<ActionTrackerModel>();
+        public IList<RaisedSystem> RaisedSystems { get; set; } = new List<RaisedSystem>();
         public int Open { get; set; }
         public int Closed { get; set; }
         public int Total { get; set; }
@@ -326,7 +326,7 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime DueDate { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public EmployeeModel CreatedBy = new EmployeeModel();
+        public EmployeeModel CreatedBy { get; set; }= new EmployeeModel();
         public DateTime CreatedDate { get; set; }
     }
 
@@ -338,23 +338,23 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime DueDate { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public EmployeeModel AddedBy = new EmployeeModel();
+        public EmployeeModel AddedBy { get; set; }= new EmployeeModel();
         public DateTime AddedOn { get; set; }
     }
 
     public class IssueDependenciesReturn
     {
         public string Id { get; set; }
-        public IssueSearchModel DependentIssue = new IssueSearchModel();
-        public EmployeeModel AddedBy = new EmployeeModel();
+        public IssueSearchModel DependentIssue { get; set; }= new IssueSearchModel();
+        public EmployeeModel AddedBy { get; set; }= new EmployeeModel();
         public DateTime AddedOn { get; set; }
     }
 
     public class TimeTrackerReturn
     {
-        public TimeTrackerModel MyActiveTask = new TimeTrackerModel();
-        public IList<TimeTrackerModel> ActiveTask = new List<TimeTrackerModel>();
-        public IList<TimeTrackerModel> EndedTask = new List<TimeTrackerModel>();
+        public TimeTrackerModel MyActiveTask { get; set; }= new TimeTrackerModel();
+        public IList<TimeTrackerModel> ActiveTask { get; set; }= new List<TimeTrackerModel>();
+        public IList<TimeTrackerModel> EndedTask { get; set; }= new List<TimeTrackerModel>();
     }
     public class TimeTrackerModel
     {
@@ -363,7 +363,7 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime StartTime { get; set;}
         public DateTime EndTime { get; set;}
         public string Status { get; set;}
-        public EmployeeModel Owner = new EmployeeModel();
+        public EmployeeModel Owner { get; set; }= new EmployeeModel();
     }
 
     public class ActionResultReturn
@@ -384,7 +384,7 @@ namespace IssueTracking.Domain.IssueTracking
         public DateTime EndDate { get; set; }
         public DateTime DueDate { get; set; }
         public string Status { get; set; }
-        public EmployeeModel SetBy = new EmployeeModel();
+        public EmployeeModel SetBy { get; set; }= new EmployeeModel();
     }
     
     public class NotificationModel
@@ -393,7 +393,7 @@ namespace IssueTracking.Domain.IssueTracking
         public int TitleId { get; set; }
         public string NotificationTitle { get; set; }
         public string NotificationDetail { get; set; }
-        public EmployeeModel NotificationFrom = new EmployeeModel();
+        public EmployeeModel NotificationFrom { get; set; }= new EmployeeModel();
         public string NotificationTo { get; set; }
         public DateTime NotificationDate { get; set; }
         public bool Status { get; set; }
@@ -410,7 +410,7 @@ namespace IssueTracking.Domain.IssueTracking
     {
         public int UnreadNotification { get; set; }
         public int ReadNotification { get; set; }
-        public IList<NotificationModel> Notifications = new List<NotificationModel>();
+        public IList<NotificationModel> Notifications { get; set; }= new List<NotificationModel>();
     }
 
     public class IssueForwardModel
@@ -420,7 +420,7 @@ namespace IssueTracking.Domain.IssueTracking
         public string ForwardToDept { get; set; }
         public string ForwardToEmp { get; set; }
         public string Remark { get; set; }
-        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
+        public IList<ResourceModel> IssueResource { get; set; }= new List<ResourceModel>();
 
     }
     
@@ -428,12 +428,12 @@ namespace IssueTracking.Domain.IssueTracking
     {
         public string Id { get; set; }
         public string IssueId { get; set; }
-        public EmployeeModel ForwardFrom = new EmployeeModel();
-        public DepartmentSchemaModel ForwardToDept = new DepartmentSchemaModel();
-        public EmployeeModel ForwardToEmp = new EmployeeModel();
+        public EmployeeModel ForwardFrom { get; set; }= new EmployeeModel();
+        public DepartmentSchemaModel ForwardToDept { get; set; }= new DepartmentSchemaModel();
+        public EmployeeModel ForwardToEmp { get; set; }= new EmployeeModel();
         public string Remark { get; set; }
         public DateTime ForwardDate { get; set; }
-        public IList<ResourceModel> IssueResource = new List<ResourceModel>();
+        public IList<ResourceModel> IssueResource { get; set; }= new List<ResourceModel>();
 
     }
 }

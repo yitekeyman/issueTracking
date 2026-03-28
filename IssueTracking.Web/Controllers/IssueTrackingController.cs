@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using IssueTracking.Datas.Entities;
 using IssueTracking.Domain.Infrastructure;
 using IssueTracking.Domain.IssueTracking;
+using IssueTracking.Domain.UnscrConsolidation;
 using IssueTracking.Web.Extentions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,10 +22,12 @@ namespace IssueTracking.Web.Controllers
         }
 
         private readonly IIssueTrackingFacade _iIssueTrackingFacade;
+        private readonly IUNSCRConsolidationFacade _iUNSCRConsolidationFacade;
 
-        public IssueTrackingController(IIssueTrackingFacade iIssueTrackingFacade)
+        public IssueTrackingController(IIssueTrackingFacade iIssueTrackingFacade, IUNSCRConsolidationFacade iUNSCRConsolidationFacade)
         {
             _iIssueTrackingFacade = iIssueTrackingFacade;
+            _iUNSCRConsolidationFacade = iUNSCRConsolidationFacade;
         }
 
         [HttpPost]
@@ -381,11 +385,12 @@ namespace IssueTracking.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetAllIssues([FromBody] QueryParams model)
+        public async Task<IActionResult> GetAllIssues([FromBody] QueryParams model)
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetAllIssues(GetSession(), model));
+                var results = await _iIssueTrackingFacade.GetAllIssues(GetSession(), model);
+                return Json(results);
             }
             catch (Exception e)
             {
@@ -620,7 +625,8 @@ namespace IssueTracking.Web.Controllers
         {
             try
             {
-                return Json(_iIssueTrackingFacade.GetDashboard(GetSession(), model));
+                var result = _iIssueTrackingFacade.GetDashboard(GetSession(), model);
+                return Json(result);
             }
             catch (Exception e)
             {
@@ -972,6 +978,35 @@ namespace IssueTracking.Web.Controllers
                 if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
                     stCode = 400;
                 return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> SearchMoneyLaundry([FromQuery] string searchParm)
+        {
+            try
+            {
+               var results=await _iUNSCRConsolidationFacade.SearchAsync(GetSession(), searchParm);
+               return Json(results);
+            }
+            catch (Exception e)
+            {
+                var stCode = 500;
+                if (e.Message.Equals("Value cannot be null.\r\nParameter name: value"))
+                    stCode = 400;
+                return StatusCode(stCode, new { message = e.Message });
+            }
+        }
+        [HttpGet]
+        public IActionResult GetUNSCRConsolidatedList([FromQuery] long id)
+        {
+            try
+            {
+                return Json(_iUNSCRConsolidationFacade.GetUNSCRConsolidatedList(GetSession(), id));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new {message = e.Message});
             }
         }
     }

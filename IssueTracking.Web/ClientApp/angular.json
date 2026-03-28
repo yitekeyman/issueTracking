@@ -144,10 +144,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "now-ui-dashboard-angular:build:production"
+              "buildTarget": "now-ui-dashboard-angular:build:production"
             },
             "development": {
-              "browserTarget": "now-ui-dashboard-angular:build:development"
+              "buildTarget": "now-ui-dashboard-angular:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -155,7 +155,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "now-ui-dashboard-angular:build"
+            "buildTarget": "now-ui-dashboard-angular:build"
           }
         },
         "test": {

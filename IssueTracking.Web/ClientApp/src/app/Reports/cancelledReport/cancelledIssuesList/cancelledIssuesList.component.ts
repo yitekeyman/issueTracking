@@ -1,6 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {ReportService} from "../../../_Services/report.service";
-import dialog from "../../../_Shared/dialog";
+import dialog from "../../../_shared/dialog";
 import swal from "sweetalert2";
 import {DatePipe} from "@angular/common";
 // @ts-ignore

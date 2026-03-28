@@ -1,0 +1,139 @@
+
+
+<div class="breadcomb-area" >
+  <div class="container">
+    <div class="breadcomb-list">
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+          <div class="breadcomb-wp">
+            <div class="breadcomb-icon">
+              <i class="notika-icon notika-app"></i>
+            </div>
+            <div class="breadcomb-ctn">
+              <h2>UNSCR Consolidation Lists</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <div class="form-group ic-cmp-int form-elet-mg">
+              <div class="">
+                <input type="text" class="form-control" placeholder="Search UNSCR Compilation..."
+                       [(ngModel)]="searchParams" (keyup.enter)="search(searchParams)"/>
+              </div>
+              <div class="form-ic-cmp">
+                <button class="btn btn-success" (click)="search(searchParams)" [disabled]="isLoading">
+                  <span *ngIf="!isLoading">Search</span>
+                  <span *ngIf="isLoading">
+                  <i class="fa fa-spinner fa-spin"></i> Searching...
+                </span>
+                </button>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="invoice-area" *ngIf="results!=null">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" >
+        <div class="data-table-list wizard-wrap-int" style="min-height: 450px;">
+
+            <div class="table-responsive" style="min-height: 400px;">
+              <table id="data-table-basic" class="table table-striped" >
+                <thead>
+                <tr>
+
+                  <th></th>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Title</th>
+                  <th>Designation</th>
+                  <th>Nationality</th>
+                  <th>Passport_No</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody *ngIf="results?.length>0"   style="min-height: 300px">
+                <tr *ngFor="let row of pagedItems; index as i"  >
+                  <td>{{(pager.currentPage - 1) * pager.pageSize + i + 1}}</td>
+                  <td>{{row.code}}</td>
+                  <td>{{row.name}}</td>
+                  <td>{{row.title}}</td>
+                  <td>{{row.designation}}</td>
+                  <td>{{row.nationality}}</td>
+                  <td>{{row.passportNo}}</td>
+                  <td>{{row.type}}</td>
+                  <td>{{row.status}}</td>
+                  <td class="text-right">
+                    <div class="btn-group">
+
+                      <button class="btn btn-sm "  data-toggle="modal" data-target="#showDetailsModal" type="button" (click)="seeUNConsolidation(row.id)"><i class="fa fa-eye"></i>
+                        Details
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                </tbody>
+                <tbody *ngIf="results?.length==0">
+                <tr>
+                  <td colspan="10" class="text-center">
+                    <div class="panel-body" style="text-align: center; margin: 50px; height: 250px">
+                      <div style="text-align: center; font-size: 50px; color:#00c292"><i
+                        class="fa fa-exclamation-triangle"></i></div>
+                      <h2>Sorry</h2>
+                      <p>There is no record found</p>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+
+              </table>
+
+            </div>
+
+
+          <div class="wizard-action-pro" *ngIf="results?.length > 0">
+            <div class="fixed-table-pagination" style="border-top: 2px solid #eee;">
+              <div class="pagination-container">
+                <ul class="pagination" *ngIf="pager.pages && pager.pages.length">
+                  <li [ngClass]="{disabled: pager.currentPage === 1}" class="page-item">
+                    <a [routerLink]="" class="page-link" (click)="setPage(1)" [attr.disabled]="pager.currentPage === 1 ? true : null"><i class="fa fa-arrows-v"></i><i
+                      class="fa fa-chevron-left"></i></a>
+                  </li>
+                  <li [ngClass]="{disabled: pager.currentPage === 1}" class="page-item">
+                    <a [routerLink]="" class="page-link" (click)="setPage(pager.currentPage - 1)" [attr.disabled]="pager.currentPage === 1 ? true : null"><i
+                      class="fa fa-chevron-left"></i></a>
+                  </li>
+                  <li *ngFor="let page of pager.pages" [ngClass]="{'active': pager.currentPage === page}" class="page-item">
+                    <a [routerLink]="" class="page-link" (click)="setPage(page)">
+                      <span class="page-number">{{page}}</span>
+                    </a>
+                  </li>
+                  <li [ngClass]="{disabled: pager.currentPage === pager.totalPages}" class="page-item">
+                    <a [routerLink]="" class="page-link" (click)="setPage(pager.currentPage + 1)" [attr.disabled]="pager.currentPage === pager.totalPages ? true : null"><i
+                      class="fa fa-chevron-right"></i></a>
+                  </li>
+                  <li [ngClass]="{disabled: pager.currentPage === pager.totalPages}" class="page-item">
+                    <a [routerLink]="" class="page-link" (click)="setPage(pager.totalPages)" [attr.disabled]="pager.currentPage === pager.totalPages ? true : null"><i
+                      class="fa fa-chevron-right"></i><i class="fa fa-arrows-v"></i></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="showDetailsModal" role="dialog">
+      <app_showUNSCRConsolidation *ngIf="showDetails"  (closeModal)="closeModal()"  [selectedId]="selectedId" ></app_showUNSCRConsolidation>
+    </div>
+  </div>
+</div>
+
+

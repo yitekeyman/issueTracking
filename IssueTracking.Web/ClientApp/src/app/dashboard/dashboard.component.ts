@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import dialog from "../components/dialog";
 import swal from "sweetalert2";
 import {DatePipe} from "@angular/common";
+import {finalize} from "rxjs";
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +18,13 @@ export class DashboardComponent implements OnInit {
 
   public departmentList: any[];
   public selectedDepartment: any;
-  public dashboard: any | null;
+  public dashboard: {
+    actions?: any[],
+    raisedSystems?: any[],
+    open?: number,
+    closed?: number,
+    total?: number
+  } | null = null;
 
   constructor(public issueTrackingService: IssueTrackingService, public router: Router, public activeRouting: ActivatedRoute) {
 
@@ -41,16 +48,27 @@ export class DashboardComponent implements OnInit {
 
   public getDashboard() {
     dialog.loading();
-    this.issueTrackingService.GetDashboard(this.selectedDepartment).subscribe(res => {
-      this.dashboard = res;
-      dialog.close();
-    }, e => {
-      swal({
-        type: 'error', title: 'Oops...', text: e.message
-      });
-    })
-  }
+    this.issueTrackingService.GetDashboard(this.selectedDepartment)
+      .pipe(finalize(() => dialog.close()))
+      .subscribe({
+        next: (res: any) => {
+          this.dashboard = {
+            actions: res.actions || [],       // Note PascalCase to match C# fields
+            raisedSystems: res.raisedSystems || [],
+            open: res.open,
+            closed: res.closed,
+            total: res.total
+          };
 
+          console.log('Dashboard data:', this.dashboard); // Verify data structure
+        },
+        error: (e) => {
+          swal({
+            type: 'error', title: 'Oops...', text: e.message
+          });
+        }
+      });
+  }
   convertDate(date: any) {
     let currentDate = new Date();
     let dates = new Date(date);

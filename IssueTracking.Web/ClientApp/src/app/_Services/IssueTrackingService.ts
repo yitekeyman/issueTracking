@@ -4,7 +4,7 @@ import {ApiServices} from "./api.service";
 import {min, Observable, ReplaySubject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {HttpClient} from '@angular/common/http';
-import {IssueListModel, IssueListRetModel, IssueListReturnModel} from "../_model/IssueTrackingModel";
+import {IssueListModel, IssueListRetModel, IssueListReturnModel, MoneyLaundry} from "../_model/IssueTrackingModel";
 import {DatePipe} from "@angular/common";
 import {END} from "@angular/cdk/keycodes";
 
@@ -370,6 +370,12 @@ export class IssueTrackingService {
   public PatchMakeReadNotification(model: any) {
     return this.apiService.post('IssueTracking/PatchMakeReadNotification', model);
   }
+  public SearchMoneyLaundry(model:any){
+    return this.apiService.get(`IssueTracking/SearchMoneyLaundry?searchParm=${model}`);
+  }
+  public getUnscrConsolidation(model: any) {{
+    return this.apiService.get(`IssueTracking/GetUNSCRConsolidatedList?id=${model}`);
+  }}
   public logout() {
     return this.apiService.post('IssueTracking/Logout', null).subscribe(res => {
       localStorage.removeItem('username');

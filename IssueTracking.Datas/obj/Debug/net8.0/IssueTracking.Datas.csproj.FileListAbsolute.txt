@@ -1,0 +1,13 @@
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\bin\Debug\net8.0\IssueTracking.Datas.deps.json
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\bin\Debug\net8.0\IssueTracking.Datas.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\bin\Debug\net8.0\IssueTracking.Datas.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.csproj.AssemblyReference.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.GeneratedMSBuildEditorConfig.editorconfig
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.AssemblyInfoInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.AssemblyInfo.cs
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.csproj.CoreCompileInputs.cache
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.sourcelink.json
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\refint\IssueTracking.Datas.dll
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\IssueTracking.Datas.pdb
+C:\Code\Personal\IssueTracking\IssueTracking.Datas\obj\Debug\net8.0\ref\IssueTracking.Datas.dll

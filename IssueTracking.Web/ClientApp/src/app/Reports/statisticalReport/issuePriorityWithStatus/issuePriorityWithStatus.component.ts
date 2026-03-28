@@ -1,10 +1,11 @@
 import {Component, OnInit} from "@angular/core";
 import {ReportService} from "../../../_Services/report.service";
-import dialog from "../../../_Shared/dialog";
+
 import swal from "sweetalert2";
 import {DatePipe} from "@angular/common";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import dialog from "../../../_shared/dialog";
 // @ts-ignore
 
 @Component({
@@ -28,7 +29,7 @@ export class IssuePriorityWithStatusComponent implements OnInit{
     hasTotalTitle(): boolean {
         return this.reportResult?.reportList?.some((rep: any) => rep.title === 'Total');
     }
-    
+
     public generateReport() {
         dialog.loading();
         this.reportService.IssueStatusIssuePriorityStatistics(this.dateFrom, this.dateTo).subscribe(res => {

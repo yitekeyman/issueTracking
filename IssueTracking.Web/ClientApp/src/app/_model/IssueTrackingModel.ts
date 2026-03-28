@@ -146,3 +146,20 @@ export interface PhoneBookSearchParam{
   name:string;
   departmentId:string;
 }
+export interface MoneyLaundry {
+  id: number;
+  code: string;
+  name: string;
+  title: string;
+  designation: string;
+  dob?: Date;
+  pob: string;
+  nationality: string;
+  passportNo: string;
+  nationalId: string;
+  address: string;
+  otherInfo: string;
+  listedOn?: Date;
+  modifiedOn?: Date;
+  status: boolean;
+}
